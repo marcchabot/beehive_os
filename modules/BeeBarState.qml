@@ -69,10 +69,3 @@ QtObject {
         osdReceived(type, parseInt(value))
     }
 }
-alue))
-    }
-}
-))
-    }
-}
-}
