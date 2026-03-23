@@ -61,11 +61,11 @@ selection {{ background-color: {PALETTE['accent']}; color: {PALETTE['bg']}; }}
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as f:
             f.write(css)
-    print("✅ GTK 3/4 : Thunar est maintenant harmonisé en Jaune Miel.")
+    print("✅ GTK 3/4: Thunar is now harmonized in Honey Yellow.")
 
 def sync_icons():
     # Si Papirus est installé, on change la couleur des dossiers
-    print("🐝 Tentative de changement de couleur des icônes Papirus...")
+    print("🐝 Attempting to change Papirus icon color...")
     
     # On essaie d'abord 'amber' (plus miel) puis 'yellow'
     # On cible explicitement Papirus-Dark car c'est ton thème actif
@@ -79,7 +79,7 @@ def sync_icons():
                 # Commande : papirus-folders -c <couleur> -t <thème>
                 subprocess.run(["papirus-folders", "-c", color, "-t", theme], 
                              check=True, capture_output=True)
-                print(f"✅ Icônes : Dossiers {theme} passés en {color.upper()} ! 🍯")
+                print(f"✅ Icons: Folders {theme} changed to {color.upper()}! 🍯")
                 success = True
                 break
             except subprocess.CalledProcessError:
@@ -87,13 +87,13 @@ def sync_icons():
         if success: break
     
     if not success:
-        print("⚠️ Impossible de changer la couleur. Vérifie que 'Papirus-Icon-Theme' est installé.")
+        print("⚠️ Cannot change color. Check if 'Papirus-Icon-Theme' is installed.")
 
 def main():
-    print("🐝 Synchronisation Bee-Hive pour Thunar...")
+    print("🐝 Bee-Hive sync for Thunar...")
     sync_gtk()
     sync_icons()
-    print("\n🍯 Thunar est maintenant prêt ! Relance Thunar pour voir le résultat.")
+    print("\n🍯 Thunar is now ready! Relaunch Thunar to see the result.")
 
 if __name__ == "__main__":
     main()

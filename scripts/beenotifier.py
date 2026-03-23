@@ -17,12 +17,12 @@ class NotificationServer(dbus.service.Object):
     def __init__(self):
         bus_name = dbus.service.BusName('org.freedesktop.Notifications', bus=dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, '/org/freedesktop/Notifications')
-        print("BeeNotifier: En ligne et à l'écoute! 🐝🔔")
+        print("BeeNotifier: Online and listening! 🐝🔔")
 
     @dbus.service.method('org.freedesktop.Notifications', in_signature='susssasa{sv}i', out_signature='u')
     def Notify(self, app_name, replaces_id, app_icon, summary, body, actions, hints, expire_timeout):
         # On ignore l'ID de remplacement pour simplifier
-        print(f"BeeNotifier: Reçu de {app_name} -> {summary}")
+        print(f"BeeNotifier: Received from {app_name} -> {summary}")
         
         # On transmet à Quickshell via IPC
         # La commande: qs ipc call root dispatchNotification "Titre" "Message" "Icon"
@@ -35,7 +35,7 @@ class NotificationServer(dbus.service.Object):
             ]
             subprocess.run(cmd, check=False)
         except Exception as e:
-            print(f"BeeNotifier: Erreur IPC -> {e}")
+            print(f"BeeNotifier: IPC Error -> {e}")
 
         return 0 # Notification ID (bidon ici)
 
@@ -62,4 +62,4 @@ if __name__ == '__main__':
         loop = GLib.MainLoop()
         loop.run()
     except Exception as e:
-        print(f"BeeNotifier: Impossible de démarrer (un autre serveur tourne déjà?) -> {e}")
+        print(f"BeeNotifier: Cannot start (another server already running?) -> {e}")
