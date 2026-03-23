@@ -1,7 +1,7 @@
 # 🐝 Bee-Hive OS
 
-> Environnement de bureau (*ricing*) ambitieux basé sur **Quickshell** (QML/Qt6) pour **CachyOS + Hyprland**.
-> Esthétique "Nexus" : jaune miel 🍯 sur noir profond, animations organiques, glassmorphism et lueur "BeeAura".
+> Ambitious desktop environment (*ricing*) based on **Quickshell** (QML/Qt6) for **CachyOS + Hyprland**.
+> "Nexus" aesthetic: honey yellow 🍯 on deep black, organic animations, glassmorphism, and "BeeAura" glow.
 
 ---
 
@@ -9,137 +9,153 @@
 
 ```
 beehive_os/
-├── shell.qml                 # Point d'entrée ShellRoot (Global UI)
-├── theme.json                # Centralisation de l'identité visuelle
-├── user_config.json          # Configuration utilisateur persistante
-├── assets/                   # Fonds d'écran 4K et ressources graphiques
+├── shell.qml                 # Main entry point ShellRoot (Global UI)
+├── theme.json                # Visual identity centralization
+├── user_config.json          # Persistent user configuration
+├── assets/                   # 4K wallpapers and graphical assets
 └── modules/
-    ├── BeeBar.qml            # Barre de statut (CPU, RAM, NET, DISK) + Stealth Mode
-    ├── BeeBarState.qml       # Singleton de communication inter-fenêtres
-    ├── BeeApps.qml           # Gestionnaire d'applications (Scan & Favoris)
-    ├── BeeConfig.qml         # Singleton config (météo, dashboard, thème, persistence)
-    ├── BeeNotify.qml         # Système de notifications "In-Shell"
-    ├── BeeWallpaper.qml      # Gestionnaire de fonds d'écran dynamiques
-    ├── BeeWeather.qml        # Météo universelle (Open-Meteo, sans clé API)
-    ├── BeeEvents.qml         # Connecteur d'événements (Calendar/Work)
-    ├── BeeCorners.qml        # Rendu organique des coins de l'écran
-    ├── BeeSettings.qml       # Panneau de configuration (GUI)
-    ├── BeeStudio.qml         # Éditeur visuel d'alvéoles (Full persistence)
-    ├── BeeSearch.qml         # Lanceur d'applications (Fuzzy search + Pins)
-    ├── BeeVibe.qml           # Visualiseur audio discret (Cava integration)
-    ├── BeePower.qml          # Gestion alimentation (Éteindre, Reboot, Lock, Exit)
-    ├── MayaDash.qml          # Tableau de bord hexagonal (Nid d'abeille)
-    └── Clock.qml             # Widget horloge analogique + digitale
+    ├── BeeBar.qml            # Status bar (CPU, RAM, NET, DISK) + Stealth Mode
+    ├── BeeBarState.qml       # Inter-window communication singleton
+    ├── BeeApps.qml           # Application manager (Scan & Favorites)
+    ├── BeeConfig.qml         # Config singleton (weather, dashboard, theme, persistence)
+    ├── BeeNotify.qml         # "In-Shell" notification system
+    ├── BeeWallpaper.qml      # Dynamic wallpaper manager
+    ├── BeeWeather.qml        # Universal weather (Open-Meteo, no API key)
+    ├── BeeEvents.qml         # Events connector (Calendar/Work)
+    ├── BeeCorners.qml        # Organic screen corner rendering
+    ├── BeeSettings.qml       # Configuration panel (GUI)
+    ├── BeeStudio.qml         # Visual cell editor (Full persistence)
+    ├── BeeSearch.qml         # Application launcher (Fuzzy search + Pins)
+    ├── BeeVibe.qml           # Discreet audio visualizer (Cava integration)
+    ├── BeePower.qml          # Power management (Shutdown, Reboot, Lock, Exit)
+    ├── MayaDash.qml          # Hexagonal dashboard (Honeycomb)
+    └── Clock.qml             # Analog + digital clock widget
 ```
 
 ---
 
 ## 📦 Modules
 
-### BeeWeather — Météo Universelle 🌦️ *(v0.6.3)*
-- **Sans clé API** : Utilise Open-Meteo pour des données météo précises
-- **Coordonnées centralisées** : `BeeConfig.weatherLat/Lon` — détection automatique pour Blainville et Mont-Tremblant
-- **Persistance** : Ville, unité et langue sauvegardées dans `user_config.json`
-- **Synchronisé** : Plus de divergence entre le widget et la BeeBar
+### BeeWeather — Universal Weather 🌦️ *(v0.6.3)*
+- **No API Key**: Uses Open-Meteo for accurate weather data
+- **Centralized Coordinates**: `BeeConfig.weatherLat/Lon`
+- **Persistence**: City, unit, and language saved in `user_config.json`
+- **Synchronized**: No more divergence between the widget and the BeeBar
 
 ### BeeAura Notifications & OSD 🔔 *(v1.0.0)*
-- **100% Natif** : Système de notifications et OSD (Volume/Luminosité) intégré sans dépendances externes.
-- **Zéro Capture Souris** : Utilisation de la propriété officielle `mask: Region {}` pour un click-through total sur les zones transparentes.
-- **BeeNotify** : Support complet des notifications système via `beenotifier.py`.
-- **BeeOSD** : Feedback visuel élégant pour le matériel (Clavier/Souris Razer).
+- **100% Native**: Notification system and OSD (Volume/Brightness) integrated without external dependencies.
+- **Zero Mouse Capture**: Uses the official `mask: Region {}` property for full click-through on transparent areas.
+- **BeeNotify**: Full support for system notifications via `beenotifier.py`.
+- **BeeOSD**: Elegant visual feedback for hardware (Razer Keyboard/Mouse).
 
-### BeePower — Gestion de l'alimentation ⚡ *(v1.0.0)*
-- **Interface BeeAura** : Menu dédié accessible via ⚡ dans la BeeBar
-- **Actions Système** : Éteindre, Redémarrer, Déconnexion, Verrouillage
+### BeePower — Power Management ⚡ *(v1.0.0)*
+- **BeeAura Interface**: Dedicated menu accessible via ⚡ in the BeeBar
+- **System Actions**: Shutdown, Reboot, Logout, Lock
 
-### BeeSearch — Lanceur d'applications 🔍 *(v1.0.0)*
-- **Scan système** : Parse les fichiers `.desktop` via Python
-- **Favoris 📌** : Jusqu'à 4 apps épinglées, persistance dans `user_config.json`
+### BeeSearch — Application Launcher 🔍 *(v1.0.0)*
+- **System Scan**: Parses `.desktop` files via Python
+- **Favorites 📌**: Up to 4 pinned apps, persistent in `user_config.json`
 
-### BeeVibe — Visualiseur audio 🎵 *(v0.8.4)*
-- **Barres d'égaliseur** intégrées au bas de chaque alvéole MayaDash
-- **Moteur Cava** : Capture audio système via Pipewire/Pulse
+### BeeVibe — Audio Visualizer 🎵 *(v0.8.4)*
+- **Equalizer Bars** integrated at the bottom of each MayaDash cell
+- **Cava Engine**: Captures system audio via Pipewire/Pulse
 
-### BeeStudio — Éditeur visuel 🎨 *(v0.8.4)*
-- **Édition Live** : Icônes, titres et actions des alvéoles avec prévisualisation immédiate
-- **Sauvegarde** dans `user_config.json`
+### BeeStudio — Visual Editor 🎨 *(v0.8.4)*
+- **Live Editing**: Icons, titles, and cell actions with immediate preview
+- **Persistence** directly in `user_config.json`
 
 ### Stealth Mode 🫥 *(v0.8.3)*
-- **Auto-Hide** : BeeBar s'efface après 3 secondes d'inactivité
-- **Sentinelle** : Fenêtre invisible en haut détecte le survol de souris
+- **Auto-Hide**: BeeBar fades out after 3 seconds of inactivity
+- **Sentinel**: Invisible window at the top detects mouse hover
 
-### BeeMotion — Parallaxe 3D 🌊 *(v0.8.0)*
-- Inclinaison 3D de la MayaDash en fonction de la position de la souris
+### BeeMotion — 3D Parallax 🌊 *(v0.8.0)*
+- 3D tilting of the MayaDash based on mouse position
 
-### BeeBar — Barre de statut ⚡
-- CPU, RAM, NET, DISK en temps réel
-- Barres de progression avec animations et glow adaptatif
+### BeeBar — Status Bar ⚡
+- CPU, RAM, NET, DISK in real-time
+- Progress bars with animations and adaptive glow
 
-### BeeEvents — Hub d'événements 📅 *(v0.7.0)*
-- Centralise les événements calendrier et alertes professionnelles
+### BeeEvents — Events Hub 📅 *(v0.7.0)*
+- Centralizes calendar events and professional alerts
 
 ---
 
 ## 🎨 Design System — BeeAura (Nexus)
 
-| Élément       | Valeur                              |
+| Element       | Value                               |
 |---------------|-------------------------------------|
-| Or primaire   | `#FFB81C` (Honey Gold)             |
-| Fond sombre   | `rgba(0.05, 0.05, 0.07, 0.95)`     |
+| Primary Gold  | `#FFB81C` (Honey Gold)             |
+| Dark Background| `rgba(0.05, 0.05, 0.07, 0.95)`     |
 | Surface       | `rgba(255, 255, 255, 0.03)`         |
 | Animations    | `Easing.InOutCubic` / `OutBack`    |
 
 ---
 
-## 🚀 Utilisation
+## 🚀 Usage
 
 ```bash
-# Prérequis : CachyOS + Hyprland + Quickshell (Qt6) + Cava
+# Requirements: CachyOS + Hyprland + Quickshell (Qt6) + Cava + Python-DBus
 QML_XHR_ALLOW_FILE_READ=1 quickshell -p ~/beehive_os
 ```
 
-### 🐝 Mise à jour de la Ruche
-Pour mettre à jour sans perdre vos réglages personnels (alvéoles, météo, apps favorites) :
+## 🛠️ Installation
+
+For an automatic installation on CachyOS:
+
+```bash
+cd ~/beehive_os
+chmod +x scripts/install_beehive_os.sh
+./scripts/install_beehive_os.sh
+```
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT** license. See the [LICENSE](LICENSE) file for details.
+
+---
+
+### 🐝 Updating the Hive
+To update without losing your personal settings (cells, weather, pinned apps):
 1. `git pull`
 2. `python3 scripts/bee_config_merge.py`
-3. Redémarrer la ruche : `qs ipc call root restart` (ou relancer Quickshell)
+3. Restart the hive: `qs ipc call root restart` (or restart Quickshell)
 
 ---
 
 ## 📋 Roadmap
 
-### ✅ Complété
+### ✅ Completed
 
 - [x] BeeBar — CPU/RAM/NET/DISK + Stealth Mode
-- [x] BeeNotify — Notifications stylisées
+- [x] BeeNotify — Stylized notifications
 - [x] BeeCorners — Fake Rounding engine
-- [x] BeeWallpaper — Transitions fluides + Assets 4K
-- [x] BeeSettings — Interface de configuration
-- [x] BeeWeather — Météo universelle sans clé API (v0.6.1)
-- [x] **BeeWeather sync fix** — Blainville/Tremblant coordonnées centralisées (v0.6.3)
-- [x] BeeEvents — Connecteurs calendrier (v0.7.0)
-- [x] BeeMotion — Parallaxe 3D (v0.8.0)
-- [x] BeeStudio — Éditeur visuel complet (v0.8.4)
-- [x] BeeSearch — Scan système + Favoris 📌 (v0.8.4)
-- [x] BeeVibe — Visualiseur audio Cava (v0.8.4)
-- [x] Stealth Mode — Auto-masquage avec sentinelle (v0.8.3)
-- [x] BeePower — Gestion alimentation ⚡ (v0.8.5)
-- [x] **BeeAura Notifications & OSD** — Système 100% natif Quickshell (v0.8.6)
-- [x] Nectar Sync 🍯 — Adaptation automatique du thème au wallpaper (v0.6.2)
+- [x] BeeWallpaper — Fluid transitions + 4K Assets
+- [x] BeeSettings — Configuration interface
+- [x] BeeWeather — Universal weather without API key (v0.6.1)
+- [x] BeeEvents — Calendar connectors (v0.7.0)
+- [x] BeeMotion — 3D Parallax (v0.8.0)
+- [x] BeeStudio — Full visual editor (v0.8.4)
+- [x] BeeSearch — System scan + Favorites 📌 (v0.8.4)
+- [x] BeeVibe — Cava audio visualizer (v0.8.4)
+- [x] Stealth Mode — Auto-hide with sentinel (v0.8.3)
+- [x] BeePower — Power management ⚡ (v0.8.5)
+- [x] **BeeAura Notifications & OSD** — 100% native Quickshell system (v0.8.6)
+- [x] Nectar Sync 🍯 — Automatic theme adaptation to wallpaper (v0.6.2)
 
-### 🔄 En cours / À venir
+### 🔄 In Progress / Upcoming
 
-- [ ] Effets sonores Bee-Hive (discrets et élégants)
-- [ ] Mode "Focus" vs Mode "Dashboard"
-- [ ] Optimisation des performances (Quickshell profiling)
-- [ ] Tests finaux sur CachyOS (Marc)
-- [ ] Widget notifications persistantes
-- [ ] Intégration agenda pharmacie / Google Calendar
+- [ ] Bee-Hive sound effects (discreet and elegant)
+- [ ] "Focus" Mode vs "Dashboard" Mode
+- [ ] Performance optimization (Quickshell profiling)
+- [ ] Persistent notifications widget
+- [ ] Multilingual Support (i18n)
 
 ---
 
-## 🐝 Crédits
+## 🐝 Credits
 
-Développé avec amour par **Maya** 🐝✨ & **Marc**.
+Developed with love by **Maya** 🐝✨ & **Marc**.
 
-*"La ruche ne dort jamais, elle s'optimise."* 🍯🚀
+*"The hive never sleeps, it optimizes."* 🍯🚀
