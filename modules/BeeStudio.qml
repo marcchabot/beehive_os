@@ -92,7 +92,7 @@ Item {
                     Behavior on color { ColorAnimation { duration: 120 } }
                     Text {
                         anchors { verticalCenter: parent.verticalCenter; left: parent.left; right: parent.right; margins: 8 }
-                        text: parent.parent.parent.label
+                        text: wallHover.parent.label || ""
                         color: "white"; font.pixelSize: 9
                         elide: Text.ElideMiddle
                         opacity: wallHover.hov ? 0.90 : 0
