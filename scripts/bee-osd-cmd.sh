@@ -5,12 +5,12 @@
 #
 # Usage :
 #   bee-osd-cmd.sh volume   toggle       # Mute/Unmute
-#   bee-osd-cmd.sh volume   5%+          # Volume +5 %
-#   bee-osd-cmd.sh volume   5%-          # Volume -5 %
-#   bee-osd-cmd.sh brightness 5%+        # Écran +5 %
-#   bee-osd-cmd.sh brightness 5%-        # Écran -5 %
-#   bee-osd-cmd.sh kbd      5%+          # Clavier +5 %
-#   bee-osd-cmd.sh kbd      5%-          # Clavier -5 %
+#   bee-osd-cmd.sh volume   5%+          # Volume +5%
+#   bee-osd-cmd.sh volume   5%-          # Volume -5%
+#   bee-osd-cmd.sh brightness 5%+        # Screen +5%
+#   bee-osd-cmd.sh brightness 5%-        # Screen -5%
+#   bee-osd-cmd.sh kbd      5%+          # Keyboard +5%
+#   bee-osd-cmd.sh kbd      5%-          # Keyboard -5%
 # ═══════════════════════════════════════════════════════════════
 
 TYPE="$1"

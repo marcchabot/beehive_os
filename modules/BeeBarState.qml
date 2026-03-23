@@ -3,21 +3,21 @@ import QtQuick
 import Quickshell
 
 // ═══════════════════════════════════════════════════════════
-// BeeBarState.qml — État partagé du Stealth Mode
-// Singleton accessible depuis shell.qml ET BeeBar.qml
+// BeeBarState.qml — Shared Stealth Mode state
+// Singleton accessible from shell.qml AND BeeBar.qml
 // ═══════════════════════════════════════════════════════════
 QtObject {
     id: root
 
-    // true  = la sentinelle a détecté la souris → forcer l'affichage
-    // false = état normal (géré par BeeBar)
+    // true  = sentinel detected mouse → force display
+    // false = normal state (handled by BeeBar)
     property bool forceVisible: false
 
-    // Signaux inter-fenêtres pour ouvrir Settings/Studio depuis BeeSearch
+    // Inter-window signals to open Settings/Studio from BeeSearch
     property bool openSettingsRequested: false
     property bool openStudioRequested:   false
 
-    // États synchronisés entre BeeSettings (Layer Top) et widgets (Background)
+    // Synchronized states between BeeSettings (Layer Top) and widgets (Background)
     property bool cornersActive: true
     property bool motionActive:  true
     property bool vibeActive:    false
@@ -25,15 +25,15 @@ QtObject {
     // Mode Focus 🎯 (masque Dashboard, Events, Horloge)
     property bool focusActive: false
 
-    // Visibilité du menu d'alimentation BeePower
+    // BeePower menu visibility
     property bool powerVisible: false
 
-    // ─── Système de Notifications BeeAura 🔔 ─────────────────
+    // ─── BeeAura Notification System 🔔 ───────────────────────
     signal notificationReceived(string title, string body, string icon)
 
-    // ─── Historique des Notifications (max 50) ────────────────
-    // Note: ListModel ne peut pas être enfant direct d'un QtObject (Singleton).
-    // On utilise un tableau JS (property var) — compatible avec ListView model.
+    // ─── Notification History (max 50) ────────────────────────
+    // Note: ListModel cannot be a direct child of a QtObject (Singleton).
+    // We use a JS array (property var) — compatible with ListView model.
     property var notificationHistory: []
     readonly property int maxHistorySize: 50
 
@@ -61,11 +61,18 @@ QtObject {
         notificationHistory = updated
     }
 
-    // ─── Système OSD BeeAura 🎚️ ──────────────────────────────
-    // type : "volume" | "mute" | "brightness" | "kbd"
-    // value : 0-100 (ignoré si type === "mute")
+    // ─── BeeAura OSD System 🎚️ ────────────────────────────────
+    // type: "volume" | "mute" | "brightness" | "kbd"
+    // value: 0-100 (ignored if type === "mute")
     signal osdReceived(string type, int value)
     function showOSD(type, value) {
         osdReceived(type, parseInt(value))
     }
+}
+alue))
+    }
+}
+))
+    }
+}
 }

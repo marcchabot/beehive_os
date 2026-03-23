@@ -14,7 +14,7 @@ Rectangle {
     height: 680
     radius: 24
 
-    // ─── Raccourci pratique vers les traductions settings ──────
+    // ─── Handy shortcut to settings translations ──────
     property var _s: BeeConfig.tr.settings || {}
 
     // ─── Fond et bordure adaptatifs au thème ──────────────────
@@ -30,7 +30,7 @@ Rectangle {
     Behavior on color        { ColorAnimation  { duration: 600 } }
     Behavior on border.color { ColorAnimation  { duration: 600 } }
 
-    // ─── Signaux vers shell.qml ────────────────────────────────
+    // ─── Signals to shell.qml ────────────────────────────────
     signal cornersToggled(bool val)
     signal motionToggled(bool val)
     signal vibeToggled(bool val)
@@ -136,7 +136,7 @@ Rectangle {
                 // ── BeePalette — v0.5 : transitions animées ───
                 SettingRow {
                     label:   settingsRoot._s.palette   || "BeePalette 🎨"
-                    desc:    settingsRoot._s.palette_desc || "Basculer entre HoneyDark 🌙 et HoneyLight ☀️."
+                    desc:    settingsRoot._s.palette_desc || "Switch between HoneyDark 🌙 and HoneyLight ☀️."
                     checked: BeeTheme.mode === "HoneyLight"
                     onToggled: (val) => {
                         BeeTheme.setMode(val ? "HoneyLight" : "HoneyDark")
@@ -147,7 +147,7 @@ Rectangle {
                 // ── Nectar Sync 🍯 — v0.6 ─────────────────────
                 SettingRow {
                     label:   settingsRoot._s.nectar_sync      || "Nectar Sync 🍯"
-                    desc:    settingsRoot._s.nectar_sync_desc  || "Adaptation automatique du thème au fond d'écran choisi."
+                    desc:    settingsRoot._s.nectar_sync_desc  || "Automatic theme adaptation to the chosen wallpaper."
                     checked: BeeTheme.nectarSync
                     onToggled: (val) => {
                         BeeTheme.nectarSync = val
@@ -158,7 +158,7 @@ Rectangle {
                 // ── BeeMotion ─────────────────────────────────
                 SettingRow {
                     label:   settingsRoot._s.motion      || "BeeMotion (Parallax)"
-                    desc:    settingsRoot._s.motion_desc  || "Effet de profondeur 3D sur la MayaDash."
+                    desc:    settingsRoot._s.motion_desc  || "3D depth effect on the MayaDash."
                     checked: BeeConfig.motionMode
                     onToggled: (val) => {
                         BeeConfig.motionMode = val
@@ -170,7 +170,7 @@ Rectangle {
                 // ── BeeVibe ───────────────────────────────────
                 SettingRow {
                     label:   settingsRoot._s.vibe      || "BeeVibe (Audio)"
-                    desc:    settingsRoot._s.vibe_desc  || "Visualiseur audio intégré aux alvéoles."
+                    desc:    settingsRoot._s.vibe_desc  || "Audio visualizer integrated into the cells."
                     checked: BeeConfig.vibeMode
                     onToggled: (val) => settingsRoot.vibeToggled(val)
                 }
@@ -189,7 +189,7 @@ Rectangle {
                 // ── Focus Mode ─────────────────────────────────
                 SettingRow {
                     label:   settingsRoot._s.focus_mode  || "Mode Focus 🎯"
-                    desc:    settingsRoot._s.focus_desc   || "Masque le dashboard, l'horloge et les événements."
+                    desc:    settingsRoot._s.focus_desc   || "Hides the dashboard, clock, and events."
                     checked: BeeConfig.focusMode
                     onToggled: (val) => {
                         BeeConfig.focusMode = val
@@ -201,7 +201,7 @@ Rectangle {
                 // ── Stealth Mode ──────────────────────────────
                 SettingRow {
                     label:   settingsRoot._s.stealth_mode  || "Stealth Mode 🫥"
-                    desc:    settingsRoot._s.stealth_desc   || "BeeBar se masque après 3s d'inactivité."
+                    desc:    settingsRoot._s.stealth_desc   || "BeeBar hides after 3s of inactivity."
                     checked: BeeConfig.stealthMode
                     onToggled: (val) => settingsRoot.stealthToggled(val)
                 }
@@ -256,7 +256,7 @@ Rectangle {
                 // ── Effets Sonores ────────────────────────────
                 SettingRow {
                     label:   settingsRoot._s.sound      || "Effets Sonores"
-                    desc:    settingsRoot._s.sound_desc  || "Activer les sons d'ambiance de la ruche."
+                    desc:    settingsRoot._s.sound_desc  || "Enable hive ambient sounds."
                     checked: true
                 }
 
@@ -331,4 +331,8 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
         }
     }
+}
+
+    }
+}
 }

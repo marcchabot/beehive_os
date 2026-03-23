@@ -32,19 +32,19 @@ def sync_gtk():
 @define-color selected_bg_color {PALETTE['accent']};
 @define-color selected_fg_color {PALETTE['bg']};
 
-/* Thunar : Sélection et Focus */
+/* Thunar: Selection and Focus */
 .view:selected, .view:selected:focus {{
     background-color: {PALETTE['accent']};
     color: {PALETTE['bg']};
 }}
 
-/* Thunar : Barre latérale (Sidepane) */
+/* Thunar: Sidebar (Sidepane) */
 .sidebar row:selected {{
     background-color: {PALETTE['accent']};
     color: {PALETTE['bg']};
 }}
 
-/* Thunar : Barre de chemin (Pathbar) */
+/* Thunar: Path bar (Pathbar) */
 .path-bar button:checked {{
     background-color: {PALETTE['accent']};
     color: {PALETTE['bg']};
@@ -64,11 +64,11 @@ selection {{ background-color: {PALETTE['accent']}; color: {PALETTE['bg']}; }}
     print("✅ GTK 3/4: Thunar is now harmonized in Honey Yellow.")
 
 def sync_icons():
-    # Si Papirus est installé, on change la couleur des dossiers
+    # If Papirus is installed, change folder color
     print("🐝 Attempting to change Papirus icon color...")
     
-    # On essaie d'abord 'amber' (plus miel) puis 'yellow'
-    # On cible explicitement Papirus-Dark car c'est ton thème actif
+    # Try 'amber' (more honey-like) first, then 'yellow'
+    # Explicitly target Papirus-Dark as it's the active theme
     themes = ["Papirus-Dark", "Papirus"]
     colors = ["amber", "yellow"]
     
@@ -76,7 +76,7 @@ def sync_icons():
     for theme in themes:
         for color in colors:
             try:
-                # Commande : papirus-folders -c <couleur> -t <thème>
+                # Command: papirus-folders -c <color> -t <theme>
                 subprocess.run(["papirus-folders", "-c", color, "-t", theme], 
                              check=True, capture_output=True)
                 print(f"✅ Icons: Folders {theme} changed to {color.upper()}! 🍯")

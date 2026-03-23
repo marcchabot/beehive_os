@@ -6,7 +6,7 @@ import Quickshell.Io
 // BeeSearch.qml — Lanceur BeeAura ultra-performant 🐝🔍
 // Sprint v0.8.1 — Phase 3 Advanced
 // • Fuzzy search avec scoring (prefix > substring > subsequence)
-// • Scan des .desktop système via Python (sans dépendance externe)
+// • System .desktop scan via Python (no external dependency)
 // • Design BeeAura : Glow actif pulsé, Glassmorphism, animations
 // • Clavier complet : ↑↓ Tab, ↵, Esc + navigation wrap-around
 // ═══════════════════════════════════════════════════════════════
@@ -37,7 +37,7 @@ Item {
     readonly property bool scanning: BeeApps.scanning
     readonly property var  _appPool: BeeApps.pool
 
-    // ─── Favoris (max 4) ──────────────────────────────────────
+    // ─── Favorites (max 4) ──────────────────────────────────────
     property var pinnedCmds: BeeApps.pinnedCmds
 
     function isPinned(cmd) {
@@ -167,11 +167,11 @@ Item {
         if (!cmd) return
 
         // Actions spéciales
-        if (cmd === "__settings__") { console.log("BeeSearch: openSettings émis"); beeSearch.openSettings(); beeSearch.hide(); return }
+        if (cmd === "__settings__") { console.log("BeeSearch: openSettings emitted"); beeSearch.openSettings(); beeSearch.hide(); return }
         if (cmd === "__studio__")   { beeSearch.openStudio();   beeSearch.hide(); return }
 
-        // Émettre la commande vers shell.qml qui gère le lancement
-        // après destruction du Loader (timer dans shell.qml, hors du Loader)
+        // Emit command to shell.qml which handles the launch
+        // after Loader destruction (timer in shell.qml, outside the Loader)
         beeSearch.launchRequested(cmd)
     }
 
@@ -269,7 +269,7 @@ Item {
             anchors { top: parent.top; left: parent.left; right: parent.right; margins: 14 }
             spacing: 0
 
-            // ─── Zone de saisie ───────────────────────────────
+            // ─── Input Area ───────────────────────────────
             Item {
                 width: parent.width
                 height: 70
@@ -330,7 +330,7 @@ Item {
                 }
             }
 
-            // Séparateur accent
+            // Accent separator
             Rectangle {
                 width: parent.width; height: 1
                 color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
@@ -361,7 +361,7 @@ Item {
                     property bool hovered:    false
                     property bool pinned:     appPinned
 
-                    // Fond sélection / hover
+                    // Selection / hover background
                     Rectangle {
                         anchors { fill: parent; leftMargin: 2; rightMargin: 6; topMargin: 1; bottomMargin: 1 }
                         radius: 13
@@ -372,7 +372,7 @@ Item {
                                 : "transparent"
                         Behavior on color { ColorAnimation { duration: 110 } }
 
-                        // Barre d'accent gauche (sélection active)
+                        // Left accent bar (active selection)
                         Rectangle {
                             anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                             width: 3; height: 28; radius: 2
@@ -417,7 +417,7 @@ Item {
                         }
                     }
 
-                    // ─── Bouton Pin 📌 (apparaît au hover) ───────────────
+                    // ─── Pin Button 📌 (appears on hover) ───────────────
                     Rectangle {
                         id: _pinBtn
                         z: 2
@@ -499,4 +499,6 @@ Item {
     onShownChanged: {
         if (shown) filterApps(searchInput.text)
     }
+}
+   }
 }

@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
-// BeeNotify.qml — Système de notifications Bee-Hive OS 🐝🔔
+// BeeNotify.qml — Bee-Hive OS notification system 🐝🔔
 // Animations organiques, glassmorphism, positionnement intelligent
 // ═══════════════════════════════════════════════════════════════
 
@@ -13,7 +13,7 @@ Item {
     width: 400
     height: 600
 
-    // ─── Écouteur Global (BeeBarState) ─────────────────────
+    // ─── Global Listener (BeeBarState) ─────────────────────
     Connections {
         target: BeeBarState
         function onNotificationReceived(title, body, icon) {
@@ -21,12 +21,12 @@ Item {
         }
     }
 
-    // ─── Modèle de données ────────────────────────────────
+    // ─── Data model ────────────────────────────────────────
     ListModel {
         id: notifyModel
     }
 
-    // ─── Fonction d'affichage ─────────────────────────────
+    // ─── Display function ──────────────────────────────────
     function show(title, body, icon = "🐝", type = "info") {
         notifyModel.insert(0, {
             "title": title,
@@ -43,11 +43,11 @@ Item {
         interval: 5000
         running: true
         repeat: true
-        onTriggered: show("Alerte Système", "La ruche est en pleine activité !", "🍯", "info")
+        onTriggered: show("System Alert", "The hive is buzzing with activity!", "🍯", "info")
     }
     */
 
-    // ─── Liste des notifications ──────────────────────────
+    // ─── Notification list ─────────────────────────────────
     ListView {
         id: notifyList
         anchors.fill: parent
@@ -60,12 +60,12 @@ Item {
             width: notifyRoot.width
             height: 90
             radius: 16
-            clip: true   // ← empêche la barre de durée de déborder des coins arrondis
+            clip: true   // ← prevents duration bar from overflowing rounded corners
             color: BeeTheme.glassBg
             border.color: type === "warning" ? "#FF4444" : BeeTheme.glassBorder
             border.width: 1
 
-            // Ombre portée (BeeAura style)
+            // Drop shadow (BeeAura style)
             layer.enabled: true
             layer.effect: MultiEffect {
                 shadowEnabled: true
@@ -74,7 +74,7 @@ Item {
                 shadowVerticalOffset: 3
             }
 
-            // ─── Animation d'entrée/sortie ─────────────────
+            // ─── Entry/exit animation ──────────────────────
             ListView.onAdd: SequentialAnimation {
                 NumberAnimation { target: notifyBox; property: "x"; from: 450; to: 0; duration: 500; easing.type: Easing.OutBack }
             }
@@ -91,7 +91,7 @@ Item {
                 anchors.margins: 15
                 spacing: 15
 
-                // Icône avec cercle lueur
+                // Icon with glow circle
                 Item {
                     width: 50; height: 50
                     Rectangle {
@@ -99,7 +99,7 @@ Item {
                         radius: 25
                         color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
                         
-                        // Emoji (si l'icône est courte)
+                        // Emoji (if icon is short)
                         Text {
                             visible: icon.length <= 4
                             text: icon
@@ -107,7 +107,7 @@ Item {
                             anchors.centerIn: parent
                         }
 
-                        // Image / Icône système (si c'est un chemin ou nom d'icône)
+                        // Image / System icon (if it's a path or icon name)
                         Image {
                             visible: icon.length > 4
                             anchors.fill: parent

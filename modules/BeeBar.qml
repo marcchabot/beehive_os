@@ -6,8 +6,8 @@ import QtQuick.Layouts
 import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
-// BeeBar.qml — Barre de statut Bee-Hive OS 🐝
-// v1.6.1 : Nettoyage définitif des ancres (Zero Warning Edition)
+// BeeBar.qml — Bee-Hive OS Status Bar 🐝
+// v1.6.1 : Final anchor cleanup (Zero Warning Edition)
 // ═══════════════════════════════════════════════════════════════
 
 Rectangle {
@@ -63,7 +63,7 @@ Rectangle {
         shadowVerticalOffset: 3
     }
 
-    // ─── Propriétés système ────────────────────────────────
+    // ─── System properties ─────────────────────────────────
     property string cpuUsage: "—"
     property string ramUsed: "—"
     property string ramTotal: "—"
@@ -180,7 +180,7 @@ Rectangle {
         anchors.rightMargin: 20
         spacing: 12
 
-        // ─── GAUCHE ───
+        // ─── LEFT ───
         RowLayout {
             spacing: 12
             Layout.alignment: Qt.AlignVCenter
@@ -345,3 +345,9 @@ Rectangle {
 
     Rectangle { width: parent.width; height: 1; anchors.bottom: parent.bottom; color: BeeTheme.accent; opacity: 0.3 }
 }
+
+
+ 0.3 }
+}
+
+

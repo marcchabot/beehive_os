@@ -2,8 +2,8 @@ import Quickshell
 import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
-// BeeCorners.qml — Coins d'écran arrondis (Fake Rounding) 🐝📱
-// Ajoute une bordure organique à l'écran pour un look Premium
+// BeeCorners.qml — Rounded screen corners (Fake Rounding) 🐝📱
+// Adds an organic border to the screen for a Premium look
 // ═══════════════════════════════════════════════════════════════
 
 Item {

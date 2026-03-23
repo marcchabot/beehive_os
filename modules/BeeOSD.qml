@@ -65,7 +65,7 @@ Item {
         id: osdAnim
 
         onStopped: {
-            console.log("BeeOSD: Animation terminée, émission signal")
+            console.log("BeeOSD: Animation complete, emitting signal")
             osd.animationComplete()
         }
 

@@ -9,11 +9,11 @@ import Quickshell.Io
 
 Item {
     id: beeVibe
-    visible: false   // composant de données pur, pas de rendu propre
+    visible: false   // pure data component, no visual rendering
 
     // ─── API publique ───────────────────────────────────────────
     property bool active: false
-    // 8 valeurs normalisées 0.0–1.0, une par alvéole
+    // 8 normalized values 0.0–1.0, one per cell
     property var barValues: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     // ─── État interne ───────────────────────────────────────────
@@ -39,7 +39,7 @@ Item {
             "exec cava -p \"$tmp\""
         ]
 
-        // Lecture ligne par ligne (une ligne = une trame de 8 valeurs)
+        // Read line by line (one line = a frame of 8 values)
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: (line) => {
@@ -94,4 +94,7 @@ Item {
             barValues = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         }
     }
+}
+}
+
 }

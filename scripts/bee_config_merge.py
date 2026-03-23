@@ -22,21 +22,21 @@ def merge_config(local_path, template_path):
         print(f"❌ Error reading JSON: {e}")
         return
 
-    # Champs à préserver absolument (données utilisateur)
+    # Fields to preserve absolutely (user data)
     preserve_keys = ['dashboard', 'pinned_apps', 'weather', 'lang', 'theme']
     
-    # Créer le nouveau config basé sur le template (pour avoir les nouvelles structures)
+    # Create new config based on template (to get new structures)
     new_cfg = template_cfg.copy()
     
-    # Restaurer les données perso
+    # Restore personal data
     for key in preserve_keys:
         if key in local_cfg:
             new_cfg[key] = local_cfg[key]
             print(f"✅ Restored key: {key}")
 
-    # Cas particulier : ne pas écraser la version du template si elle est plus récente
+    # Special case: don't overwrite template version if it's newer
     if 'version' in local_cfg and 'version' in template_cfg:
-        # On garde la version du template car c'est une mise à jour
+        # Keep template version since this is an upgrade
         print(f"🚀 Upgrading to version: {template_cfg['version']}")
 
     # Sauvegarder
@@ -53,7 +53,7 @@ def merge_config(local_path, template_path):
         print(f"❌ Error writing: {e}")
 
 if __name__ == "__main__":
-    # Chemins relatifs au dossier beehive_os
+    # Paths relative to beehive_os directory
     home = os.path.expanduser("~")
     base_dir = os.path.join(home, "beehive_os")
     
@@ -61,3 +61,4 @@ if __name__ == "__main__":
     template = os.path.join(base_dir, "user_config.example.json")
     
     merge_config(local, template)
+)

@@ -51,7 +51,7 @@ ShellRoot {
             BeeConfig.saveConfig()
         }
         function testOSD() {
-            console.log("TEST OSD - Fonction appelée!")
+            console.log("TEST OSD - Function called!")
             BeeBarState.showOSD("volume", 50)
         }
         // ─── BeeAura Notifications (relayé depuis beenotifier.py) ──

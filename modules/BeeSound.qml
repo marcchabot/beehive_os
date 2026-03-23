@@ -5,7 +5,7 @@ import Quickshell.Io
 // ═══════════════════════════════════════════════════════════════
 // BeeSound.qml — Singleton effets sonores Bee-Hive OS 🐝🔊
 // Utilise pw-play (PipeWire) pour des sons discrets et élégants.
-// Fallback automatique sur les sons système freedesktop.
+// Automatic fallback to freedesktop system sounds.
 // Pool de 3 Process pour éviter les fuites mémoire.
 // ═══════════════════════════════════════════════════════════════
 
@@ -21,7 +21,7 @@ QtObject {
     readonly property string _sysBase:   "/usr/share/sounds/freedesktop/stereo/"
 
     // ── Table de résolution : nom logique → fichier son ──────────
-    // Priorité : assets/sounds/<name>.ogg, puis sons système.
+    // Priority: assets/sounds/<name>.ogg, then system sounds.
     readonly property var _soundMap: ({
         "dash_open":   "audio-volume-change.oga",
         "dash_close":  "audio-volume-change.oga",

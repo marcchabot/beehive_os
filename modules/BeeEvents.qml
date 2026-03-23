@@ -19,12 +19,12 @@ Item {
     width:  300
     height: eventsColumn.implicitHeight + 28
 
-    // ─── Données réelles — Chargées depuis JSON ────────────────
+    // ─── Real data — Loaded from JSON ──────────────────────────
     ListModel {
         id: eventsModel
     }
 
-    // ─── Propriété pour l'état hover du pied ──────────────────
+    // ─── Footer hover state property ──────────────────
     property bool footerHovered: false
 
     readonly property int maxEvents: 3
@@ -57,7 +57,7 @@ Item {
                         console.warn("BeeEvents: Erreur parsing JSON:", e);
                     }
                 } else {
-                    console.warn("BeeEvents: Erreur chargement events.json, status:", doc.status);
+                    console.warn("BeeEvents: events.json load error, status:", doc.status);
                 }
             }
         }
@@ -297,5 +297,12 @@ Item {
             NumberAnimation { target: beeEvents; property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
             NumberAnimation { target: beeEvents; property: "scale";   to: 1.0; duration: 500; easing.type: Easing.OutBack  }
         }
+    }
+}
+ }
+    }
+}
+}
+ }
     }
 }

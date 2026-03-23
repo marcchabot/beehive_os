@@ -21,7 +21,7 @@ Item {
     // ─── Dossier fonds d'écran ───────────────────────────────────
     property string wallpaperFolder: "/home/marc/Pictures/Wallpapers"
 
-    // ─── État sélection / édition (Alvéoles) ─────────────────────
+    // ─── Selection / editing state (Cells) ────────────────────────
     property int    selectedIndex:    -1
     property bool   editCustomizable: true
     property string editIcon:         ""
@@ -320,7 +320,7 @@ Item {
 
                     // ── Label section ────────────────────────
                     Text {
-                        text: "CATÉGORIES"
+                        text: "CATEGORIES"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.32)
                         font { pixelSize: 8; bold: true; letterSpacing: 2.2 }
                         Layout.leftMargin: 20
@@ -331,8 +331,8 @@ Item {
                     // ── Catégories ────────────────────────────
                     ListModel {
                         id: categoryModel
-                        ListElement { catIcon: "🍯"; catLabel: "Alvéoles";      catSub: "Cellules du dashboard" }
-                        ListElement { catIcon: "🖼";  catLabel: "Fonds d'écran"; catSub: "Bibliothèque & rotation" }
+                        ListElement { catIcon: "🍯"; catLabel: "Cells";      catSub: "Dashboard cells" }
+                        ListElement { catIcon: "🖼";  catLabel: "Wallpapers"; catSub: "Library "Bibliothèque & rotation" rotation" }
                         ListElement { catIcon: "🔔"; catLabel: "Historique";     catSub: "Journal des notifications" }
                     }
 
@@ -429,7 +429,7 @@ Item {
                                 }
                                 Text {
                                     visible: beeStudio._saveDirty
-                                    text: "● non sauvegardé"
+                                    text: "● unsaved"
                                     color: Qt.rgba(1.0, 0.75, 0.2, 0.70)
                                     font { pixelSize: 8; italic: true }
                                 }
@@ -474,13 +474,13 @@ Item {
                                 ColumnLayout {
                                     spacing: 1
                                     Text {
-                                        text: "Alvéoles"
+                                        text: "Cells"
                                         color: BeeTheme.accent
                                         font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
                                         Behavior on color { ColorAnimation { duration: 600 } }
                                     }
                                     Text {
-                                        text: "Éditeur de cellules du dashboard"
+                                        text: "Dashboard cell editor"
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                         font.pixelSize: 10
                                     }
@@ -525,7 +525,7 @@ Item {
                                             anchors.fill: parent; anchors.margins: 12; spacing: 7
 
                                             Text {
-                                                text: "ALVÉOLES"
+                                                text: "CELLS"
                                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                                 font { pixelSize: 9; bold: true; letterSpacing: 2 }
                                             }
@@ -566,7 +566,7 @@ Item {
                                                             }
                                                             Text {
                                                                 visible: model.customizable === false
-                                                                text: "🔒 protégée"; font.pixelSize: 8
+                                                                text: "🔒 protected"; font.pixelSize: 8
                                                                 color: Qt.rgba(1.0, 0.65, 0.2, 0.65)
                                                             }
                                                         }
@@ -602,7 +602,7 @@ Item {
                                                 }
                                             }
                                             Text {
-                                                text: "Sélectionnez une alvéole"
+                                                text: "Select a cell"
                                                 color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 }
                                                 Layout.alignment: Qt.AlignHCenter
                                                 Behavior on color { ColorAnimation { duration: 600 } }
@@ -625,7 +625,7 @@ Item {
                                                     ColumnLayout {
                                                         spacing: 2; Layout.fillWidth: true
                                                         Text {
-                                                            text: beeStudio.editTitle || "Alvéole"
+                                                            text: beeStudio.editTitle || "Cell"
                                                             color: BeeTheme.accent; font { bold: true; pixelSize: 15 }
                                                             elide: Text.ElideRight; Layout.fillWidth: true
                                                             Behavior on color { ColorAnimation { duration: 300 } }
@@ -664,16 +664,16 @@ Item {
                                                     }
                                                 }
 
-                                                FieldLabel { labelText: "ICÔNE" }
+                                                FieldLabel { labelText: "ICON" }
                                                 BeeField { id: iconField; placeholderText: "Emoji (ex: 🐝)"; onTextEdited: { if (!beeStudio._loading) beeStudio.editIcon = text } }
 
                                                 FieldLabel { labelText: "TITRE" }
-                                                BeeField { id: titleField; placeholderText: "Nom de l'alvéole"; onTextEdited: { if (!beeStudio._loading) beeStudio.editTitle = text } }
+                                                BeeField { id: titleField; placeholderText: "Cell name"; onTextEdited: { if (!beeStudio._loading) beeStudio.editTitle = text } }
 
                                                 FieldLabel { labelText: "SOUS-TITRE" }
-                                                BeeField { id: subtitleField; placeholderText: "Catégorie ou statut"; onTextEdited: { if (!beeStudio._loading) beeStudio.editSubtitle = text } }
+                                                BeeField { id: subtitleField; placeholderText: "Category or status"; onTextEdited: { if (!beeStudio._loading) beeStudio.editSubtitle = text } }
 
-                                                FieldLabel { labelText: "DÉTAIL" }
+                                                FieldLabel { labelText: "DETAIL" }
                                                 Rectangle {
                                                     Layout.fillWidth: true; height: 64; radius: 7
                                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, beeStudio.editCustomizable ? 0.07 : 0.03)
@@ -697,7 +697,7 @@ Item {
                                                 FieldLabel { labelText: "ACTION" }
                                                 BeeField { id: actionField; placeholderText: "none | app:nom | toggle:settings"; onTextEdited: { if (!beeStudio._loading) beeStudio.editAction = text } }
 
-                                                FieldLabel { labelText: "FOND D'ÉCRAN 🍯 (NECTAR SYNC)" }
+                                                FieldLabel { labelText: "WALLPAPER 🍯 (NECTAR SYNC)" }
                                                 RowLayout {
                                                     Layout.fillWidth: true; spacing: 8
                                                     WallCard { width: 110; height: 80; src: "../assets/wallpaper.png";       label: "Mysterious";  mode: "HoneyDark" }
@@ -715,7 +715,7 @@ Item {
                                                             font { pixelSize: 12; bold: true }
                                                             Behavior on color { ColorAnimation { duration: 600 } }
                                                         }
-                                                        Text { text: "Bordure et titre accentués"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 9 }
+                                                        Text { text: "Highlighted border and title"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 9 }
                                                     }
                                                     Switch {
                                                         checked: beeStudio.editHighlighted; enabled: beeStudio.editCustomizable
@@ -735,7 +735,7 @@ Item {
                                                     Behavior on color       { ColorAnimation { duration: 150 } }
                                                     Behavior on border.color { ColorAnimation { duration: 150 } }
                                                     Text {
-                                                        text: beeStudio.editCustomizable ? "✦  Appliquer" : "🔒  Protégée"
+                                                        text: beeStudio.editCustomizable ? "✦  Apply" : "🔒  Protected"
                                                         color: beeStudio.editCustomizable ? BeeTheme.accent : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.25)
                                                         font { pixelSize: 12; bold: true }
                                                         anchors.centerIn: parent
@@ -808,7 +808,7 @@ Item {
                                 Text { text: "🖼"; font.pixelSize: 24 }
                                 ColumnLayout {
                                     spacing: 1
-                                    Text { text: "Fonds d'écran"; color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: "Wallpapers"; color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
                                     Text { text: "Cliquez sur une image pour l'appliquer"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
                             }
@@ -880,7 +880,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: "ORIGINAUX BEE-HIVE 🍯"
+                                            text: "BEE-HIVE ORIGINALS 🍯"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }
@@ -897,7 +897,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: "MA BIBLIOTHÈQUE 🖼"
+                                            text: "MY LIBRARY 🖼"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }
@@ -905,7 +905,7 @@ Item {
                                         // État vide bibliothèque
                                         Text {
                                             visible: wallpaperModel.count === 0
-                                            text: "Aucun autre fond d'écran trouvé dans " + beeStudio.wallpaperFolder
+                                            text: "No other wallpapers found in " + beeStudio.wallpaperFolder
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.25)
                                             font.pixelSize: 11; font.italic: true
                                             Layout.leftMargin: 10
@@ -986,7 +986,7 @@ Item {
                                             }
                                         }
                                         Text { text: "Aucune notification"; color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 } Layout.alignment: Qt.AlignHCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                        Text { text: "Les notifications apparaîtront\nici au fil du temps."; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; Layout.alignment: Qt.AlignHCenter }
+                                        Text { text: "Notifications will appear\nhere over time."; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; Layout.alignment: Qt.AlignHCenter }
                                     }
                                 }
 

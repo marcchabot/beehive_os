@@ -7,7 +7,7 @@ import QtQuick.Effects
 // ═══════════════════════════════════════════════════════════════
 // MayaDash.qml — Tableau de bord Maya (Bee-Hive OS) 🐝
 // v0.6 : BeeVibe — Visualiseur audio intégré aux alvéoles (Phase 3)
-//        Barres d'égaliseur subtiles, réactives au son système
+//        Subtle equalizer bars, reactive to system audio
 // v0.5 : BeeMotion — Effet de parallaxe 3D
 // ═══════════════════════════════════════════════════════════════
 
@@ -181,7 +181,7 @@ Rectangle {
         id: hexCell
         width: 220; height: 250
 
-        // ─── Données depuis BeeConfig ─────────────────────────
+        // ─── Data from BeeConfig ───────────────────────────────
         property int    cellIndex:     0
         // BeeConfig.cellsRevision est évalué en premier (opérateur virgule) pour
         // créer une dépendance réactive — ListModel.get() seul ne suffit pas.
@@ -194,7 +194,7 @@ Rectangle {
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
 
-        // ─── BeeVibe : valeur audio pour cette alvéole ────────
+        // ─── BeeVibe: audio value for this cell ────────────────
         property real vibeValue: beeVibe.barValues.length > cellIndex
                                  ? beeVibe.barValues[cellIndex] : 0.0
 
@@ -341,7 +341,7 @@ Rectangle {
             }
         }
 
-        // ─── BeeVibe : barres égaliseur au bas de l'alvéole ──
+        // ─── BeeVibe: equalizer bars at cell bottom ────────────
         // 5 barres rectangulaires, hauteur animée selon vibeValue
         // Chaque barre a un facteur de phase fixe pour un rendu
         // "spectre" sans calcul FFT supplémentaire côté QML.

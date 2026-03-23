@@ -3,7 +3,7 @@ import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
 // BeeTheme.qml — BeePalette Engine 🐝🎨  (Singleton global)
-// v0.6.1 : Nectar Sync 🍯 — wallpaperOverride (sélection BeeStudio)
+// v0.6.1: Nectar Sync 🍯 — wallpaperOverride (BeeStudio selection)
 //
 // ─── Architecture ─────────────────────────────────────────────
 //   • _progress (0.0 → 1.0) : animation de transition Dark↔Light
@@ -146,7 +146,7 @@ QtObject {
     )
 
     // ─── Fond d'écran actif ───────────────────────────────────
-    // wallpaperOverride prioritaire (sélection BeeStudio),
+    // wallpaperOverride takes priority (BeeStudio selection),
     // sinon dérivé automatiquement du mode courant.
     property string wallpaper: wallpaperOverride !== ""
         ? wallpaperOverride

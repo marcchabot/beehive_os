@@ -2,9 +2,9 @@ import QtQuick
 import QtQuick.Layouts
 
 // ═══════════════════════════════════════════════════════════════
-// BeeWeather.qml — Module Météo Universel 🐝🌦️
+// BeeWeather.qml — Universal Weather Module 🐝🌦️
 // Utilise l'API gratuite Open-Meteo (Sans clé API)
-// v1.1 : i18n — conditions météo et textes traduits via BeeConfig.tr
+// v1.1: i18n — weather conditions and translated texts via BeeConfig.tr
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -19,7 +19,7 @@ Item {
     property string unit: "celsius"
     property string lang: "fr"
 
-    // ─── Données météo ────────────────────────────────────
+    // ─── Weather data ──────────────────────────────────────
     property string temperature: "—"
     property string condition: (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
     property string icon: "🌡️"
@@ -50,7 +50,7 @@ Item {
         return fallback[code] || ["❓", "Inconnu"]
     }
 
-    // ─── Récupération des données (Open-Meteo) ────────────
+    // ─── Data retrieval (Open-Meteo) ───────────────────────
     function updateWeather() {
         loading = true
         condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
@@ -76,7 +76,7 @@ Item {
         xhr.send()
     }
 
-    // Relancer la météo quand la langue change (pour mettre à jour les conditions)
+    // Reload weather when language changes (to update conditions)
     Connections {
         target: BeeConfig
         function onTrChanged() {

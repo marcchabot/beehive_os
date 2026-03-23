@@ -3,9 +3,9 @@ import QtQuick
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
-// BeeConfig.qml — Système BeeConfig 🐝📋  (Singleton global)
-// Charge user_config.json et expose les données du dashboard
-// Accès : BeeConfig.cells, BeeConfig.weatherCity, etc.
+// BeeConfig.qml — BeeConfig System 🐝📋  (Global Singleton)
+// Loads user_config.json and exposes dashboard data
+// Access: BeeConfig.cells, BeeConfig.weatherCity, etc.
 // ═══════════════════════════════════════════════════════════════
 
 QtObject {
@@ -39,8 +39,8 @@ QtObject {
     // ─── BeeSearch (Favoris) ──────────────────────────────────
     property var pinnedApps: []
     onPinnedAppsChanged: {
-        console.log("BeeConfig: pinnedApps a changé (via binding ou set) →", JSON.stringify(pinnedApps))
-        // Si BeeApps.pinnedCmds n'est pas déjà à jour par binding, on force
+        console.log("BeeConfig: pinnedApps changed (via binding or set) →", JSON.stringify(pinnedApps))
+        // If BeeApps.pinnedCmds is not already updated by binding, force it
         if (JSON.stringify(BeeApps.pinnedCmds) !== JSON.stringify(pinnedApps))
             BeeApps.pinnedCmds = pinnedApps
     }
@@ -48,7 +48,7 @@ QtObject {
     // ─── BeeEvents ────────────────────────────────────────────
     property bool eventsEnabled: true
 
-    // ─── Langue de l'interface (i18n) ─────────────────────────
+    // ─── UI language (i18n) ────────────────────────────────────
     property string uiLang: "fr"
     property var    tr:     ({})
 
@@ -61,7 +61,7 @@ QtObject {
                 try {
                     tr = JSON.parse(xhr.responseText)
                 } catch(e) {
-                    console.warn("BeeConfig: Erreur i18n →", e)
+                    console.warn("BeeConfig: i18n error →", e)
                 }
             }
         }
@@ -73,7 +73,7 @@ QtObject {
         loadI18n(lang)
     }
 
-    // ─── Météo ────────────────────────────────────────────────
+    // ─── Weather ───────────────────────────────────────────────
     property string weatherCity: "Blainville"
     property string weatherUnit: "metric"
     property string weatherLang: "fr"
@@ -83,26 +83,26 @@ QtObject {
     // ─── Dashboard ────────────────────────────────────────────
     property string dashTitle: "🍯 Maya Dashboard"
 
-    // ─── Modèle des alvéoles ──────────────────────────────────
+    // ─── Cells model ───────────────────────────────────────────
     property ListModel cells: ListModel { id: _cells }
 
-    // ─── Révision — incrémenté à chaque set() d'une cellule ──
-    // Permet aux bindings externes (MayaDash) de se réévaluer
-    // car ListModel.get() ne crée pas de dépendance fine.
+    // ─── Revision — incremented on each cell set() ────────────
+    // Allows external bindings (MayaDash) to re-evaluate
+    // since ListModel.get() does not create fine-grained dependency.
     property int cellsRevision: 0
 
-    // ─── Config brute (préservée pour la sauvegarde) ──────────
+    // ─── Raw config (preserved for saving) ─────────────────────
     property var _rawConfig: ({})
 
-    // ─── Process de sauvegarde ────────────────────────────────
+    // ─── Save process ──────────────────────────────────────────
     property Process saveProc: Process {
         id: _saveProc
         running: false
     }
 
-    // ─── Chargement au démarrage ──────────────────────────────
+    // ─── Load at startup ───────────────────────────────────────
     Component.onCompleted: {
-        loadI18n("fr")   // Pré-charge le français par défaut
+        loadI18n("fr")   // Pre-load French by default
         loadConfig()
     }
 
@@ -159,7 +159,7 @@ QtObject {
             weatherUnit = cfg.weather.unit || weatherUnit
             weatherLang = cfg.weather.lang || weatherLang
 
-            // Mise à jour automatique des coordonnées si c'est un lieu connu
+            // Auto-update coordinates if it's a known location
             if (weatherCity === "Blainville") {
                 weatherLat = 45.67
                 weatherLon = -73.88
@@ -178,26 +178,26 @@ QtObject {
                 loadDefaults()
             }
         }
-        // Appliquer la durée de transition configurée
+        // Apply configured transition duration
         if (cfg.transitions && cfg.transitions.theme_duration_ms)
             BeeTheme.transitionDuration = cfg.transitions.theme_duration_ms
         // Nectar Sync 🍯
         if (cfg.nectar_sync !== undefined)
             BeeTheme.nectarSync = cfg.nectar_sync === true
-        // Appliquer le thème sauvegardé (animé via setMode)
+        // Apply saved theme (animated via setMode)
         if (cfg.theme && cfg.theme !== BeeTheme.mode)
             BeeTheme.setMode(cfg.theme)
     }
 
     // ─── Sauvegarde vers user_config.json ────────────────────
     function saveConfig() {
-        // PROTECTION CRITIQUE: Ne JAMAIS sauvegarder si les cells ne sont pas chargées!
+        // CRITICAL PROTECTION: NEVER save if cells are not loaded!
         if (_cells.count === 0) {
-            console.warn("BeeConfig: REFUS de sauvegarder — cells vide! Protection activée. 🐝🛡️")
+            console.warn("BeeConfig: REFUSING to save — empty cells! Protection enabled. 🐝🛡️")
             return
         }
         
-        // Reconstruire le tableau des cellules depuis le modèle live
+        // Rebuild cells array from live model
         var cells = []
         for (var i = 0; i < _cells.count; i++) {
             var c = _cells.get(i)
@@ -213,10 +213,10 @@ QtObject {
             })
         }
 
-        // Créer une COPIE de _rawConfig pour ne pas modifier l'original
+        // Create a COPY of _rawConfig to avoid modifying the original
         var cfg = JSON.parse(JSON.stringify(_rawConfig))
         
-        // Mettre à jour seulement les champs gérés dynamiquement
+        // Update only dynamically managed fields
         cfg.lang         = uiLang
         cfg.stealth_mode = stealthMode
         cfg.vibe_mode    = vibeMode
@@ -248,13 +248,13 @@ QtObject {
         cfg.dashboard.title = dashTitle
         cfg.dashboard.cells = cells
 
-        console.log("BeeConfig: Sauvegarde de", cells.length, "alvéoles 🐝💾")
+        console.log("BeeConfig: Saving", cells.length, "cells 🐝💾")
         
         var jsonStr = JSON.stringify(cfg, null, 2)
         var filepath = Qt.resolvedUrl("../user_config.json").toString().replace("file://", "")
 
-        // Sauvegarde robuste via heredoc pour éviter les problèmes d'échappement
-        // et l'absence de propriété 'env' sur certaines versions de Quickshell.
+        // Robust save via heredoc to avoid escaping issues
+        // and the absence of 'env' property on some Quickshell versions.
         _saveProc.running = false
         _saveProc.command = ["bash", "-c", "cat << 'BEEEOF' > " + filepath + "\n" + jsonStr + "\nBEEEOF"]
         _saveProc.running = true
@@ -262,13 +262,26 @@ QtObject {
 
     function loadDefaults() {
         _cells.clear()
-        _cells.append({ icon: "📅",  title: "Famille Chabot",  subtitle: "Calendrier",          detail: "Ski à Tremblant\nNoah — Soccer 14h",      action: "app:calendar",    highlighted: false })
-        _cells.append({ icon: "💊",  title: "Pharmacie",        subtitle: "Alertes & Commandes",  detail: "3 alertes actives\n1 commande en attente", action: "none",            highlighted: false })
-        _cells.append({ icon: "🐝",  title: "Maya Status",      subtitle: "En ligne",             detail: "Bee-Hive OS\nCollaboration Maya/Marc",                 action: "none",            highlighted: true  })
-        _cells.append({ icon: "🏔️", title: "Tremblant",        subtitle: "Chalet",               detail: "Construction\nEn cours…",                  action: "none",            highlighted: false })
-        _cells.append({ icon: "🖥️", title: "Système",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false })
-        _cells.append({ icon: "💰",  title: "Powerland",        subtitle: "Finances",             detail: "Groupe Powerland\nFiducie 2019",            action: "none",            highlighted: false })
-        _cells.append({ icon: "🎮",  title: "Gaming",           subtitle: "Overwatch",            detail: "Prêt pour\nune partie ?",                  action: "app:steam",       highlighted: false })
-        _cells.append({ icon: "⚙️",  title: "Settings",         subtitle: "Bee-Hive OS",          detail: "Configuration\n& Préférences",             action: "toggle:settings", highlighted: false })
+        _cells.append({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false })
+        _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false })
+        _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true  })
+        _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false })
+        _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false })
+        _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false })
+        _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false })
+        _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false })
     }
+}
+alse })
+    }
+}
+    }
+}
+}
+
+    }
+}
+}
+  }
+}
 }

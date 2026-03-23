@@ -4,43 +4,43 @@ import Quickshell
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
-// BeeApps.qml — Pool d'applications scanné au démarrage
-// Singleton partagé : lance le scan Python une seule fois au boot
-// BeeSearch lit BeeApps.pool dès qu'il est prêt.
+// BeeApps.qml — Application pool scanned at startup
+// Shared singleton: launches Python scan once at boot
+// BeeSearch reads BeeApps.pool as soon as it's ready.
 // ═══════════════════════════════════════════════════════════════
 QtObject {
     id: root
 
-    // true pendant le scan, false une fois terminé
+    // true during scan, false once finished
     property bool  scanning: false
 
-    // Pool complet une fois le scan terminé
+    // Complete pool once scan is done
     property var   pool: []
 
-    // ─── Favoris (max 4, persistés via BeeConfig) ────────────
+    // ─── Favorites (max 4, persisted via BeeConfig) ────────────
     property var pinnedCmds: BeeConfig.pinnedApps
-    onPinnedCmdsChanged: console.log("BeeApps: pinnedCmds synchronisé depuis BeeConfig →", JSON.stringify(pinnedCmds))
+    onPinnedCmdsChanged: console.log("BeeApps: pinnedCmds synced from BeeConfig →", JSON.stringify(pinnedCmds))
 
     function pin(cmd) {
         if (pinnedCmds.length >= 4) return
         var arr = pinnedCmds.slice()
         arr.push(cmd)
         BeeConfig.pinnedApps = arr
-        console.log("BeeApps: pin demandé pour", cmd)
+        console.log("BeeApps: pin requested for", cmd)
         BeeConfig.saveConfig()
     }
 
     function unpin(cmd) {
         var arr = pinnedCmds.filter(function(c) { return c !== cmd })
         BeeConfig.pinnedApps = arr
-        console.log("BeeApps: unpin demandé pour", cmd)
+        console.log("BeeApps: unpin requested for", cmd)
         BeeConfig.saveConfig()
     }
 
-    // Retrait des fonctions de sauvegarde locales redondantes
-    // (Centralisé dans BeeConfig)
+    // Removed redundant local save functions
+    // (Centralized in BeeConfig)
 
-    // ─── Mapping catégorie .desktop → émoji ───────────────────
+    // ─── .desktop category → emoji mapping ────────────────────
     function _iconFor(cat) {
         var c = (cat || "").toLowerCase()
         var rules = [
@@ -69,13 +69,13 @@ QtObject {
         return "📦"
     }
 
-    // ─── Apps statiques BeeHive (toujours en tête) ────────────
+    // ─── BeeHive static apps (always at the top) ──────────────
     readonly property var _staticApps: [
-        { icon: "🐝", name: "BeeHive Paramètres", cmd: "__settings__", cat: "BeeHive" },
+        { icon: "🐝", name: "BeeHive Settings", cmd: "__settings__", cat: "BeeHive" },
         { icon: "🎨", name: "BeeStudio",          cmd: "__studio__",   cat: "BeeHive" }
     ]
 
-    // ─── Script Python : scan des fichiers .desktop ───────────
+    // ─── Python script: scan .desktop files ───────────
     readonly property string _scanCmd:
         "python3 << 'PYEOF'\n" +
         "import os,json,glob,configparser,re\n" +
@@ -95,7 +95,7 @@ QtObject {
         "    if e.get('hidden','false').lower()=='true':continue\n" +
         "    x=e.get('exec','')\n" +
         "    if not x:continue\n" +
-        "    # Nettoyage intelligent des paramètres %u, %U, %f, etc. (incluant les flags type --uri=)\n" +
+        "    # Smart cleanup of %u, %U, %f, etc. parameters (including --uri= style flags)\n" +
         "    x=re.sub(r' [^ ]*=[uUfFdDnNickvm% ]+', '', x)\n" +
         "    x=re.sub(r' ?%[uUfFdDnNickvm]', '', x).strip()\n" +
         "    # Correction Ozone pour Spotify sur Wayland\n" +
@@ -133,7 +133,7 @@ QtObject {
             }
         }
         onExited: {
-            // Fusionner : BeeHive en tête, puis apps scannées
+            // Merge: BeeHive apps first, then scanned apps
             var merged = root._staticApps.slice()
             var seen = {}
             root._staticApps.forEach(function(a) { seen[a.name.toLowerCase()] = true })
@@ -146,14 +146,22 @@ QtObject {
             root.pool     = merged
             root._scanned = []
             root.scanning = false
-            console.log("BeeApps: scan terminé —", root.pool.length, "applications trouvées")
+            console.log("BeeApps: scan complete —", root.pool.length, "applications found")
         }
     }
 
-    // ─── Démarrage au boot de Quickshell ──────────────────────
+    // ─── Start at Quickshell boot ──────────────────────────────
     Component.onCompleted: {
         scanning = true
-        pool = _staticApps.slice() // Pool minimal dispo immédiatement
+        pool = _staticApps.slice() // Minimal pool available immediately
         _proc.running = true
     }
+}
+true
+    }
+}
+}
+}
+
+}
 }
