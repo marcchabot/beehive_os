@@ -95,15 +95,97 @@ if ! grep -q "beehive_fish.config" "$HOME/.config/fish/config.fish" 2>/dev/null;
     echo "✅ Fish configured."
 fi
 
-# 5. Installing SDDM Theme (Optional, requires sudo)
-echo -e "${AMBER}🖼️ Installing SDDM login theme...${RESET}"
-# SDDM theme is usually in a separate folder ~/beehive-sddm
-if [ -d "$HOME/beehive-sddm" ]; then
+# 5. SDDM Login Theme (Optional)
+echo -e "${YELLOW}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "   🖼️  BEE-HIVE SDDM THEME (Login Screen)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${RESET}"
+echo "This theme transforms your login screen into a sleek"
+echo "Nexus-style interface (honey yellow & black) that"
+echo "matches Bee-Hive OS perfectly."
+echo ""
+echo "📦 Requirements:"
+echo "   • SDDM display manager installed"
+echo "   • sudo privileges (installs to /usr/share/sddm/themes/)"
+echo ""
+echo "✨ Result: A cohesive Bee-Hive experience from boot to desktop!"
+echo ""
+
+INSTALL_SDDM=false
+
+# Check if SDDM is installed
+if ! pacman -Qs sddm > /dev/null 2>&1; then
+    echo "⚠️  SDDM is not installed on your system."
+    echo "   The login theme requires SDDM as your display manager."
+    echo ""
+    read -p "🐝 Install SDDM display manager? [Y/n]: " install_sddm_pkg
+    case "$install_sddm_pkg" in
+        [Yy]*|"" )
+            echo -e "${AMBER}📦 Installing SDDM...${RESET}"
+            sudo pacman -S --noconfirm sddm
+            echo "✅ SDDM installed."
+            ;;
+        [Nn]* )
+            echo "ℹ️ Skipping SDDM theme (requires SDDM)."
+            INSTALL_SDDM="skip"
+            ;;
+    esac
+fi
+
+# Proceed with theme installation if not skipped
+if [ "$INSTALL_SDDM" != "skip" ]; then
+    # Check if beehive-sddm folder exists
+    if [ ! -d "$HOME/beehive-sddm" ]; then
+        echo ""
+        echo "ℹ️  Bee-Hive SDDM theme not found locally."
+        read -p "🐝 Clone beehive-sddm from GitHub? [Y/n]: " clone_choice
+        case "$clone_choice" in
+            [Yy]*|"" )
+                echo -e "${AMBER}🔧 Cloning beehive-sddm...${RESET}"
+                git clone https://github.com/marcchabot/beehive-sddm.git "$HOME/beehive-sddm"
+                echo "✅ Clone complete!"
+                ;;
+            [Nn]* )
+                echo "ℹ️ Skipping SDDM theme installation."
+                INSTALL_SDDM="skip"
+                ;;
+        esac
+    fi
+
+    # Ask for installation if we have the theme
+    if [ "$INSTALL_SDDM" != "skip" ] && [ -d "$HOME/beehive-sddm" ]; then
+        echo ""
+        read -p "🐝 Install the Bee-Hive login theme? [Y/n]: " choice
+        case "$choice" in
+            [Yy]*|"" ) INSTALL_SDDM=true;;
+            [Nn]* ) INSTALL_SDDM=false; echo "ℹ️ Skipping SDDM theme installation.";;
+        esac
+    fi
+fi
+
+# Install the theme
+if [ "$INSTALL_SDDM" = true ]; then
+    echo -e "${AMBER}🔧 Installing SDDM theme...${RESET}"
     sudo rm -rf /usr/share/sddm/themes/beehive
     sudo cp -r "$HOME/beehive-sddm" /usr/share/sddm/themes/beehive
-    echo "✅ SDDM theme installed from ~/beehive-sddm."
-else
-    echo "ℹ️ Folder ~/beehive-sddm not found. Login theme skipped."
+    
+    # Check if beehive is set as current theme
+    if [ -f "/etc/sddm.conf" ]; then
+        if ! grep -q "Theme=beehive" /etc/sddm.conf 2>/dev/null; then
+            echo ""
+            echo "💡 Tip: To activate the theme, add this to /etc/sddm.conf:"
+            echo "   [Theme]"
+            echo "   Current=beehive"
+        fi
+    else
+        echo ""
+        echo "💡 Tip: Create /etc/sddm.conf with:"
+        echo "   [Theme]"
+        echo "   Current=beehive"
+    fi
+    
+    echo "✅ SDDM theme installed! Your login screen is now hive-ready."
 fi
 
 # 6. Finalization
