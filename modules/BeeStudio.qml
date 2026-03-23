@@ -326,7 +326,7 @@ Item {
 
                     // ── Label section ────────────────────────
                     Text {
-                        text: "CATEGORIES"
+                        text: tr("categories_label")
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.32)
                         font { pixelSize: 8; bold: true; letterSpacing: 2.2 }
                         Layout.leftMargin: 20
@@ -337,9 +337,9 @@ Item {
                     // ── Catégories ────────────────────────────
                     ListModel {
                         id: categoryModel
-                        ListElement { catIcon: "🍯"; catKey: "cells"; catSub: "Dashboard cells" }
-                        ListElement { catIcon: "🖼";  catKey: "wallpapers"; catSub: "Library rotation" }
-                        ListElement { catIcon: "🔔"; catKey: "history"; catSub: "Notification journal" }
+                        ListElement { catIcon: "🍯"; catKey: "category_cells"; catSub: "cells_desc" }
+                        ListElement { catIcon: "🖼";  catKey: "category_wallpapers"; catSub: "wallpapers_desc" }
+                        ListElement { catIcon: "🔔"; catKey: "category_history"; catSub: "history_desc" }
                     }
 
                     Repeater {
@@ -393,7 +393,7 @@ Item {
                                         Behavior on color { ColorAnimation { duration: 150 } }
                                     }
                                     Text {
-                                        text: catSub
+                                        text: tr(catSub)
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.36)
                                         font.pixelSize: 9; Layout.fillWidth: true; elide: Text.ElideRight
                                     }

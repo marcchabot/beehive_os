@@ -101,6 +101,66 @@
     "dismiss_all": "Tout effacer"
   },
 
+  "cells": {
+    "calendar": {
+      "icon": "📅",
+      "title": "Calendrier",
+      "subtitle": "Planning",
+      "detail": "3 événements aujourd'hui\n1 rappel",
+      "action": "app:calendar"
+    },
+    "email": {
+      "icon": "📧",
+      "title": "Email",
+      "subtitle": "Boîte de réception",
+      "detail": "5 messages non lus\n2 brouillons",
+      "action": "app:email"
+    },
+    "beehive": {
+      "icon": "🐝",
+      "title": "Bee-Hive OS",
+      "subtitle": "En ligne",
+      "detail": "Framework Actif\nTout fonctionne",
+      "action": "none",
+      "highlighted": true
+    },
+    "weather": {
+      "icon": "🌤️",
+      "title": "Météo",
+      "subtitle": "Prévisions",
+      "detail": "Ensoleillé, 22°C\nLégère brise",
+      "action": "none"
+    },
+    "system": {
+      "icon": "🖥️",
+      "title": "Système",
+      "subtitle": "CachyOS",
+      "detail": "Hyprland\nQuickshell",
+      "action": "app:terminal"
+    },
+    "analytics": {
+      "icon": "📊",
+      "title": "Analytique",
+      "subtitle": "Tableau de bord",
+      "detail": "CPU: 15%\nRAM: 4.2 GB",
+      "action": "none"
+    },
+    "gaming": {
+      "icon": "🎮",
+      "title": "Jeux",
+      "subtitle": "Steam",
+      "detail": "Prêt à jouer ?\nBibliothèque: 42 jeux",
+      "action": "app:steam"
+    },
+    "settings": {
+      "icon": "⚙️",
+      "title": "Paramètres",
+      "subtitle": "Bee-Hive OS",
+      "detail": "Configuration\n& Préférences",
+      "action": "toggle:settings"
+    }
+  },
+
   "studio": {
     "title": "BeeStudio",
     "subtitle": "Centre de Contrôle",
@@ -163,6 +223,8 @@
     "wallpaper_example_mysterious": "Mystérieux",
     "wallpaper_example_dark_bee": "Abeille Sombre",
     "wallpaper_example_light_bee": "Abeille Claire",
-    "wallpaper_example_soft_light": "Lumière Douce"
+    "wallpaper_example_soft_light": "Lumière Douce",
+    "categories_label": "CATÉGORIES",
+    "maya_status": "Statut de Maya"
   }
 }

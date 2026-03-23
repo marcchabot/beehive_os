@@ -73,6 +73,24 @@ QtObject {
         loadI18n(lang)
     }
 
+    // ─── Cell translation helper ─────────────────────────────────
+    // Returns translated cell data based on current language
+    // Falls back to English if translation missing
+    function trCell(key) {
+        if (!tr || !tr.cells) return null
+        var cell = tr.cells[key]
+        if (!cell) return null
+        // Return a fresh object to avoid reference issues
+        return {
+            icon: cell.icon || "",
+            title: cell.title || "",
+            subtitle: cell.subtitle || "",
+            detail: cell.detail || "",
+            action: cell.action || "none",
+            highlighted: cell.highlighted || false
+        }
+    }
+
     // ─── Weather ───────────────────────────────────────────────
     property string weatherCity: "Blainville"
     property string weatherUnit: "metric"
@@ -262,13 +280,32 @@ QtObject {
 
     function loadDefaults() {
         _cells.clear()
-        _cells.append({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false })
-        _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false })
-        _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true  })
-        _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false })
-        _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false })
-        _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false })
-        _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false })
-        _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false })
+        // Try to load localized cells if i18n is available
+        var localized = false
+        var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
+        for (var i = 0; i < cellKeys.length; i++) {
+            var key = cellKeys[i]
+            var cell = trCell(key)
+            if (cell) {
+                _cells.append(cell)
+                localized = true
+            } else {
+                // Fallback to hardcoded English if translation missing
+                localized = false
+                break
+            }
+        }
+        if (!localized) {
+            // Fallback to English defaults
+            _cells.clear()
+            _cells.append({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false })
+            _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false })
+            _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true  })
+            _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false })
+            _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false })
+            _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false })
+            _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false })
+            _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false })
+        }
     }
 }

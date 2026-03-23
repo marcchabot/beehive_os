@@ -163,6 +163,68 @@
     "wallpaper_example_mysterious": "Mysterious",
     "wallpaper_example_dark_bee": "Dark Bee",
     "wallpaper_example_light_bee": "Light Bee",
-    "wallpaper_example_soft_light": "Soft Light"
+    "wallpaper_example_soft_light": "Soft Light",
+    "categories_label": "CATEGORIES",
+    "maya_status": "Maya Status"
+  },
+
+  "cells": {
+    "calendar": {
+      "icon": "📅",
+      "title": "Calendar",
+      "subtitle": "Schedule",
+      "detail": "3 events today\n1 reminder",
+      "action": "app:calendar"
+    },
+    "email": {
+      "icon": "📧",
+      "title": "Email",
+      "subtitle": "Inbox",
+      "detail": "5 unread messages\n2 drafts",
+      "action": "app:email"
+    },
+    "beehive": {
+      "icon": "🐝",
+      "title": "Bee-Hive OS",
+      "subtitle": "Online",
+      "detail": "Framework Active\nAll systems go",
+      "action": "none",
+      "highlighted": true
+    },
+    "weather": {
+      "icon": "🌤️",
+      "title": "Weather",
+      "subtitle": "Forecast",
+      "detail": "Sunny, 22°C\nLight breeze",
+      "action": "none"
+    },
+    "system": {
+      "icon": "🖥️",
+      "title": "System",
+      "subtitle": "CachyOS",
+      "detail": "Hyprland\nQuickshell",
+      "action": "app:terminal"
+    },
+    "analytics": {
+      "icon": "📊",
+      "title": "Analytics",
+      "subtitle": "Dashboard",
+      "detail": "CPU: 15%\nRAM: 4.2 GB",
+      "action": "none"
+    },
+    "gaming": {
+      "icon": "🎮",
+      "title": "Gaming",
+      "subtitle": "Steam",
+      "detail": "Ready to play?\nLibrary: 42 games",
+      "action": "app:steam"
+    },
+    "settings": {
+      "icon": "⚙️",
+      "title": "Settings",
+      "subtitle": "Bee-Hive OS",
+      "detail": "Configuration\n& Preferences",
+      "action": "toggle:settings"
+    }
   }
 }
