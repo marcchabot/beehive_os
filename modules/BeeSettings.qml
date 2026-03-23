@@ -37,10 +37,45 @@ Rectangle {
     signal stealthToggled(bool val)
     signal focusToggled(bool val)
 
-    // ─── Header ───────────────────────────────────────────────
+    // ─── Close button — Top Right (absolute positioning) ─────
+    Rectangle {
+        id: closeRect
+        anchors {
+            top: parent.top
+            right: parent.right
+            margins: 12
+        }
+        z: 100
+        width: 32; height: 32; radius: 16
+        color: closeHov.containsMouse
+            ? Qt.rgba(1.0, 0.3, 0.3, 0.2)
+            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+        border.color: closeHov.containsMouse
+            ? Qt.rgba(1.0, 0.3, 0.3, 0.5)
+            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+        border.width: 1
+        Behavior on color { ColorAnimation { duration: 150 } }
+
+        Text {
+            text: "✕"; anchors.centerIn: parent
+            color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent
+            font { pixelSize: 14; bold: true }
+            Behavior on color { ColorAnimation { duration: 150 } }
+        }
+        MouseArea {
+            id: closeHov; anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+            onClicked: settingsRoot.visible = false
+        }
+    }
+
+    // ─── Main Content Column ─────────────────────────────────
     ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 30
+        anchors {
+            fill: parent
+            margins: 30
+            rightMargin: 50  // Extra space to avoid overlap with close button
+        }
         spacing: 20
 
         RowLayout {
@@ -52,36 +87,6 @@ Rectangle {
                 font { bold: true; pixelSize: 20; letterSpacing: 1 }
                 Layout.fillWidth: true
                 Behavior on color { ColorAnimation { duration: 600 } }
-            }
-        }
-
-        // Bouton fermeture (Top Right)
-        Rectangle {
-            id: closeRect
-            Layout.alignment: Qt.AlignTop | Qt.AlignRight
-            Layout.rightMargin: 12
-            Layout.topMargin: 12
-            z: 100
-            width: 32; height: 32; radius: 16
-            color: closeHov.containsMouse
-                ? Qt.rgba(1.0, 0.3, 0.3, 0.2)
-                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
-            border.color: closeHov.containsMouse
-                ? Qt.rgba(1.0, 0.3, 0.3, 0.5)
-                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
-            border.width: 1
-            Behavior on color { ColorAnimation { duration: 150 } }
-
-            Text {
-                text: "✕"; anchors.centerIn: parent
-                color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent
-                font { pixelSize: 14; bold: true }
-                Behavior on color { ColorAnimation { duration: 150 } }
-            }
-            MouseArea {
-                id: closeHov; anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor; hoverEnabled: true
-                onClicked: settingsRoot.visible = false
             }
         }
 
