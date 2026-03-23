@@ -15,6 +15,19 @@ echo "   🐝  BEE-HIVE OS : HIVE INSTALLATION  🐝"
 echo "   --------------------------------------------"
 echo -e "${RESET}"
 
+# 0. Detect Git repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"
+
+if [ -z "$REPO_ROOT" ]; then
+    echo "❌ Error: This script must be run from within the beehive_os Git repository."
+    echo "Please run: git clone https://github.com/marcchabot/beehive_os.git && cd beehive_os"
+    exit 1
+fi
+
+echo -e "${AMBER}📍 Repository root detected: $REPO_ROOT${RESET}"
+cd "$REPO_ROOT"
+
 # 1. Dependency Check
 echo -e "${AMBER}🔍 Checking dependencies...${RESET}"
 DEPENDENCIES=("quickshell" "kitty" "fish" "fastfetch" "papirus-icon-theme" "swww" "git" "python" "python-dbus" "cava")
