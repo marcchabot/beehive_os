@@ -500,4 +500,3 @@ Item {
         if (shown) filterApps(searchInput.text)
     }
 }
-}
