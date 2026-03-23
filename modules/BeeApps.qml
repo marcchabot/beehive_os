@@ -157,11 +157,3 @@ QtObject {
         _proc.running = true
     }
 }
-true
-    }
-}
-}
-}
-
-}
-}
