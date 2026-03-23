@@ -58,7 +58,9 @@ Rectangle {
         // Bouton fermeture (Top Right)
         Rectangle {
             id: closeRect
-            anchors { right: parent.right; top: parent.top; margins: 12 }
+            Layout.alignment: Qt.AlignTop | Qt.AlignRight
+            Layout.rightMargin: 12
+            Layout.topMargin: 12
             z: 100
             width: 32; height: 32; radius: 16
             color: closeHov.containsMouse
