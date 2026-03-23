@@ -332,7 +332,7 @@ Item {
                     ListModel {
                         id: categoryModel
                         ListElement { catIcon: "🍯"; catLabel: "Cells";      catSub: "Dashboard cells" }
-                        ListElement { catIcon: "🖼";  catLabel: "Wallpapers"; catSub: "Library "Bibliothèque & rotation" rotation" }
+                        ListElement { catIcon: "🖼";  catLabel: "Wallpapers"; catSub: "Library \"Bibliothèque & rotation\" rotation" }
                         ListElement { catIcon: "🔔"; catLabel: "Historique";     catSub: "Journal des notifications" }
                     }
 
