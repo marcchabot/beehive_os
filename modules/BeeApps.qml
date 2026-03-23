@@ -1,0 +1,159 @@
+pragma Singleton
+import QtQuick
+import Quickshell
+import Quickshell.Io
+
+// ═══════════════════════════════════════════════════════════════
+// BeeApps.qml — Pool d'applications scanné au démarrage
+// Singleton partagé : lance le scan Python une seule fois au boot
+// BeeSearch lit BeeApps.pool dès qu'il est prêt.
+// ═══════════════════════════════════════════════════════════════
+QtObject {
+    id: root
+
+    // true pendant le scan, false une fois terminé
+    property bool  scanning: false
+
+    // Pool complet une fois le scan terminé
+    property var   pool: []
+
+    // ─── Favoris (max 4, persistés via BeeConfig) ────────────
+    property var pinnedCmds: BeeConfig.pinnedApps
+    onPinnedCmdsChanged: console.log("BeeApps: pinnedCmds synchronisé depuis BeeConfig →", JSON.stringify(pinnedCmds))
+
+    function pin(cmd) {
+        if (pinnedCmds.length >= 4) return
+        var arr = pinnedCmds.slice()
+        arr.push(cmd)
+        BeeConfig.pinnedApps = arr
+        console.log("BeeApps: pin demandé pour", cmd)
+        BeeConfig.saveConfig()
+    }
+
+    function unpin(cmd) {
+        var arr = pinnedCmds.filter(function(c) { return c !== cmd })
+        BeeConfig.pinnedApps = arr
+        console.log("BeeApps: unpin demandé pour", cmd)
+        BeeConfig.saveConfig()
+    }
+
+    // Retrait des fonctions de sauvegarde locales redondantes
+    // (Centralisé dans BeeConfig)
+
+    // ─── Mapping catégorie .desktop → émoji ───────────────────
+    function _iconFor(cat) {
+        var c = (cat || "").toLowerCase()
+        var rules = [
+            [["internet", "web", "browser"],                      "🌐"],
+            [["game", "gaming", "emulator"],                      "🎮"],
+            [["audio", "music", "sound", "midi", "mixer"],        "🎵"],
+            [["video", "multimedia", "dvd", "player"],            "🎬"],
+            [["development", "ide", "debugger", "building"],      "📝"],
+            [["filemanager", "filetools"],                         "📁"],
+            [["graphics", "image", "photography", "viewer"],      "🎨"],
+            [["office", "wordprocessor", "spreadsheet", "presentation", "calendar"], "📊"],
+            [["security", "password", "encryption"],              "🔐"],
+            [["chat", "instantmessaging", "social"],              "💬"],
+            [["email", "mail", "news"],                           "📧"],
+            [["science", "education", "math"],                    "🔬"],
+            [["terminal", "consoleonly"],                          "💻"],
+            [["settings", "configuration", "preferences"],        "⚙️"],
+            [["cloud", "network", "remote"],                      "☁️"],
+            [["system", "monitor", "utility", "archiving"],       "⚙️"]
+        ]
+        for (var i = 0; i < rules.length; i++) {
+            for (var j = 0; j < rules[i][0].length; j++) {
+                if (c.indexOf(rules[i][0][j]) !== -1) return rules[i][1]
+            }
+        }
+        return "📦"
+    }
+
+    // ─── Apps statiques BeeHive (toujours en tête) ────────────
+    readonly property var _staticApps: [
+        { icon: "🐝", name: "BeeHive Paramètres", cmd: "__settings__", cat: "BeeHive" },
+        { icon: "🎨", name: "BeeStudio",          cmd: "__studio__",   cat: "BeeHive" }
+    ]
+
+    // ─── Script Python : scan des fichiers .desktop ───────────
+    readonly property string _scanCmd:
+        "python3 << 'PYEOF'\n" +
+        "import os,json,glob,configparser,re\n" +
+        "apps=[]\n" +
+        "seen=set()\n" +
+        "dirs=['/usr/share/applications',os.path.expanduser('~/.local/share/applications')]\n" +
+        "paths=[p for d in dirs for p in glob.glob(d+'/*.desktop')]\n" +
+        "for p in paths:\n" +
+        "  try:\n" +
+        "    c=configparser.ConfigParser(strict=False,interpolation=None)\n" +
+        "    c.read(p,encoding='utf-8')\n" +
+        "    if 'Desktop Entry' not in c:continue\n" +
+        "    e=c['Desktop Entry']\n" +
+        "    n=e.get('name','')\n" +
+        "    if not n or n.lower() in seen:continue\n" +
+        "    if e.get('nodisplay','false').lower()=='true':continue\n" +
+        "    if e.get('hidden','false').lower()=='true':continue\n" +
+        "    x=e.get('exec','')\n" +
+        "    if not x:continue\n" +
+        "    # Nettoyage intelligent des paramètres %u, %U, %f, etc. (incluant les flags type --uri=)\n" +
+        "    x=re.sub(r' [^ ]*=[uUfFdDnNickvm% ]+', '', x)\n" +
+        "    x=re.sub(r' ?%[uUfFdDnNickvm]', '', x).strip()\n" +
+        "    # Correction Ozone pour Spotify sur Wayland\n" +
+        "    if 'spotify' in p.lower():\n" +
+        "        x = 'spotify --enable-features=UseOzonePlatform --ozone-platform=wayland'\n" +
+        "    cat=e.get('categories','').split(';')[0]\n" +
+        "    if e.get('terminal','false').lower()=='true':x='kitty -e '+x\n" +
+        "    apps.append({'name':n,'cmd':x,'cat':cat})\n" +
+        "    seen.add(n.lower())\n" +
+        "  except:pass\n" +
+        "apps.sort(key=lambda a:a['name'].lower())\n" +
+        "for a in apps:print(json.dumps(a))\n" +
+        "PYEOF"
+
+    property var _scanned: []
+
+    property Process _scanProc: Process {
+        id: _proc
+        running: false
+        command: ["bash", "-c", root._scanCmd]
+        stdout: SplitParser {
+            onRead: data => {
+                var s = (data || "").trim()
+                if (!s) return
+                try {
+                    var o = JSON.parse(s)
+                    if (o && o.name && o.cmd)
+                        root._scanned.push({
+                            icon: root._iconFor(o.cat),
+                            name: o.name,
+                            cmd:  o.cmd,
+                            cat:  o.cat || "Application"
+                        })
+                } catch(e) {}
+            }
+        }
+        onExited: {
+            // Fusionner : BeeHive en tête, puis apps scannées
+            var merged = root._staticApps.slice()
+            var seen = {}
+            root._staticApps.forEach(function(a) { seen[a.name.toLowerCase()] = true })
+            root._scanned.forEach(function(a) {
+                if (!seen[a.name.toLowerCase()]) {
+                    merged.push(a)
+                    seen[a.name.toLowerCase()] = true
+                }
+            })
+            root.pool     = merged
+            root._scanned = []
+            root.scanning = false
+            console.log("BeeApps: scan terminé —", root.pool.length, "applications trouvées")
+        }
+    }
+
+    // ─── Démarrage au boot de Quickshell ──────────────────────
+    Component.onCompleted: {
+        scanning = true
+        pool = _staticApps.slice() // Pool minimal dispo immédiatement
+        _proc.running = true
+    }
+}

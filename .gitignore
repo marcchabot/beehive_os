@@ -1,0 +1,7 @@
+.git-credentials
+node_modules/
+*.log
+*.bak
+user_config.json
+data/*.json
+!data/events.json

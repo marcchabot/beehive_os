@@ -1,0 +1,23 @@
+# Bee-Hive OS — Module Registry v0.6
+# Singletons globaux (accessibles depuis tout le shell)
+singleton BeeTheme    1.0 BeeTheme.qml
+singleton BeeConfig   1.0 BeeConfig.qml
+singleton BeeBarState 1.0 BeeBarState.qml
+singleton BeeApps     1.0 BeeApps.qml
+singleton BeeSound    1.0 BeeSound.qml
+
+# Composants visuels
+BeeBar       1.0 BeeBar.qml
+BeeVibe      1.0 BeeVibe.qml
+BeeCorners   1.0 BeeCorners.qml
+BeeNotify    1.0 BeeNotify.qml
+BeeOSD       1.0 BeeOSD.qml
+BeeEvents    1.0 BeeEvents.qml
+BeeWeather   1.0 BeeWeather.qml
+BeeSearch    1.0 BeeSearch.qml
+BeeSettings  1.0 BeeSettings.qml
+BeePower     1.0 BeePower.qml
+BeeWallpaper 1.0 BeeWallpaper.qml
+BeeStudio    1.0 BeeStudio.qml
+Clock        1.0 Clock.qml
+MayaDash     1.0 MayaDash.qml

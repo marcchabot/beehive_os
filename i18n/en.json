@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "lang": "en",
+    "version": "1.4.0",
+    "description": "English translations — Bee-Hive OS"
+  },
+
+  "bar": {
+    "tooltip_cpu": "CPU",
+    "tooltip_ram": "Memory",
+    "tooltip_net": "Network",
+    "tooltip_disk": "Disk"
+  },
+
+  "weather": {
+    "loading": "Loading…",
+    "error": "Weather unavailable",
+    "feels_like": "Feels like",
+    "conditions": {
+      "0":  ["☀️", "Clear"],
+      "1":  ["🌤️", "Mostly clear"],
+      "2":  ["⛅", "Partly cloudy"],
+      "3":  ["☁️", "Overcast"],
+      "45": ["🌫️", "Fog"],
+      "48": ["🌫️", "Icy fog"],
+      "51": ["🌦️", "Light drizzle"],
+      "53": ["🌦️", "Moderate drizzle"],
+      "55": ["🌦️", "Dense drizzle"],
+      "61": ["🌧️", "Light rain"],
+      "63": ["🌧️", "Moderate rain"],
+      "65": ["🌧️", "Heavy rain"],
+      "71": ["🌨️", "Light snow"],
+      "73": ["🌨️", "Moderate snow"],
+      "75": ["🌨️", "Heavy snow"],
+      "77": ["🌨️", "Snow grains"],
+      "80": ["🌦️", "Light showers"],
+      "81": ["🌦️", "Moderate showers"],
+      "82": ["🌦️", "Violent showers"],
+      "85": ["🌨️", "Light snow showers"],
+      "86": ["🌨️", "Heavy snow showers"],
+      "95": ["⛈️", "Thunderstorm"],
+      "96": ["⛈️", "Thunderstorm, light hail"],
+      "99": ["⛈️", "Thunderstorm, heavy hail"],
+      "unknown": ["❓", "Unknown"]
+    }
+  },
+
+  "dashboard": {
+    "default_title": "My Dashboard",
+    "no_events": "No upcoming events"
+  },
+
+  "events": {
+    "upcoming": "Upcoming events",
+    "see_calendar": "See calendar →"
+  },
+
+  "settings": {
+    "title": "Bee-Hive Settings",
+    "palette": "BeePalette 🎨",
+    "palette_desc": "Toggle between HoneyDark 🌙 and HoneyLight ☀️ with smooth transition.",
+    "nectar_sync": "Nectar Sync 🍯",
+    "nectar_sync_desc": "Automatic theme adaptation to the selected wallpaper.",
+    "motion": "BeeMotion (Parallax)",
+    "motion_desc": "3D depth effect on MayaDash.",
+    "vibe": "BeeVibe (Audio)",
+    "vibe_desc": "Audio visualizer in cells. Uses Cava if available.",
+    "clock": "Bee-Hive Time (Clock) 🕰️",
+    "clock_desc": "Display analog clock in the center of the dashboard.",
+    "focus_mode": "Focus Mode 🎯",
+    "focus_desc": "Hides the dashboard, clock and events. Ideal for focus.",
+    "stealth_mode": "Stealth Mode 🫥",
+    "stealth_desc": "BeeBar hides after 3s of inactivity. Hover the top of the screen to reveal.",
+    "sound": "Sound Effects",
+    "sound_desc": "Enable hive ambient sounds.",
+    "language": "Language",
+    "language_desc": "Change the interface language.",
+    "save": "Save",
+    "close": "Close"
+  },
+
+  "power": {
+    "subtitle": "What would you like to do?",
+    "footer": "click outside to close",
+    "shutdown": "Shutdown",
+    "reboot": "Reboot",
+    "lock": "Lock",
+    "logout": "Log Out",
+    "sleep": "Sleep"
+  },
+
+  "search": {
+    "placeholder": "Search applications…",
+    "loading": "Loading applications…",
+    "no_results": "No results for",
+    "hint": "↑↓/Tab navigate  ↵ launch  Esc close"
+  },
+
+  "notifications": {
+    "dismiss": "Dismiss",
+    "dismiss_all": "Clear all"
+  }
+}

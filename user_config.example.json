@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.2",
+  "version": "1.3.6",
+  "theme": "HoneyDark",
+  "_comment": "Bee-Hive OS — Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
+  "transitions": {
+    "theme_duration_ms": 600
+  },
+  "weather": {
+    "city": "Montreal",
+    "unit": "metric",
+    "lang": "fr"
+  },
+  "dashboard": {
+    "title": "🍯 Ma Ruche",
+    "cells": [
+      {
+        "icon": "📅",
+        "title": "Calendrier",
+        "subtitle": "Mes Événements",
+        "detail": "Aucun événement\npour le moment",
+        "action": "url:https://calendar.google.com",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "🖥️",
+        "title": "Système",
+        "subtitle": "CachyOS",
+        "detail": "Hyprland\nQuickshell",
+        "action": "app:kitty",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "⚙️",
+        "title": "Settings",
+        "subtitle": "Bee-Hive OS",
+        "detail": "Configuration\n& Préférences",
+        "action": "toggle:settings",
+        "highlighted": true,
+        "customizable": false,
+        "color": ""
+      }
+    ]
+  },
+  "nectar_sync": true,
+  "stealth_mode": false,
+  "beebar_stats": {
+    "cpu": true,
+    "ram": true,
+    "net": true,
+    "disk": true,
+    "battery": true
+  },
+  "bee_events": {
+    "enabled": true,
+    "max_events": 3
+  },
+  "framework": {
+    "name": "Bee-Hive OS",
+    "version": "1.3.6",
+    "author": "Communauté Bee-Hive",
+    "license": "MIT"
+  },
+  "vibe_mode": false,
+  "corners_mode": true,
+  "motion_mode": true,
+  "pinned_apps": [
+    "__settings__",
+    "__studio__",
+    "kitty"
+  ],
+  "analog_clock": true,
+  "focus_mode": false
+}

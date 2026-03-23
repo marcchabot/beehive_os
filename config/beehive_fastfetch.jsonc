@@ -1,0 +1,42 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "source": "~/.config/fastfetch/beehive_logo.png",
+    "type": "kitty",
+    "width": 28,
+    "height": 12,
+    "padding": {
+      "top": 1,
+      "left": 1,
+      "right": 3
+    }
+  },
+  "display": {
+    "separator": "  ",
+    "color": {
+      "keys": "yellow",
+      "title": "yellow",
+      "separator": "yellow"
+    }
+  },
+  "modules": [
+    { "type": "title",    "key": "🐝 User", "color": { "user": "yellow", "at": "white", "host": "yellow" } },
+    "separator",
+    { "type": "os",       "key": "🍯 OS"        },
+    { "type": "host",     "key": "󰌢 Host"      },
+    { "type": "kernel",   "key": "󰒋 Kernel"    },
+    { "type": "uptime",   "key": "󰔚 Uptime"    },
+    { "type": "packages", "key": "󰏗 Packages"  },
+    { "type": "shell",    "key": "󰞷 Shell"     },
+    { "type": "display",  "key": "󰍹 Display"   },
+    { "type": "wm",       "key": "󱂬 WM"        },
+    { "type": "terminal", "key": "󰆍 Terminal"  },
+    { "type": "cpu",      "key": "󰻠 CPU"       },
+    { "type": "gpu",      "key": "󰍹 GPU"       },
+    { "type": "memory",   "key": "󰍛 RAM"       },
+    { "type": "disk",     "key": "󰋊 Disk"      },
+    { "type": "battery",  "key": "󰁹 Battery"   },
+    "break",
+    { "type": "colors", "paddingLeft": 2, "symbol": "block" }
+  ]
+}

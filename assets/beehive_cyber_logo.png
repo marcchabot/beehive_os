@@ -1,0 +1,61 @@
+# ═══════════════════════════════════════════════════════════════
+# Bee-Hive OS — Kitty Terminal Theme 🐝💻
+# v1.1.0 : Palette révisée — lisibilité maximale
+# ═══════════════════════════════════════════════════════════════
+
+background            #0D0D0D
+foreground            #FFFFFF
+cursor                #FFB81C
+cursor_text_color     #0D0D0D
+selection_background  #FFB81C
+selection_foreground  #0D0D0D
+
+url_color             #FFB81C
+active_border_color   #FFB81C
+inactive_border_color #333333
+bell_border_color     #FFB81C
+
+active_tab_background   #FFB81C
+active_tab_foreground   #0D0D0D
+inactive_tab_background #1A1A1A
+inactive_tab_foreground #AAAAAA
+tab_bar_margin_color    #0D0D0D
+
+# Standard Colors — palette lisible sur fond noir
+# Black
+color0  #1A1A1A
+color8  #444444
+
+# Red
+color1  #FF5555
+color9  #FF7777
+
+# Green
+color2  #50FA7B
+color10 #69FF94
+
+# Yellow / Honey Gold (autocompletion, hints)
+color3  #FFB81C
+color11 #FFCE54
+
+# Blue
+color4  #8BE9FD
+color12 #A8F0FF
+
+# Magenta
+color5  #FF79C6
+color13 #FF92DF
+
+# Cyan
+color6  #62D6E8
+color14 #80EEFF
+
+# White
+color7  #DDDDDD
+color15 #FFFFFF
+
+font_family      JetBrainsMono Nerd Font
+font_size        11.0
+window_padding_width 12
+confirm_os_window_close 0
+background_opacity 0.95

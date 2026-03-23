@@ -1,0 +1,51 @@
+/* ═══════════════════════════════════════════════════════════════
+   SwayOSD Style — Bee-Hive OS 🐝🍯
+   Style BeeAura : Glassmorphisme doré/noir
+   ═══════════════════════════════════════════════════════════════ */
+
+window {
+    background: transparent;
+}
+
+#osd {
+    background: rgba(13, 13, 13, 0.90);
+    border: 1.5px solid rgba(255, 184, 28, 0.25);
+    border-radius: 18px;
+    padding: 16px 24px;
+    min-width: 280px;
+}
+
+/* Barre de progression */
+progressbar {
+    background: transparent;
+}
+
+progressbar trough {
+    background: rgba(255, 184, 28, 0.12);
+    border-radius: 4px;
+    min-height: 8px;
+    border: none;
+}
+
+progressbar progress {
+    background: linear-gradient(to right, #D4960A, #FFB81C);
+    border-radius: 4px;
+    min-height: 8px;
+    border: none;
+    box-shadow: 0 0 8px rgba(255, 184, 28, 0.5);
+}
+
+/* Icône */
+image {
+    -gtk-icon-size: 24px;
+    color: #FFB81C;
+    margin-right: 12px;
+}
+
+/* Label texte */
+label {
+    color: #FFFFFF;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: 500;
+}
