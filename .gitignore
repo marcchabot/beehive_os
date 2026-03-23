@@ -5,3 +5,4 @@ node_modules/
 user_config.json
 data/*.json
 !data/events.json
+data/events.json
