@@ -284,6 +284,15 @@ Item {
     scale: visible ? 1.0 : 0.92
     Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
 
+    // ─── Auto-refresh timer (every 5 minutes) ─────────────────
+    Timer {
+        id: refreshTimer
+        interval: 300000  // 5 minutes
+        running: true
+        repeat: true
+        onTriggered: loadEvents()
+    }
+
     Component.onCompleted: {
         scale = 0.92
         loadEvents()
