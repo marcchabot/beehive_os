@@ -126,7 +126,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: (BeeConfig.tr.events && BeeConfig.tr.events.upcoming) || "Prochains événements"
+                text: (BeeConfig.tr.events && BeeConfig.tr.events.upcoming) || "Upcoming events"
                 color: BeeTheme.accent
                 font.pixelSize: 12
                 font.weight: Font.Medium
@@ -258,7 +258,7 @@ Item {
         Item { width: 1; height: 6 }
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: (BeeConfig.tr.events && BeeConfig.tr.events.see_calendar) || "Voir le calendrier →"
+            text: (BeeConfig.tr.events && BeeConfig.tr.events.see_calendar) || "See calendar →"
             color: beeEvents.footerHovered
                 ? BeeTheme.accent
                 : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.45)

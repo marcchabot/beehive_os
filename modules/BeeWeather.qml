@@ -21,7 +21,7 @@ Item {
 
     // ─── Données météo ────────────────────────────────────
     property string temperature: "—"
-    property string condition: (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Chargement…"
+    property string condition: (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
     property string icon: "🌡️"
     property bool loading: true
 
@@ -53,7 +53,7 @@ Item {
     // ─── Récupération des données (Open-Meteo) ────────────
     function updateWeather() {
         loading = true
-        condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Chargement…"
+        condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code&timezone=auto`
 
         const xhr = new XMLHttpRequest()
@@ -67,7 +67,7 @@ Item {
                     beeWeather.icon = info[0]
                     beeWeather.condition = info[1]
                 } else {
-                    beeWeather.condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.error) || "Météo indisponible"
+                    beeWeather.condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.error) || "Weather unavailable"
                 }
                 loading = false
             }

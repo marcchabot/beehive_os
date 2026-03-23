@@ -298,8 +298,8 @@ Item {
                         anchors.fill: parent
                         verticalAlignment: Text.AlignVCenter
                         text: beeSearch.scanning
-                            ? ((BeeConfig.tr.search && BeeConfig.tr.search.loading)   || "Chargement des applications…")
-                            : ((BeeConfig.tr.search && BeeConfig.tr.search.placeholder) || "Rechercher une application…")
+                            ? ((BeeConfig.tr.search && BeeConfig.tr.search.loading)   || "Loading applications…")
+                            : ((BeeConfig.tr.search && BeeConfig.tr.search.placeholder) || "Search for an application…")
                         color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.42)
                         font.pixelSize: 18
                         font.weight: Font.Light
@@ -472,7 +472,7 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    text: ((BeeConfig.tr.search && BeeConfig.tr.search.no_results) || "Aucun résultat pour")
+                    text: ((BeeConfig.tr.search && BeeConfig.tr.search.no_results) || "No results for")
                           + " «" + searchInput.text + "»"
                     color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
                     font.pixelSize: 13
@@ -485,7 +485,7 @@ Item {
         // Hint clavier (bas droite du panneau)
         Text {
             anchors { bottom: parent.bottom; right: parent.right; margins: 9 }
-            text: (BeeConfig.tr.search && BeeConfig.tr.search.hint) || "↑↓/Tab naviguer  ↵ lancer  Esc fermer"
+            text: (BeeConfig.tr.search && BeeConfig.tr.search.hint) || "↑↓/Tab navigate  ↵ launch  Esc close"
             color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.30)
             font.pixelSize: 10
         }

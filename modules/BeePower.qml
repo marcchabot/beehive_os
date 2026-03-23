@@ -123,7 +123,7 @@ Item {
             anchors.top:              parent.top
             anchors.topMargin:        74
             anchors.horizontalCenter: parent.horizontalCenter
-            text: (BeeConfig.tr.power && BeeConfig.tr.power.subtitle) || "Que veux-tu faire ?"
+            text: (BeeConfig.tr.power && BeeConfig.tr.power.subtitle) || "What would you like to do?"
             font.pixelSize: 13
             font.letterSpacing: 1
             color: BeeTheme.textPrimary
@@ -245,7 +245,7 @@ Item {
             anchors.bottom:           parent.bottom
             anchors.bottomMargin:     18
             anchors.horizontalCenter: parent.horizontalCenter
-            text: (BeeConfig.tr.power && BeeConfig.tr.power.footer) || "clic extérieur pour fermer"
+            text: (BeeConfig.tr.power && BeeConfig.tr.power.footer) || "click outside to close"
             font.pixelSize: 11
             font.letterSpacing: 0.8
             color: BeeTheme.textPrimary
