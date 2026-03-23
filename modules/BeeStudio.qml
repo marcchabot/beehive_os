@@ -103,6 +103,12 @@ Item {
         }
     }
 
+    // ─── Traductions ───────────────────────────────────────────────
+    function tr(key) {
+        if (!BeeConfig.tr || !BeeConfig.tr.studio) return ""
+        return BeeConfig.tr.studio[key] || ""
+    }
+
     // ─── Chargement cellule ──────────────────────────────────────
     function loadCell(index) {
         if (index < 0 || index >= BeeConfig.cells.count) return
@@ -288,7 +294,7 @@ Item {
                                 spacing: 6
                                 Text { text: "🐝"; font.pixelSize: 20 }
                                 Text {
-                                    text: "BeeStudio"
+                                    text: tr("title")
                                     color: BeeTheme.accent
                                     font { bold: true; pixelSize: 18; letterSpacing: 1.2 }
                                     anchors.verticalCenter: parent.verticalCenter
@@ -296,7 +302,7 @@ Item {
                                 }
                             }
                             Text {
-                                text: "Control Center  v2.1"
+                                text: tr("subtitle") + "  v2.1"
                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
                                 font { pixelSize: 9; letterSpacing: 0.8 }
                                 Layout.alignment: Qt.AlignHCenter
@@ -331,9 +337,9 @@ Item {
                     // ── Catégories ────────────────────────────
                     ListModel {
                         id: categoryModel
-                        ListElement { catIcon: "🍯"; catLabel: "Cells";      catSub: "Dashboard cells" }
-                        ListElement { catIcon: "🖼";  catLabel: "Wallpapers"; catSub: "Library \"Bibliothèque & rotation\" rotation" }
-                        ListElement { catIcon: "🔔"; catLabel: "Historique";     catSub: "Journal des notifications" }
+                        ListElement { catIcon: "🍯"; catKey: "cells"; catSub: "Dashboard cells" }
+                        ListElement { catIcon: "🖼";  catKey: "wallpapers"; catSub: "Library rotation" }
+                        ListElement { catIcon: "🔔"; catKey: "history"; catSub: "Notification journal" }
                     }
 
                     Repeater {
@@ -380,7 +386,7 @@ Item {
                                 ColumnLayout {
                                     Layout.fillWidth: true; spacing: 2
                                     Text {
-                                        text: catLabel
+                                        text: tr(catKey)
                                         color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
                                         font { pixelSize: 13; bold: isActive }
                                         Layout.fillWidth: true; elide: Text.ElideRight
@@ -525,7 +531,7 @@ Item {
                                             anchors.fill: parent; anchors.margins: 12; spacing: 7
 
                                             Text {
-                                                text: "CELLS"
+                                                text: tr("section_cells")
                                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                                 font { pixelSize: 9; bold: true; letterSpacing: 2 }
                                             }
@@ -602,7 +608,7 @@ Item {
                                                 }
                                             }
                                             Text {
-                                                text: "Select a cell"
+                                                text: tr("select_cell_prompt")
                                                 color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 }
                                                 Layout.alignment: Qt.AlignHCenter
                                                 Behavior on color { ColorAnimation { duration: 600 } }
@@ -631,7 +637,7 @@ Item {
                                                             Behavior on color { ColorAnimation { duration: 300 } }
                                                         }
                                                         Text {
-                                                            text: beeStudio.editCustomizable ? "✦  Modifiable" : "🔒  Lecture seule"
+                                                            text: beeStudio.editCustomizable ? tr("editable_label_modifiable") : tr("editable_label_readonly")
                                                             color: beeStudio.editCustomizable
                                                                 ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4)
                                                                 : Qt.rgba(1.0, 0.65, 0.2, 0.75)
@@ -664,16 +670,16 @@ Item {
                                                     }
                                                 }
 
-                                                FieldLabel { labelText: "ICON" }
-                                                BeeField { id: iconField; placeholderText: "Emoji (ex: 🐝)"; onTextEdited: { if (!beeStudio._loading) beeStudio.editIcon = text } }
+                                                FieldLabel { labelText: tr("field_label_icon") }
+                                                BeeField { id: iconField; placeholderText: tr("field_placeholder_icon"); onTextEdited: { if (!beeStudio._loading) beeStudio.editIcon = text } }
 
-                                                FieldLabel { labelText: "TITRE" }
-                                                BeeField { id: titleField; placeholderText: "Cell name"; onTextEdited: { if (!beeStudio._loading) beeStudio.editTitle = text } }
+                                                FieldLabel { labelText: tr("field_label_title") }
+                                                BeeField { id: titleField; placeholderText: tr("field_placeholder_title"); onTextEdited: { if (!beeStudio._loading) beeStudio.editTitle = text } }
 
-                                                FieldLabel { labelText: "SOUS-TITRE" }
-                                                BeeField { id: subtitleField; placeholderText: "Category or status"; onTextEdited: { if (!beeStudio._loading) beeStudio.editSubtitle = text } }
+                                                FieldLabel { labelText: tr("field_label_subtitle") }
+                                                BeeField { id: subtitleField; placeholderText: tr("field_placeholder_subtitle"); onTextEdited: { if (!beeStudio._loading) beeStudio.editSubtitle = text } }
 
-                                                FieldLabel { labelText: "DETAIL" }
+                                                FieldLabel { labelText: tr("field_label_detail") }
                                                 Rectangle {
                                                     Layout.fillWidth: true; height: 64; radius: 7
                                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, beeStudio.editCustomizable ? 0.07 : 0.03)
@@ -687,23 +693,23 @@ Item {
                                                         onTextChanged: { if (!beeStudio._loading) beeStudio.editDetail = text }
                                                         Text {
                                                             visible: parent.text === ""
-                                                            text: "Texte secondaire (\\n pour nouvelle ligne)"
+                                                            text: tr("field_placeholder_detail_hint")
                                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                                                             font.pixelSize: 11; anchors.fill: parent
                                                         }
                                                     }
                                                 }
 
-                                                FieldLabel { labelText: "ACTION" }
+                                                FieldLabel { labelText: tr("field_label_action") }
                                                 BeeField { id: actionField; placeholderText: "none | app:nom | toggle:settings"; onTextEdited: { if (!beeStudio._loading) beeStudio.editAction = text } }
 
-                                                FieldLabel { labelText: "WALLPAPER 🍯 (NECTAR SYNC)" }
+                                                FieldLabel { labelText: tr("label_wallpaper_nectar") }
                                                 RowLayout {
                                                     Layout.fillWidth: true; spacing: 8
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper.png";       label: "Mysterious";  mode: "HoneyDark" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_dark_bee.png"; label: "Dark Bee"; mode: "HoneyDark" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light_bee.png"; label: "Light Bee"; mode: "HoneyLight" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light.png"; label: "Soft Light"; mode: "HoneyLight" }
+                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper.png";       label: tr("wallpaper_example_mysterious");  mode: "HoneyDark" }
+                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_dark_bee.png"; label: tr("wallpaper_example_dark_bee"); mode: "HoneyDark" }
+                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light_bee.png"; label: tr("wallpaper_example_light_bee"); mode: "HoneyLight" }
+                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light.png"; label: tr("wallpaper_example_soft_light"); mode: "HoneyLight" }
                                                 }
 
                                                 RowLayout {
@@ -711,11 +717,11 @@ Item {
                                                     ColumnLayout {
                                                         spacing: 1; Layout.fillWidth: true
                                                         Text {
-                                                            text: "Mise en valeur"; color: BeeTheme.textPrimary
+                                                            text: tr("highlighted_checkbox"); color: BeeTheme.textPrimary
                                                             font { pixelSize: 12; bold: true }
                                                             Behavior on color { ColorAnimation { duration: 600 } }
                                                         }
-                                                        Text { text: "Highlighted border and title"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 9 }
+                                                        Text { text: tr("highlighted_tooltip"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 9 }
                                                     }
                                                     Switch {
                                                         checked: beeStudio.editHighlighted; enabled: beeStudio.editCustomizable
@@ -735,7 +741,7 @@ Item {
                                                     Behavior on color       { ColorAnimation { duration: 150 } }
                                                     Behavior on border.color { ColorAnimation { duration: 150 } }
                                                     Text {
-                                                        text: beeStudio.editCustomizable ? "✦  Apply" : "🔒  Protected"
+                                                        text: beeStudio.editCustomizable ? tr("save_button") : tr("protected")
                                                         color: beeStudio.editCustomizable ? BeeTheme.accent : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.25)
                                                         font { pixelSize: 12; bold: true }
                                                         anchors.centerIn: parent
@@ -770,7 +776,7 @@ Item {
                                     width: 130; height: 30; radius: 15
                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
                                     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
-                                    Text { text: "💾  Sauvegarder"; color: BeeTheme.accent; font { pixelSize: 11; bold: true } anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("save_button"); color: BeeTheme.accent; font { pixelSize: 11; bold: true } anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { BeeConfig.saveConfig(); beeStudio._saveDirty = false } }
                                 }
                             }
@@ -808,8 +814,8 @@ Item {
                                 Text { text: "🖼"; font.pixelSize: 24 }
                                 ColumnLayout {
                                     spacing: 1
-                                    Text { text: "Wallpapers"; color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
-                                    Text { text: "Cliquez sur une image pour l'appliquer"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
+                                    Text { text: tr("wallpapers_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("subtitle_wallpapers_hover"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
                             }
                         }
@@ -947,8 +953,8 @@ Item {
                                 Text { text: "🔔"; font.pixelSize: 24 }
                                 ColumnLayout {
                                     spacing: 1
-                                    Text { text: "Historique"; color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
-                                    Text { text: "Journal des notifications"; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
+                                    Text { text: tr("history_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("history_desc"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
                                 Item { Layout.fillWidth: true }
                             }
@@ -985,8 +991,8 @@ Item {
                                                 NumberAnimation { to: 0.8; duration: 2000; easing.type: Easing.InOutSine }
                                             }
                                         }
-                                        Text { text: "Aucune notification"; color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 } Layout.alignment: Qt.AlignHCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                        Text { text: "Notifications will appear\nhere over time."; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; Layout.alignment: Qt.AlignHCenter }
+                                        Text { text: tr("empty_history"); color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 } Layout.alignment: Qt.AlignHCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                        Text { text: tr("empty_history_desc"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; Layout.alignment: Qt.AlignHCenter }
                                     }
                                 }
 
@@ -1079,7 +1085,7 @@ Item {
                                     height: 30; radius: 15; width: clearHistLbl.implicitWidth + 24
                                     color: Qt.rgba(1.0, 0.3, 0.3, 0.12)
                                     border.color: Qt.rgba(1.0, 0.3, 0.3, 0.40); border.width: 1
-                                    Text { id: clearHistLbl; anchors.centerIn: parent; text: "✕  Tout effacer"; color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font { pixelSize: 11; bold: true } }
+                                    Text { id: clearHistLbl; anchors.centerIn: parent; text: tr("clear_history_button"); color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font { pixelSize: 11; bold: true } }
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.clearNotificationHistory() }
                                 }
                             }
