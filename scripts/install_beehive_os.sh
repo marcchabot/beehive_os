@@ -71,6 +71,17 @@ mkdir -p "$HOME/.config/beehive_backups"
 [ -f "$HOME/.config/kitty/kitty.conf" ] && cp "$HOME/.config/kitty/kitty.conf" "$HOME/.config/beehive_backups/kitty.conf.bak"
 [ -f "$HOME/.config/fish/config.fish" ] && cp "$HOME/.config/fish/config.fish" "$HOME/.config/beehive_backups/config.fish.bak"
 
+# 3.5. Privacy cleanup (remove personal data)
+echo -e "${AMBER}🔒 Cleaning up personal data...${RESET}"
+if [ -f "$HOME/beehive_os/data/events.json" ]; then
+    rm "$HOME/beehive_os/data/events.json"
+    echo "✅ Removed personal calendar events (data/events.json)."
+fi
+if [ -f "$HOME/beehive_os/user_config.json" ]; then
+    rm "$HOME/beehive_os/user_config.json"
+    echo "✅ Removed personal configuration (user_config.json)."
+fi
+
 # 4. Injecting Bee-Hive configurations
 echo -e "${AMBER}💉 Injecting hive venom (configs)...${RESET}"
 
