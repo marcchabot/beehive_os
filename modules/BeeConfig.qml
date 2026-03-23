@@ -272,16 +272,3 @@ QtObject {
         _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false })
     }
 }
-alse })
-    }
-}
-    }
-}
-}
-
-    }
-}
-}
-  }
-}
-}
