@@ -27,6 +27,42 @@ ShellRoot {
             BeeBarState.motionActive = BeeConfig.motionMode
         }
     }
+
+    // ─── BeePower Action Handler ───────────────────────────────
+    Connections {
+        target: BeePower
+        function onActionRequested(cmd) {
+            console.log("BeePower: action requested →", cmd)
+            // Parse command format: "app:name", "toggle:setting", "shell:command", etc.
+            if (cmd.startsWith("app:")) {
+                var appName = cmd.substring(4)
+                var desktopFile = "/usr/share/applications/" + appName + ".desktop"
+                // Try to launch via desktop file
+                var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"] }', root, "BeePowerAppLauncher")
+                proc.start()
+            } else if (cmd.startsWith("toggle:")) {
+                var setting = cmd.substring(7)
+                if (setting === "stealth") {
+                    BeeConfig.stealthMode = !BeeConfig.stealthMode
+                    BeeConfig.saveConfig()
+                } else if (setting === "focus") {
+                    BeeConfig.focusMode = !BeeConfig.focusMode
+                    BeeConfig.saveConfig()
+                } else if (setting === "settings") {
+                    // Open BeeStudio
+                    toggleDash()
+                    // TODO: Actually open BeeStudio panel (needs integration)
+                    console.log("BeePower: toggle:settings → should open BeeStudio")
+                }
+            } else if (cmd.startsWith("shell:")) {
+                var shellCmd = cmd.substring(6)
+                var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"] }', root, "BeePowerShell")
+                proc.start()
+            } else {
+                console.warn("BeePower: Unknown command format →", cmd)
+            }
+        }
+    }
     Component.onCompleted: {
         BeeBarState.vibeActive    = BeeConfig.vibeMode
         BeeBarState.focusActive   = BeeConfig.focusMode
