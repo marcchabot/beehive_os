@@ -150,12 +150,15 @@ Rectangle {
                         color: copyHov.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
                         border.color: BeeTheme.accent; border.width: 1
                         Behavior on color { ColorAnimation { duration: 120 } }
-                        Text { anchors.centerIn: parent; text: copied ? "✓ Done" : "📋 Copy"; color: BeeTheme.accent; font { pixelSize: 11; bold: true } }
+                        Text { id: copyLabel; anchors.centerIn: parent; text: parent.copied ? "✓ Done" : "📋 Copy"; color: BeeTheme.accent; font { pixelSize: 11; bold: true } }
                         property bool copied: false
                         MouseArea {
                             id: copyHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                Clipboard.setText("source = ~/beehive_os/config/beehive_keybinds.conf")
+                                Qt.createQmlObject(
+                                    'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "printf \'source = ~/beehive_os/config/beehive_keybinds.conf\' | wl-copy"] }',
+                                    copyHov, "clipCopy"
+                                )
                                 parent.copied = true
                                 copyReset.start()
                             }
