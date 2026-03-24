@@ -63,7 +63,8 @@ def fetch_events():
         cmd = ["gog", "calendar", "list", cal['id'], "--from", from_date, "--max", "10", "--json"]
         
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # We add a timeout and don't suppress stderr so we can see if it prompts for a password
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
             if result.returncode == 0:
                 data = json.loads(result.stdout)
                 for event in data.get("events", []):
@@ -96,6 +97,11 @@ def fetch_events():
                     })
             else:
                 print(f"⚠️ Warning: Could not fetch {cal['label']}. Make sure 'gog' is authorized.")
+                if result.stderr:
+                    print(f"Details: {result.stderr.strip()}")
+        except subprocess.TimeoutExpired:
+            print(f"❌ Timeout fetching {cal['label']}. The 'gog' CLI is probably waiting for a password or keyring prompt.")
+            print("To fix this, export GOG_KEYRING_PASSWORD in your environment or set keyring_backend to file.")
         except Exception as e:
             print(f"❌ Error fetching {cal['label']}: {e}")
 
