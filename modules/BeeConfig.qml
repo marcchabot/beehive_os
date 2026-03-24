@@ -16,15 +16,31 @@ QtObject {
 
     // ─── BeeVibe ───────────────────────────────────────────────
     property bool vibeMode: false
+    onVibeModeChanged: {
+        BeeBarState.vibeActive = vibeMode
+        if (root._loaded) saveConfig()
+    }
 
     // ─── Mode Focus 🎯 ──────────────────────────────────────────
     property bool focusMode: false
+    onFocusModeChanged: {
+        BeeBarState.focusActive = focusMode
+        if (root._loaded) saveConfig()
+    }
 
     // ─── BeeCorners 🐝📱 ───────────────────────────────────────
     property bool cornersMode: true
+    onCornersModeChanged: {
+        BeeBarState.cornersActive = cornersMode
+        if (root._loaded) saveConfig()
+    }
 
     // ─── BeeMotion (Parallax) ──────────────────────────────────
     property bool motionMode: true
+    onMotionModeChanged: {
+        BeeBarState.motionActive = motionMode
+        if (root._loaded) saveConfig()
+    }
 
     // ─── BeeBar Visibility ────────────────────────────────────
     property bool showCpu: true
@@ -50,12 +66,7 @@ QtObject {
     property string icsUrl: ""  // URL ICS (Google Calendar, Outlook, Apple…)
 
     // ─── Sync properties to BeeBarState ─────────────────────
-    // Ensures visual components (Layer Background) react to 
-    // settings changed in BeeSettings (Layer Top).
-    onFocusModeChanged:  BeeBarState.focusActive = focusMode
-    onVibeModeChanged:   BeeBarState.vibeActive  = vibeMode
-    onCornersModeChanged: BeeBarState.cornersActive = cornersMode
-    onMotionModeChanged:  BeeBarState.motionActive  = motionMode
+    // Removed old redundant listeners as they are now handled above with auto-save.
 
     // ─── UI language (i18n) ────────────────────────────────────
     property string uiLang: "fr"
@@ -118,6 +129,8 @@ QtObject {
     // Allows external bindings (MayaDash) to re-evaluate
     // since ListModel.get() does not create fine-grained dependency.
     property int cellsRevision: 0
+
+    property bool _loaded: false
 
     // ─── Raw config (preserved for saving) ─────────────────────
     property var _rawConfig: ({})
@@ -259,6 +272,8 @@ QtObject {
 
         if (cfg.theme && cfg.theme !== BeeTheme.mode) BeeTheme.setMode(cfg.theme)
         if (cfg.nectar_sync !== undefined) BeeTheme.nectarSync = cfg.nectar_sync === true
+
+        root._loaded = true
     }
 
     // ─── Sauvegarde vers user_config.json ────────────────────
