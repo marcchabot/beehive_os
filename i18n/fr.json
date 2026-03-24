@@ -80,6 +80,7 @@
   },
 
   "power": {
+    "title": "BEE POWER",
     "subtitle": "Que veux-tu faire ?",
     "footer": "clic extérieur pour fermer",
     "shutdown": "Éteindre",
@@ -226,5 +227,20 @@
     "wallpaper_example_soft_light": "Lumière Douce",
     "categories_label": "CATÉGORIES",
     "maya_status": "Statut de Maya"
+  },
+
+  "common": {
+    "bee_power": "BEE POWER",
+    "bee_hive_time": "🐝 Bee-Hive Time",
+    "bee_studio_title": "BeeStudio v2.1 🍯",
+    "unsaved": "● unsaved",
+    "cells": "Cells",
+    "dashboard_cell_editor": "Dashboard cell editor",
+    "protected": "🔒 protected",
+    "wallpapers_folder": "~/Pictures/Wallpapers",
+    "beehive_originals": "BEE-HIVE ORIGINALS 🍯",
+    "my_library": "MY LIBRARY 🖼",
+    "no_other_wallpapers": "No other wallpapers found in",
+    "version_info": "Bee-Hive OS v0.9.0 · BeeMotion 3D · BeeVibe 🐝"
   }
 }
