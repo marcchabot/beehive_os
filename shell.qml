@@ -80,8 +80,8 @@ ShellRoot {
         }
 
         // ─── Settings / Studio / Launcher ───────
-        function showSettings() { root.settingsVisible = true }
-        function showStudio()   { root.studioVisible   = true }
+        function showSettings() { root.controlTab = 3; root.controlVisible = true }
+        function showStudio()   { root.controlTab = 0; root.controlVisible = true }
         function showLauncher() { root.searchVisible   = true }
         function showSearch()   { root.searchVisible   = true }
         
@@ -220,26 +220,27 @@ ShellRoot {
     }
 
     // Panneaux Interactifs
-    property bool settingsVisible: false
-    property bool studioVisible: false
+    property bool controlVisible: false
+    property int  controlTab: 0
 
     Loader {
-        active: root.settingsVisible
+        active: root.controlVisible
         sourceComponent: Variants {
             model: Quickshell.screens
             delegate: PanelWindow {
                 required property var modelData
                 screen: modelData
                 WlrLayershell.layer: WlrLayer.Top
-                WlrLayershell.namespace: "beehive-settings"
+                WlrLayershell.namespace: "beehive-control"
                 focusable: true
                 anchors { top: true; bottom: true; left: true; right: true }
                 color: "transparent"
 
-                BeeSettings {
+                BeeControl {
                     anchors.centerIn: parent
                     visible: true
-                    onVisibleChanged: { if (!visible) root.settingsVisible = false }
+                    currentTab: root.controlTab
+                    onVisibleChanged: { if (!visible) root.controlVisible = false }
                 }
             }
         }
@@ -286,35 +287,14 @@ ShellRoot {
                 BeeSearch {
                     anchors.fill: parent
                     shown: true
-                    onOpenSettings: { root.settingsVisible = true }
-                    onOpenStudio:   { root.studioVisible   = true }
+                    onOpenSettings: { root.controlTab = 3; root.controlVisible = true }
+                    onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
                     onLaunchRequested: (cmd) => {
                         root._pendingCmd = cmd
                         root.searchVisible = false
                         launchTimer.restart()
                     }
                     onShownChanged: { if (!shown) root.searchVisible = false }
-                }
-            }
-        }
-    }
-
-    Loader {
-        active: root.studioVisible
-        sourceComponent: Variants {
-            model: Quickshell.screens
-            delegate: PanelWindow {
-                required property var modelData
-                screen: modelData
-                WlrLayershell.layer: WlrLayer.Top
-                WlrLayershell.namespace: "beehive-studio"
-                focusable: true
-                anchors { top: true; bottom: true; left: true; right: true }
-                color: "transparent"
-                BeeStudio { 
-                    anchors.fill: parent
-                    visible: true
-                    onVisibleChanged: { if (!visible) root.studioVisible = false }
                 }
             }
         }

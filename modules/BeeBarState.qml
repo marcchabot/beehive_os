@@ -28,37 +28,45 @@ QtObject {
     // BeePower menu visibility
     property bool powerVisible: false
 
-    // ─── BeeAura Notification System 🔔 ───────────────────────
+    // ─── BeeAura History & Notifications 🔔📜 ─────────────────
+    // Centralized event bus for the whole hive
     signal notificationReceived(string title, string body, string icon)
 
-    // ─── Notification History (max 50) ────────────────────────
-    // Note: ListModel cannot be a direct child of a QtObject (Singleton).
-    // We use a JS array (property var) — compatible with ListView model.
-    property var notificationHistory: []
+    property var historyModel: []
     readonly property int maxHistorySize: 50
 
-    function dispatchNotification(title, body, icon) {
-        notificationReceived(title, body, icon)
+    function logAction(category, message, icon = "🐝", type = "info") {
+        // 1. Send visual toast (BeeNotify)
+        notificationReceived(category, message, icon)
+
+        // 2. Add to permanent history for "The Hive"
         var entry = {
-            "title":     title,
-            "body":      body,
+            "category":  category,
+            "message":   message,
             "icon":      icon,
+            "type":      type,
             "timestamp": new Date().toLocaleTimeString(Qt.locale("fr_CA"), "HH:mm")
         }
-        var updated = [entry].concat(notificationHistory)
+        
+        var updated = [entry].concat(historyModel)
         if (updated.length > maxHistorySize)
             updated = updated.slice(0, maxHistorySize)
-        notificationHistory = updated
+        historyModel = updated
     }
 
-    function clearNotificationHistory() {
-        notificationHistory = []
+    // Alias for backward compatibility if needed
+    function dispatchNotification(title, body, icon) {
+        logAction(title, body, icon)
     }
 
-    function removeNotification(index) {
-        var updated = notificationHistory.slice()
+    function clearHistory() {
+        historyModel = []
+    }
+
+    function removeHistoryEntry(index) {
+        var updated = historyModel.slice()
         updated.splice(index, 1)
-        notificationHistory = updated
+        historyModel = updated
     }
 
     // ─── BeeAura OSD System 🎚️ ────────────────────────────────

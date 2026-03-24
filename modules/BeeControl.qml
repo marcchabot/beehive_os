@@ -1,0 +1,322 @@
+import Quickshell
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Effects
+import "."
+
+// ═══════════════════════════════════════════════════════════════
+// BeeControl.qml — "The Hive" Control Center 🐝🍯
+// Consolidation v2.0 : Settings + Studio + History
+// Navigation latérale intuitive, design Glassmorphism
+// ═══════════════════════════════════════════════════════════════
+
+Rectangle {
+    id: controlRoot
+    width:  820
+    height: 620
+    radius: 28
+    visible: false
+    anchors.centerIn: parent
+
+    // ─── State ──────────────────────────────────────────────
+    property int currentTab: 0   // 0=MyHive 1=Design 2=Stats 3=System 4=Logs
+    property var _s: BeeConfig.tr.settings || {}
+
+    // ─── Styles ─────────────────────────────────────────────
+    color: BeeTheme.glassBg
+    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+    border.width: 1
+
+    Behavior on color        { ColorAnimation { duration: 600 } }
+    Behavior on border.color { ColorAnimation { duration: 600 } }
+
+    // Drop shadow
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowColor: Qt.rgba(0,0,0, BeeTheme.mode === "HoneyDark" ? 0.45 : 0.12)
+        shadowBlur: 1.0
+        shadowVerticalOffset: 6
+    }
+
+    // ─── Reusable Components ───────────────────────────────
+    
+    // Une ligne de réglage standard (Texte + Switch)
+    component SettingRow: RowLayout {
+        property string label: ""
+        property string desc:  ""
+        property bool checked: false
+        signal toggled(bool val)
+        spacing: 20
+        ColumnLayout {
+            Layout.fillWidth: true; spacing: 2
+            Text { text: label; color: BeeTheme.textPrimary; font { bold: true; pixelSize: 14 }; Behavior on color { ColorAnimation { duration: 600 } } }
+            Text { text: desc; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        }
+        Switch { checked: parent.checked; onCheckedChanged: parent.toggled(checked) }
+    }
+
+    // Un en-tête de section
+    component SectionHeader: ColumnLayout {
+        property string title: ""
+        spacing: 10
+        Item { width: 1; height: 10 }
+        Text { text: title; color: BeeTheme.accent; font { bold: true; pixelSize: 13; letterSpacing: 1.2 } }
+        Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+    }
+
+    // ─── Close button ───────────────────────────────────────
+    Rectangle {
+        anchors { top: parent.top; right: parent.right; margins: 16 }
+        width: 32; height: 32; radius: 16; z: 100
+        color: closeHov.containsMouse ? "#ff555522" : "#ffffff08"
+        border.color: closeHov.containsMouse ? "#ff555566" : BeeTheme.accent
+        border.width: 1
+        Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font { bold: true; pixelSize: 14 } }
+        MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: controlRoot.visible = false }
+    }
+
+    // ─── Sidebar + Content ──────────────────────────────────
+    RowLayout {
+        anchors.fill: parent; spacing: 0
+
+        // ─── Sidebar (Navigation) ───
+        Rectangle {
+            Layout.fillHeight: true
+            width: 85
+            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+            
+            Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: BeeTheme.separator }
+
+            Column {
+                anchors { top: parent.top; horizontalCenter: parent.horizontalCenter; topMargin: 35 }
+                spacing: 22
+                Text { text: "🐝"; font.pixelSize: 28; anchors.horizontalCenter: parent.horizontalCenter; bottomPadding: 15 }
+
+                Repeater {
+                    model: [
+                        { icon: "🍯", label: "Hive",    idx: 0 },
+                        { icon: "🎨", label: "Design",  idx: 1 },
+                        { icon: "📊", label: "Stats",   idx: 2 },
+                        { icon: "⚙️", label: "System",  idx: 3 },
+                        { icon: "📜", label: "Logs",    idx: 4 }
+                    ]
+                    
+                    Item {
+                        width: 55; height: 55; anchors.horizontalCenter: parent.horizontalCenter
+                        Rectangle {
+                            anchors.fill: parent; radius: 15
+                            color: controlRoot.currentTab === modelData.idx ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2) : "transparent"
+                            border.color: controlRoot.currentTab === modelData.idx ? BeeTheme.accent : "transparent"
+                            border.width: 1
+                            Behavior on color { ColorAnimation { duration: 150 } }
+                        }
+                        Text { text: modelData.icon; anchors.centerIn: parent; font.pixelSize: 22; opacity: controlRoot.currentTab === modelData.idx ? 1.0 : 0.6 }
+                        MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: controlRoot.currentTab = modelData.idx }
+                    }
+                }
+            }
+        }
+
+        // ─── Main Content (Tabs) ───
+        StackLayout {
+            id: contentStack
+            Layout.fillWidth: true; Layout.fillHeight: true
+            currentIndex: controlRoot.currentTab
+
+            // Tab 0 : My Hive (Dashboard Cells Editor)
+            Item {
+                ColumnLayout {
+                    anchors { fill: parent; margins: 35 }
+                    Text { text: "🍯 My Hive"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+                    Text { text: "Portage de l'éditeur d'alvéoles (BeeStudio) en cours..."; color: BeeTheme.textSecondary; font.italic: true }
+                    Item { Layout.fillHeight: true }
+                }
+            }
+
+            // Tab 1 : Design (Appearance & Wallpapers)
+            Item {
+                ScrollView {
+                    anchors.fill: parent; contentWidth: -1; clip: true
+                    ColumnLayout {
+                        width: parent.width; anchors.margins: 35
+                        spacing: 25
+
+                        Text { text: "🎨 Design & Appearance"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+
+                        SectionHeader { title: "THEME & VIBE" }
+
+                        SettingRow {
+                            label: controlRoot._s.palette || "BeePalette 🎨"
+                            desc:  controlRoot._s.palette_desc || "Switch between HoneyDark 🌙 and HoneyLight ☀️."
+                            checked: BeeTheme.mode === "HoneyLight"
+                            onToggled: (val) => {
+                                let mode = val ? "HoneyLight" : "HoneyDark"
+                                BeeTheme.setMode(mode)
+                                BeeConfig.saveConfig()
+                                BeeBarState.logAction("Design", "Mode " + mode + " activé", val ? "☀️" : "🌙")
+                            }
+                        }
+
+                        SettingRow {
+                            label: controlRoot._s.nectar_sync || "Nectar Sync 🍯"
+                            desc:  controlRoot._s.nectar_sync_desc || "Automatic theme adaptation to the chosen wallpaper."
+                            checked: BeeTheme.nectarSync
+                            onToggled: (val) => {
+                                BeeTheme.nectarSync = val
+                                BeeConfig.saveConfig()
+                                BeeBarState.logAction("Design", "Nectar Sync " + (val ? "activé" : "désactivé"), "🍯")
+                            }
+                        }
+
+                        SettingRow {
+                            label: controlRoot._s.motion || "BeeMotion"
+                            desc:  controlRoot._s.motion_desc || "3D depth effect on the MayaDash."
+                            checked: BeeConfig.motionMode
+                            onToggled: (val) => {
+                                BeeConfig.motionMode = val
+                                BeeConfig.saveConfig()
+                                BeeBarState.logAction("Design", "BeeMotion " + (val ? "activé" : "désactivé"), "🌪️")
+                            }
+                        }
+
+                        SectionHeader { title: "WALLPAPERS" }
+                        Text { text: "L'explorateur de fonds d'écran sera injecté ici..."; color: BeeTheme.textSecondary; font.italic: true }
+                        
+                        Item { Layout.fillHeight: true; height: 20 }
+                    }
+                }
+            }
+
+            // Tab 2 : BeeBar (Stats Monitoring)
+            Item {
+                ColumnLayout {
+                    anchors { fill: parent; margins: 35 }
+                    spacing: 25
+
+                    Text { text: "📊 BeeBar Stats"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    SectionHeader { title: "INDICATORS VISIBILITY" }
+
+                    Flow {
+                        Layout.fillWidth: true; spacing: 12
+                        Repeater {
+                            model: [
+                                { label: BeeConfig.tr.bar.tooltip_cpu || "CPU", prop: "showCpu", icon: "📟" },
+                                { label: BeeConfig.tr.bar.tooltip_ram || "RAM", prop: "showRam", icon: "🧠" },
+                                { label: BeeConfig.tr.bar.tooltip_net || "NET", prop: "showNet", icon: "🌐" },
+                                { label: BeeConfig.tr.bar.tooltip_disk || "DISK", prop: "showDisk", icon: "💾" },
+                                { label: BeeConfig.tr.bar.tooltip_battery || "BAT", prop: "showBattery", icon: "🔋" }
+                            ]
+                            Rectangle {
+                                width: 75; height: 45; radius: 12
+                                color: BeeConfig[modelData.prop] ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                border.color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.separator
+                                border.width: 1
+
+                                Column {
+                                    anchors.centerIn: parent; spacing: 2
+                                    Text { text: modelData.icon; anchors.horizontalCenter: parent.horizontalCenter; font.pixelSize: 14 }
+                                    Text { text: modelData.label; anchors.horizontalCenter: parent.horizontalCenter; color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary; font { pixelSize: 10; bold: BeeConfig[modelData.prop] } }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        BeeConfig[modelData.prop] = !BeeConfig[modelData.prop]
+                                        BeeConfig.saveConfig()
+                                        BeeBarState.logAction("BeeBar", "Indicateur " + modelData.label + (BeeConfig[modelData.prop] ? " affiché" : " masqué"), modelData.icon)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Item { Layout.fillHeight: true }
+                }
+            }
+
+            // Tab 3 : System (General)
+            Item {
+                ColumnLayout {
+                    anchors { fill: parent; margins: 35 }
+                    spacing: 25
+
+                    Text { text: "⚙️ System & Preferences"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    
+                    SectionHeader { title: "LANGUAGE" }
+                    RowLayout {
+                        spacing: 12
+                        Repeater {
+                            model: [ { code: "fr", label: "🇫🇷 Français" }, { code: "en", label: "🇬🇧 English" } ]
+                            Rectangle {
+                                property bool isActive: BeeConfig.uiLang === modelData.code
+                                width: 120; height: 40; radius: 10
+                                color: isActive ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2) : "transparent"
+                                border.color: isActive ? BeeTheme.accent : BeeTheme.separator
+                                border.width: 1
+                                Text { anchors.centerIn: parent; text: modelData.label; color: isActive ? BeeTheme.accent : BeeTheme.textPrimary; font { bold: isActive; pixelSize: 13 } }
+                                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { BeeConfig.setLang(modelData.code); BeeConfig.saveConfig(); BeeBarState.logAction("System", "Langue changée : " + modelData.label, "🌍") } }
+                            }
+                        }
+                    }
+
+                    SectionHeader { title: "PRIVACY & FOCUS" }
+                    SettingRow {
+                        label: controlRoot._s.stealth || "Stealth Mode 👤"
+                        desc: "Hide BeeBar until mouse enters the top sensor area."
+                        checked: BeeConfig.stealthMode
+                        onToggled: (val) => { BeeConfig.stealthMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Furtif " + (val ? "activé" : "désactivé"), "👤") }
+                    }
+                    SettingRow {
+                        label: controlRoot._s.focus || "Focus Mode 🎯"
+                        desc: "Hide Dashboard and background elements for maximum focus."
+                        checked: BeeConfig.focusMode
+                        onToggled: (val) => { BeeConfig.focusMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Focus " + (val ? "activé" : "désactivé"), "🎯") }
+                    }
+
+                    Item { Layout.fillHeight: true }
+                }
+            }
+
+            // Tab 4 : History (📜 Logs)
+            Item {
+                ColumnLayout {
+                    anchors { fill: parent; margins: 35 }
+                    RowLayout {
+                        spacing: 12
+                        Text { text: "📜 Hive Activity Log"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                        Item { Layout.fillWidth: true }
+                        Button {
+                            text: "Clear All"; flat: true
+                            onClicked: BeeBarState.clearHistory()
+                        }
+                    }
+                    Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+                    
+                    ListView {
+                        id: historyList; Layout.fillWidth: true; Layout.fillHeight: true
+                        model: BeeBarState.historyModel; spacing: 12; clip: true
+                        delegate: Rectangle {
+                            width: historyList.width; height: 62; radius: 15
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.04)
+                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+                            border.width: 1
+                            RowLayout {
+                                anchors.fill: parent; anchors.margins: 12; spacing: 15
+                                Text { text: modelData.icon; font.pixelSize: 22 }
+                                ColumnLayout {
+                                    spacing: 2; Layout.fillWidth: true
+                                    Text { text: modelData.category; color: BeeTheme.accent; font { bold: true; pixelSize: 13 } }
+                                    Text { text: modelData.message; color: BeeTheme.textPrimary; font.pixelSize: 12; elide: Text.ElideRight; Layout.fillWidth: true }
+                                }
+                                Text { text: modelData.timestamp; color: BeeTheme.textSecondary; font.pixelSize: 11; opacity: 0.7 }
+                            }
+                        }
+                        Text { visible: historyList.count === 0; text: "No activity recorded yet... 🐝💤"; anchors.centerIn: parent; color: BeeTheme.textSecondary; font.italic: true }
+                    }
+                }
+            }
+        }
+    }
+}
