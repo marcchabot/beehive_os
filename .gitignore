@@ -6,7 +6,7 @@ client_secret.json
 google_access.json
 GATEWAY_TOKEN.txt
 pending_messages.json
-# data/
+data/
 
 # ─── Credentials & secrets ────────────────────────────────────
 .git-credentials
