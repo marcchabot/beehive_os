@@ -36,7 +36,12 @@ Item {
                 // status 0 = fichier local OK sous Qt, 200 = HTTP OK
                 if (doc.status === 200 || doc.status === 0) {
                     try {
-                        var data = JSON.parse(doc.responseText);
+                        var text = doc.responseText.trim();
+                        if (text === "") {
+                            eventsModel.clear();
+                            return;
+                        }
+                        var data = JSON.parse(text);
                         var nowSec = Date.now() / 1000;
                         // Filtre : événements dans les 30 dernières minutes ou futurs
                         var upcoming = data.filter(function(e) {

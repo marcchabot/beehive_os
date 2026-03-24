@@ -131,7 +131,13 @@ QtObject {
             if (xhr.readyState !== XMLHttpRequest.DONE) return
             if (xhr.status === 200 || xhr.status === 0) {
                 try {
-                    applyConfig(JSON.parse(xhr.responseText))
+                    var text = xhr.responseText.trim()
+                    if (text === "") {
+                        console.log("BeeConfig: user_config.json est vide, chargement des défauts.")
+                        loadDefaults()
+                        return
+                    }
+                    applyConfig(JSON.parse(text))
                     return
                 } catch (e) {
                     console.warn("BeeConfig: Erreur JSON →", e)

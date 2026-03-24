@@ -54,33 +54,25 @@ if [ -d "$HOME/beehive_os" ]; then
     mv "$HOME/beehive_os" "$HOME/beehive_os_bak_$(date +%Y%m%d_%H%M%S)"
 fi
 
-# Copying files (ignoring local personal configs)
+# Copying files
 cp -r . "$HOME/beehive_os"
 chmod -R 755 "$HOME/beehive_os"
 
-# Initializing config if it doesn't exist
-if [ ! -f "$HOME/beehive_os/user_config.json" ]; then
-    cp "$HOME/beehive_os/user_config.example.json" "$HOME/beehive_os/user_config.json"
-    echo "✅ Initial configuration created from template."
-fi
-
-# 3. Backing up existing configurations
-echo -e "${AMBER}💾 Backing up your current configurations...${RESET}"
-mkdir -p "$HOME/.config/beehive_backups"
-[ -f "$HOME/.config/hypr/hyprland.conf" ] && cp "$HOME/.config/hypr/hyprland.conf" "$HOME/.config/beehive_backups/hyprland.conf.bak"
-[ -f "$HOME/.config/kitty/kitty.conf" ] && cp "$HOME/.config/kitty/kitty.conf" "$HOME/.config/beehive_backups/kitty.conf.bak"
-[ -f "$HOME/.config/fish/config.fish" ] && cp "$HOME/.config/fish/config.fish" "$HOME/.config/beehive_backups/config.fish.bak"
-
-# 3.5. Privacy cleanup (remove personal data)
+# 3. Privacy cleanup (remove personal data from the NEW installation)
 echo -e "${AMBER}🔒 Cleaning up personal data...${RESET}"
-if [ -f "$HOME/beehive_os/data/events.json" ]; then
-    rm "$HOME/beehive_os/data/events.json"
-    echo "✅ Removed personal calendar events (data/events.json)."
-fi
-if [ -f "$HOME/beehive_os/user_config.json" ]; then
-    rm "$HOME/beehive_os/user_config.json"
-    echo "✅ Removed personal configuration (user_config.json)."
-fi
+# We ensure the target directory doesn't have personal files from the source
+rm -f "$HOME/beehive_os/data/events.json"
+rm -f "$HOME/beehive_os/user_config.json"
+
+# 3.1 Initializing config from templates
+echo -e "${AMBER}📋 Initializing default configuration...${RESET}"
+mkdir -p "$HOME/beehive_os/data"
+cp "$HOME/beehive_os/user_config.example.json" "$HOME/beehive_os/user_config.json"
+echo "[]" > "$HOME/beehive_os/data/events.json"
+echo "✅ Configuration and events initialized."
+
+# 3.2 Backing up existing system configurations
+echo -e "${AMBER}💾 Backing up your current system configurations...${RESET}"
 
 # 4. Injecting Bee-Hive configurations
 echo -e "${AMBER}💉 Injecting hive venom (configs)...${RESET}"
