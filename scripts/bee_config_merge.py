@@ -53,12 +53,15 @@ def merge_config(local_path, template_path):
         print(f"❌ Error writing: {e}")
 
 if __name__ == "__main__":
-    # Paths relative to beehive_os directory
-    home = os.path.expanduser("~")
-    base_dir = os.path.join(home, "beehive_os")
+    # Check current directory first (for dev/isolated runs)
+    if os.path.exists("user_config.json"):
+        base_dir = "."
+    else:
+        # Canonical location for Marc's PC
+        home = os.path.expanduser("~")
+        base_dir = os.path.join(home, "beehive_os")
     
     local = os.path.join(base_dir, "user_config.json")
     template = os.path.join(base_dir, "user_config.example.json")
     
     merge_config(local, template)
-)
