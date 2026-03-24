@@ -61,7 +61,9 @@ Item {
             height: 90
             radius: 16
             clip: true   // ← prevents duration bar from overflowing rounded corners
-            color: BeeTheme.glassBg
+            color: BeeTheme.mode === "HoneyDark"
+                ? Qt.rgba(0.06, 0.05, 0.08, 0.93)
+                : Qt.rgba(0.96, 0.94, 0.90, 0.95)
             border.color: type === "warning" ? "#FF4444" : BeeTheme.glassBorder
             border.width: 1
 
