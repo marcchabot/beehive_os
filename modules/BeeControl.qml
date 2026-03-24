@@ -24,8 +24,10 @@ Rectangle {
     property var _s: BeeConfig.tr.settings || {}
 
     // ─── Styles ─────────────────────────────────────────────
-    color: BeeTheme.glassBg
-    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+    color: BeeTheme.mode === "HoneyDark"
+        ? Qt.rgba(0.06, 0.05, 0.08, 0.94)
+        : Qt.rgba(0.96, 0.94, 0.90, 0.96)
+    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
     border.width: 1
 
     Behavior on color        { ColorAnimation { duration: 600 } }
