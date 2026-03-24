@@ -15,7 +15,7 @@ ShellRoot {
     // ─── First Run Detection ──────────────────────────────────
     Process {
         id: firstRunCheck
-        command: ["bash", "-c", "test -f ~/.config/beehive/.bee_welcomed && echo yes || echo no"]
+        command: ["bash", "-c", "mkdir -p ~/.config/beehive && test -f ~/.config/beehive/.bee_welcomed && echo yes || echo no"]
         running: true
         stdout: SplitParser {
             onRead: (line) => {

@@ -186,9 +186,9 @@ Rectangle {
                 MouseArea {
                     id: ctaHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        // Marquer le first run comme complété
-                        var proc = Qt.createQmlObject(
-                            'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "touch ~/.config/beehive/.bee_welcomed"] }',
+                        // Crée le dossier ET le fichier marker → ne plus jamais afficher
+                        Qt.createQmlObject(
+                            'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "mkdir -p ~/.config/beehive && touch ~/.config/beehive/.bee_welcomed"] }',
                             welcomeRoot, "markWelcome"
                         )
                         welcomeRoot.dismissed()
