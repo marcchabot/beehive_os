@@ -131,67 +131,72 @@ Rectangle {
             Layout.fillWidth: true; Layout.fillHeight: true
             currentIndex: controlRoot.currentTab
 
-            // Tab 0 : My Hive (Dashboard Cells Editor)
+            // Tab 0 : My Hive (Dashboard Cells Editor — BeeStudio embedded)
             Item {
-                ColumnLayout {
-                    anchors { fill: parent; margins: 35 }
-                    Text { text: "🍯 My Hive"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
-                    Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
-                    Text { text: "Portage de l'éditeur d'alvéoles (BeeStudio) en cours..."; color: BeeTheme.textSecondary; font.italic: true }
-                    Item { Layout.fillHeight: true }
+                BeeStudio {
+                    anchors.fill: parent
+                    visible: controlRoot.currentTab === 0
                 }
             }
 
-            // Tab 1 : Design (Appearance & Wallpapers)
+            // Tab 1 : Design (Theme + Wallpapers)
             Item {
-                ScrollView {
-                    anchors.fill: parent; contentWidth: -1; clip: true
-                    ColumnLayout {
-                        width: parent.width; anchors.margins: 35
-                        spacing: 25
+                ColumnLayout {
+                    anchors.fill: parent; spacing: 0
 
-                        Text { text: "🎨 Design & Appearance"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    // ─── Theme controls (compact bar on top) ───
+                    Rectangle {
+                        Layout.fillWidth: true; height: 70
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                        border.color: BeeTheme.separator; border.width: 1
 
-                        SectionHeader { title: "THEME & VIBE" }
+                        RowLayout {
+                            anchors { fill: parent; leftMargin: 20; rightMargin: 20 }
+                            spacing: 30
 
-                        SettingRow {
-                            label: controlRoot._s.palette || "BeePalette 🎨"
-                            desc:  controlRoot._s.palette_desc || "Switch between HoneyDark 🌙 and HoneyLight ☀️."
-                            checked: BeeTheme.mode === "HoneyLight"
-                            onToggled: (val) => {
-                                let mode = val ? "HoneyLight" : "HoneyDark"
-                                BeeTheme.setMode(mode)
-                                BeeConfig.saveConfig()
-                                BeeBarState.logAction("Design", "Mode " + mode + " activé", val ? "☀️" : "🌙")
+                            // Theme toggle
+                            RowLayout {
+                                spacing: 10
+                                Text { text: "🎨"; font.pixelSize: 18 }
+                                Text { text: "HoneyDark / HoneyLight"; color: BeeTheme.textPrimary; font.pixelSize: 13 }
+                                Switch {
+                                    checked: BeeTheme.mode === "HoneyLight"
+                                    onCheckedChanged: {
+                                        let mode = checked ? "HoneyLight" : "HoneyDark"
+                                        BeeTheme.setMode(mode)
+                                        BeeConfig.saveConfig()
+                                        BeeBarState.logAction("Design", "Mode " + mode + " activé", checked ? "☀️" : "🌙")
+                                    }
+                                }
                             }
-                        }
 
-                        SettingRow {
-                            label: controlRoot._s.nectar_sync || "Nectar Sync 🍯"
-                            desc:  controlRoot._s.nectar_sync_desc || "Automatic theme adaptation to the chosen wallpaper."
-                            checked: BeeTheme.nectarSync
-                            onToggled: (val) => {
-                                BeeTheme.nectarSync = val
-                                BeeConfig.saveConfig()
-                                BeeBarState.logAction("Design", "Nectar Sync " + (val ? "activé" : "désactivé"), "🍯")
+                            // Nectar Sync toggle
+                            RowLayout {
+                                spacing: 10
+                                Text { text: "🍯"; font.pixelSize: 18 }
+                                Text { text: "Nectar Sync"; color: BeeTheme.textPrimary; font.pixelSize: 13 }
+                                Switch {
+                                    checked: BeeTheme.nectarSync
+                                    onCheckedChanged: {
+                                        BeeTheme.nectarSync = checked
+                                        BeeConfig.saveConfig()
+                                        BeeBarState.logAction("Design", "Nectar Sync " + (checked ? "activé" : "désactivé"), "🍯")
+                                    }
+                                }
                             }
-                        }
 
-                        SettingRow {
-                            label: controlRoot._s.motion || "BeeMotion"
-                            desc:  controlRoot._s.motion_desc || "3D depth effect on the MayaDash."
-                            checked: BeeConfig.motionMode
-                            onToggled: (val) => {
-                                BeeConfig.motionMode = val
-                                BeeConfig.saveConfig()
-                                BeeBarState.logAction("Design", "BeeMotion " + (val ? "activé" : "désactivé"), "🌪️")
-                            }
+                            Item { Layout.fillWidth: true }
                         }
+                    }
 
-                        SectionHeader { title: "WALLPAPERS" }
-                        Text { text: "L'explorateur de fonds d'écran sera injecté ici..."; color: BeeTheme.textSecondary; font.italic: true }
-                        
-                        Item { Layout.fillHeight: true; height: 20 }
+                    // ─── Wallpaper browser (BeeStudio cat 1) ───
+                    Item {
+                        Layout.fillWidth: true; Layout.fillHeight: true
+                        BeeStudio {
+                            anchors.fill: parent
+                            activeCategory: 1   // Wallpapers tab
+                            visible: controlRoot.currentTab === 1
+                        }
                     }
                 }
             }
