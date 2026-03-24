@@ -61,7 +61,7 @@ def fetch_events():
     
     for cal in CALENDARS:
         # Use gog CLI to fetch events in JSON format
-        cmd = ["gog", "calendar", "list", cal['id'], "--from", from_date, "--max", "10", "--json"]
+        cmd = ["gog", "calendar", "list", cal['id'], "--account", "powerland@gmail.com", "--from", from_date, "--max", "10", "--json"]
         
         try:
             # We add a timeout and don't suppress stderr so we can see if it prompts for a password
