@@ -9,7 +9,8 @@
     "tooltip_cpu": "CPU",
     "tooltip_ram": "Mémoire",
     "tooltip_net": "Réseau",
-    "tooltip_disk": "Disque"
+    "tooltip_disk": "Disque",
+    "tooltip_battery": "BAT"
   },
 
   "weather": {

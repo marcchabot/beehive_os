@@ -250,7 +250,7 @@ Rectangle {
                                 height: parent.height; radius: 2; color: beeBar.cpuPercent > 80 ? '#FF4444' : BeeTheme.accent
                             }
                         }
-                        Text { text: 'CPU'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_cpu) || 'CPU'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
                         Text { text: beeBar.cpuUsage; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
                     }
 
@@ -264,13 +264,13 @@ Rectangle {
                                 height: parent.height; radius: 2; color: beeBar.ramPercent > 85 ? '#FF4444' : BeeTheme.accent
                             }
                         }
-                        Text { text: 'RAM'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_ram) || 'RAM'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
                         Text { text: beeBar.ramUsed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
                     }
 
                     RowLayout {
                         visible: BeeConfig.showNet; spacing: 6
-                        Text { text: 'NET'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_net) || 'NET'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
                         Text { text: beeBar.netSpeed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
                     }
                 }
@@ -292,7 +292,7 @@ Rectangle {
                         height: parent.height; radius: 2; color: beeBar.diskPercent > 90 ? '#FF4444' : BeeTheme.accent
                     }
                 }
-                Text { text: 'DISK'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_disk) || 'DISK'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
                 Text { text: beeBar.diskUsed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
             }
 
@@ -307,7 +307,7 @@ Rectangle {
                         height: parent.height; radius: 2; color: beeBar.batteryPercent < 20 ? '#FF4444' : BeeTheme.accent
                     }
                 }
-                Text { text: beeBar.batteryStatus === "Charging" ? '⚡' : 'BAT'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                Text { text: beeBar.batteryStatus === "Charging" ? '⚡' : (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_battery) || 'BAT'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
                 Text { text: beeBar.batteryPercent + "%"; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
             }
 
