@@ -95,7 +95,8 @@ QtObject {
             subtitle: cell.subtitle || "",
             detail: cell.detail || "",
             action: cell.action || "none",
-            highlighted: cell.highlighted || false
+            highlighted: cell.highlighted || false,
+            customizable: true
         }
     }
 
@@ -346,6 +347,8 @@ QtObject {
             var key = cellKeys[i]
             var cell = trCell(key)
             if (cell) {
+                // Special case: Bee-Hive logo cell is protected by default
+                if (key === "beehive") cell.customizable = false
                 _cells.append(cell)
                 localized = true
             } else {
@@ -357,14 +360,14 @@ QtObject {
         if (!localized) {
             // Fallback to English defaults
             _cells.clear()
-            _cells.append({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false })
-            _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false })
-            _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true  })
-            _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false })
-            _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false })
-            _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false })
-            _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false })
-            _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false })
+            _cells.append({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false, customizable: true })
+            _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false, customizable: true })
+            _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true,  customizable: false })
+            _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false, customizable: true })
+            _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false, customizable: true })
+            _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false, customizable: true })
+            _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false, customizable: true })
+            _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
         }
     }
 }
