@@ -315,19 +315,17 @@ Rectangle {
                                         color: BeeTheme.textPrimary
                                         font.pixelSize: 12
                                         clip: true
-                                        placeholderText: "https://calendar.google.com/calendar/ical/..."
                                         onEditingFinished: {
                                             BeeConfig.icsUrl = text
                                             BeeConfig.saveConfig()
                                         }
-                                        // Placeholder text
-                                        Text {
-                                            visible: !parent.text && !parent.activeFocus
-                                            text: parent.placeholderText
-                                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
-                                            font.pixelSize: 11
-                                            anchors.verticalCenter: parent.verticalCenter
-                                        }
+                                    }
+                                    Text {
+                                        visible: !icsField.text && !icsField.activeFocus
+                                        text: "https://calendar.google.com/calendar/ical/..."
+                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                        font.pixelSize: 11
+                                        anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
                                     }
                                 }
 
