@@ -86,8 +86,9 @@ Bee-Hive OS includes **Honey-Sync**, a local script to fetch your Google Calenda
 
 1. **Install `gog` CLI** (Google Workspace CLI):
    ```bash
-   go install github.com/mmcdole/gog@latest
+   go install github.com/steipete/gogcli@latest
    ```
+   *(Note: The binary will be installed as `gogcli` in `~/go/bin/`. You may need to rename or symlink it to `gog` in your `$PATH`.)*
 2. **Authorize `gog`** with your Google account:
    ```bash
    gog auth login
