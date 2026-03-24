@@ -96,16 +96,16 @@ QtObject {
     property QtObject light: QtObject {
         id: _light
         readonly property color bg:            "#F5F0E8"
-        readonly property color accent:        "#8A6106" // Plus sombre pour meilleur contraste
-        readonly property color secondary:     "#EDE6D8"
-        readonly property color textPrimary:   "#1A1A1A"
-        readonly property color textSecondary: "#453B30" // Plus sombre pour lisibilité
-        readonly property color barBg:         Qt.rgba(0.94,  0.92,  0.88,  0.94) // Plus "Beige/Miel"
-        readonly property color glassBg:       Qt.rgba(1,     1,     1,     0.92)
-        readonly property color glassBorder:   Qt.rgba(0.65,  0.46,  0.03,  0.4)
-        readonly property color backdropBg:    Qt.rgba(0.93,  0.89,  0.84,  0.90)
-        readonly property real  auraAlpha:     0.4
-        readonly property color separator:     Qt.rgba(0, 0, 0, 0.12) // Plus marqué en Light
+        readonly property color accent:        "#634604" // Très sombre pour contraste maximal (Brun/Miel foncé)
+        readonly property color secondary:     "#EBE2D3"
+        readonly property color textPrimary:   "#1A1A1A" // Noir charbon
+        readonly property color textSecondary: "#3D342B" // Brun très sombre pour sous-titres
+        readonly property color barBg:         Qt.rgba(0.92,  0.90,  0.85,  0.96) // Plus dense
+        readonly property color glassBg:       Qt.rgba(1,     1,     1,     0.94)
+        readonly property color glassBorder:   Qt.rgba(0.40,  0.28,  0.02,  0.5) // Bordures bien visibles
+        readonly property color backdropBg:    Qt.rgba(0.90,  0.86,  0.80,  0.92)
+        readonly property real  auraAlpha:     0.35
+        readonly property color separator:     Qt.rgba(0, 0, 0, 0.18) // Lignes bien marquées
         readonly property string wallpaper:    "../assets/wallpaper_light_bee.png"
     }
 
