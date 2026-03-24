@@ -56,6 +56,14 @@
     "see_calendar": "See calendar →"
   },
 
+  "sync": {
+    "last_sync": "Sync: %1 min ago",
+    "syncing": "Syncing...",
+    "error": "Sync error",
+    "no_sources": "No calendar configured",
+    "sources_count": "%1 active calendar(s)"
+  },
+
   "settings": {
     "title": "Bee-Hive Settings",
     "palette": "BeePalette 🎨",

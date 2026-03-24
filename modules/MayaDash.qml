@@ -195,6 +195,39 @@ Rectangle {
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
 
+            // Détection de la cellule Calendar pour afficher le compteur live
+            property bool isCalendarCell: cellData && (cellData.icon === "📅" || cellData.title === "Calendar" || cellData.title === "Calendrier")
+            
+            // Texte de détail dynamique pour la cellule Calendar
+            property string dynamicDetail: {
+                if (hexCell.isCalendarCell) {
+                    var count = BeeConfig.liveSyncCount;
+                    var lang = BeeConfig.uiLang || "en";
+                    if (count > 0) {
+                        if (lang === "fr") {
+                            return count + (count > 1 ? " événements" : " événement");
+                        } else {
+                            return count + (count > 1 ? " upcoming events" : " upcoming event");
+                        }
+                    } else {
+                        if (BeeConfig.tr && BeeConfig.tr.cells && BeeConfig.tr.cells.no_events) {
+                            return BeeConfig.tr.cells.no_events;
+                        }
+                        return (lang === "fr") ? "Aucun événement à venir" : "No upcoming events";
+                    }
+                }
+                return cellData ? cellData.detail : "";
+            }
+
+            // Réagir aux changements de liveSyncCount pour mise à jour immédiate
+            Connections {
+                target: BeeConfig
+                function onLiveSyncCountChanged() {
+                    // Force la réévaluation de dynamicDetail
+                    hexCell.dynamicDetail = hexCell.dynamicDetail;
+                }
+            }
+
         // ─── BeeVibe: audio value for this cell ────────────────
         property real vibeValue: beeVibe.barValues.length > cellIndex
                                  ? beeVibe.barValues[cellIndex] : 0.0
@@ -331,7 +364,7 @@ Rectangle {
             }
 
             Text {
-                text: hexCell.detail
+                text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
