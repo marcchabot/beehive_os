@@ -106,8 +106,8 @@ def fetch_events():
 def main():
     if not check_gog_installed():
         print("❌ Error: 'gog' CLI not found.")
-        print("Please install it: go install github.com/steipete/gogcli@latest")
-        print("Then rename or symlink 'gogcli' to 'gog' if needed.")
+        print("Please install it: yay -S gogcli")
+        print("Or compile: go install github.com/steipete/gogcli/cmd/gog@latest")
         sys.exit(1)
 
     if not os.path.exists(os.path.dirname(OUTPUT_FILE)):
