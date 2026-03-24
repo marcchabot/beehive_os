@@ -159,19 +159,16 @@ QtObject {
 
     function applyConfig(cfg) {
         _rawConfig = cfg
-        console.log("BeeConfig: Application de la configuration (pinned_apps:", JSON.stringify(cfg.pinned_apps || []), ")")
-        if (cfg.stealth_mode !== undefined)
-            stealthMode = cfg.stealth_mode === true
-        if (cfg.vibe_mode !== undefined)
-            vibeMode = cfg.vibe_mode === true
-        if (cfg.focus_mode !== undefined)
-            focusMode = cfg.focus_mode === true
-        if (cfg.corners_mode !== undefined)
-            cornersMode = cfg.corners_mode === true
-        if (cfg.motion_mode !== undefined)
-            motionMode = cfg.motion_mode === true
-        if (cfg.analog_clock !== undefined)
-            analogClock = cfg.analog_clock === true
+        console.log("BeeConfig: Application de la configuration...")
+        
+        // ... (autres propriétés)
+        if (cfg.stealth_mode !== undefined) stealthMode = cfg.stealth_mode === true
+        if (cfg.vibe_mode !== undefined)    vibeMode = cfg.vibe_mode === true
+        if (cfg.focus_mode !== undefined)   focusMode = cfg.focus_mode === true
+        if (cfg.corners_mode !== undefined) cornersMode = cfg.corners_mode === true
+        if (cfg.motion_mode !== undefined)  motionMode = cfg.motion_mode === true
+        if (cfg.analog_clock !== undefined) analogClock = cfg.analog_clock === true
+        
         if (cfg.beebar_stats !== undefined) {
             showCpu = cfg.beebar_stats.cpu !== false
             showRam = cfg.beebar_stats.ram !== false
@@ -179,96 +176,73 @@ QtObject {
             showDisk = cfg.beebar_stats.disk !== false
             showBattery = cfg.beebar_stats.battery === true
         }
+
         if (cfg.pinned_apps !== undefined && Array.isArray(cfg.pinned_apps))
             pinnedApps = cfg.pinned_apps
+
         if (cfg.bee_events !== undefined)
             eventsEnabled = cfg.bee_events.enabled !== false
+
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
             uiLang = cfg.lang
             loadI18n(uiLang)
         }
+
         if (cfg.weather) {
             weatherCity = cfg.weather.city || weatherCity
             weatherUnit = cfg.weather.unit || weatherUnit
             weatherLang = cfg.weather.lang || weatherLang
-
-            // Auto-update coordinates if it's a known location
-            if (weatherCity === "Blainville") {
-                weatherLat = 45.67
-                weatherLon = -73.88
-            } else if (weatherCity === "Mont-Tremblant" || weatherCity === "Tremblant") {
-                weatherLat = 46.12
-                weatherLon = -74.60
-            }
+            if (weatherCity === "Blainville") { weatherLat = 45.67; weatherLon = -73.88 }
+            else if (weatherCity === "Tremblant") { weatherLat = 46.12; weatherLon = -74.60 }
         }
+
         if (cfg.dashboard) {
             dashTitle = cfg.dashboard.title || dashTitle
             if (cfg.dashboard.cells && cfg.dashboard.cells.length > 0) {
                 _cells.clear()
-                // Load user-configured cells first
                 for (var i = 0; i < cfg.dashboard.cells.length; i++) {
                     var cell = cfg.dashboard.cells[i]
-                    // Force customizable if not explicitly false (handles missing prop)
-                    if (cell.customizable === undefined) cell.customizable = true
-                    _cells.append(cell)
+                    
+                    // --- MIGRATION CRITIQUE ---
+                    // On force le déverrouillage de TOUT sauf du logo central
+                    // Cela règle les problèmes de fichiers config corrompus par d'anciennes versions
+                    var isLogo = (cell.title === "Bee-Hive OS" || cell.icon === "🐝")
+                    var canEdit = isLogo ? false : true
+                    
+                    _cells.append({
+                        icon:         cell.icon || "📦",
+                        title:        cell.title || "Module",
+                        subtitle:     cell.subtitle || "",
+                        detail:       cell.detail || "",
+                        action:       cell.action || "none",
+                        highlighted:  cell.highlighted === true,
+                        customizable: canEdit,
+                        color:        cell.color || ""
+                    })
                 }
-                // If less than 8 cells, pad with defaults to ensure full dashboard
-                var totalCells = _cells.count
-                if (totalCells < 8) {
-                    console.log("BeeConfig: Padding cells from", totalCells, "to 8 with defaults")
-                    var defaults = []
-                    // Try to get localized defaults first
+                
+                // Remplissage si nécessaire
+                if (_cells.count < 8) {
                     var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
                     for (var k = 0; k < cellKeys.length; k++) {
-                        var cellData = trCell(cellKeys[k])
-                        if (cellData) {
-                            // Ensure Bee-Hive logo is protected, others open
-                            cellData.customizable = (cellKeys[k] !== "beehive")
-                            defaults.push(cellData)
-                        }
-                    }
-                    // Fallback to English if not all localized
-                    if (defaults.length < 8) {
-                        defaults = []
-                        defaults.push({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false, customizable: true })
-                        defaults.push({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false, customizable: true })
-                        defaults.push({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true,  customizable: false })
-                        defaults.push({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false, customizable: true })
-                        defaults.push({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false, customizable: true })
-                        defaults.push({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false, customizable: true })
-                        defaults.push({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false, customizable: true })
-                        defaults.push({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
-                    }
-                    // Pad remaining cells with defaults that are not already present
-                    for (var i = totalCells; i < 8; i++) {
-                        var defIdx = 0
-                        // Find a default that's not already used
-                        var foundValid = false
-                        while (defIdx < defaults.length) {
-                            var alreadyUsed = false
-                            for (var j = 0; j < _cells.count; j++) {
-                                if (_cells.get(j).title === defaults[defIdx].title) {
-                                    alreadyUsed = true
-                                    break
-                                }
-                            }
-                            if (!alreadyUsed) {
-                                foundValid = true
-                                break
-                            }
-                            defIdx++
+                        if (_cells.count >= 8) break
+                        
+                        var def = trCell(cellKeys[k])
+                        if (!def) continue
+                        
+                        // Vérifier si déjà présent par le titre
+                        var exists = false
+                        for (var j = 0; j < _cells.count; j++) {
+                            if (_cells.get(j).title === def.title) { exists = true; break }
                         }
                         
-                        if (foundValid) {
-                            var d = defaults[defIdx]
+                        if (!exists) {
+                            var isDefLogo = (cellKeys[k] === "beehive")
                             _cells.append({
-                                icon: d.icon, title: d.title, subtitle: d.subtitle, 
-                                detail: d.detail, action: d.action, 
-                                highlighted: d.highlighted, 
-                                customizable: (d.customizable !== false) // Force boolean true
+                                icon: def.icon, title: def.title, subtitle: def.subtitle,
+                                detail: def.detail, action: def.action,
+                                highlighted: def.highlighted, customizable: !isDefLogo
                             })
-                        } else {
-                            _cells.append({ icon: "▣", title: "Cell " + (i+1), subtitle: "Empty", detail: "", action: "none", highlighted: false, customizable: true })
                         }
                     }
                 }
@@ -276,15 +250,9 @@ QtObject {
                 loadDefaults()
             }
         }
-        // Apply configured transition duration
-        if (cfg.transitions && cfg.transitions.theme_duration_ms)
-            BeeTheme.transitionDuration = cfg.transitions.theme_duration_ms
-        // Nectar Sync 🍯
-        if (cfg.nectar_sync !== undefined)
-            BeeTheme.nectarSync = cfg.nectar_sync === true
-        // Apply saved theme (animated via setMode)
-        if (cfg.theme && cfg.theme !== BeeTheme.mode)
-            BeeTheme.setMode(cfg.theme)
+
+        if (cfg.theme && cfg.theme !== BeeTheme.mode) BeeTheme.setMode(cfg.theme)
+        if (cfg.nectar_sync !== undefined) BeeTheme.nectarSync = cfg.nectar_sync === true
     }
 
     // ─── Sauvegarde vers user_config.json ────────────────────
