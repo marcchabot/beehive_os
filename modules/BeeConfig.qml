@@ -65,6 +65,18 @@ QtObject {
     property bool eventsEnabled: true
     property string icsUrl: ""  // URL ICS (Google Calendar, Outlook, Apple…)
 
+    // ─── Bee-Live Sync v2 ────────────────────────────────────
+    property string eventsLivePath: StandardPaths.writableLocation(
+        StandardPaths.ConfigLocation) + "/beehive_os/events_live.json"
+    property var liveSyncMeta: null
+    property int liveSyncCount: 0
+
+    signal eventsReloadRequested()
+
+    function reloadLiveEvents() {
+        eventsReloadRequested()
+    }
+
     // ─── Sync properties to BeeBarState ─────────────────────
     // Removed old redundant listeners as they are now handled above with auto-save.
 

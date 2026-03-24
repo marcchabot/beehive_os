@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.2",
-  "version": "1.3.6",
+  "schema_version": "2.0",
+  "version": "1.7.0",
   "theme": "HoneyDark",
   "lang": "en",
   "_comment": "Bee-Hive OS — Community configuration file. Modify the values below to customize your hive.",
@@ -61,11 +61,34 @@
     "enabled": true,
     "max_events": 3
   },
-  "_comment_ics": "Export your calendar as ICS from Google Calendar, Outlook, Apple Calendar, etc. Paste the URL or local path below.",
+  "_comment_ics": "Bee-Live Sync v2: Add calendar sources below. You can have multiple calendars with different colors/labels. The old 'events_ics_url' is still supported for backward compatibility.",
+  "calendars": [
+    {
+      "id": "famille",
+      "type": "ics",
+      "url": "",
+      "label": "Famille",
+      "color": "#FFB81C"
+    },
+    {
+      "id": "pharmacie",
+      "type": "ics",
+      "url": "",
+      "label": "Pharmacie",
+      "color": "#4CAF50"
+    }
+  ],
+  "live_sync": {
+    "enabled": true,
+    "interval_seconds": 900,
+    "max_events": 5,
+    "lookahead_days": 14
+  },
   "events_ics_url": "",
+  "_comment_migration": "If you have an existing events_ics_url, run scripts/bee_migrate_sync_v2.sh to migrate automatically to the calendars array.",
   "framework": {
     "name": "Bee-Hive OS",
-    "version": "1.3.6",
+    "version": "1.7.0",
     "author": "Bee-Hive Community",
     "license": "MIT"
   },

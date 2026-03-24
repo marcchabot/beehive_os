@@ -107,6 +107,11 @@ ShellRoot {
         function showOSD(type: string, value: int) {
             BeeBarState.showOSD(type, value)
         }
+
+        // ─── Bee-Live Sync v2 ───────
+        function refreshEvents() {
+            BeeConfig.reloadLiveEvents()
+        }
     }
 
     // Sentinelle Stealth

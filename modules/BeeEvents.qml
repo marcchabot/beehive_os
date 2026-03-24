@@ -43,9 +43,17 @@ Item {
                             return;
                         }
                         var data = JSON.parse(text);
+                        // Support format v2 (objet avec events[]) et v1 (tableau direct)
+                        var eventsArray = Array.isArray(data) ? data : (data.events || []);
+
+                        // Mettre à jour les métadonnées de sync
+                        if (data._meta) {
+                            BeeConfig.liveSyncMeta = data._meta;
+                        }
+
                         var nowSec = Date.now() / 1000;
                         // Filtre : événements dans les 30 dernières minutes ou futurs
-                        var upcoming = data.filter(function(e) {
+                        var upcoming = eventsArray.filter(function(e) {
                             return !e.timestamp || e.timestamp >= nowSec - 1800;
                         });
                         eventsModel.clear();
@@ -56,9 +64,11 @@ Item {
                                 evtTitle:  upcoming[i].title || "Événement",
                                 evtTime:   upcoming[i].time  || "",
                                 evtSub:    upcoming[i].sub   || "",
-                                evtUrgent: upcoming[i].urgent === true
+                                evtUrgent: upcoming[i].urge === true || upcoming[i].urgent === true
                             });
                         }
+                        // Mettre à jour le compteur pour la cellule dashboard
+                        BeeConfig.liveSyncCount = upcoming.length;
                     } catch(e) {
                         console.warn("BeeEvents: Erreur parsing JSON:", e);
                     }
@@ -68,8 +78,18 @@ Item {
             }
         }
         // Qt.resolvedUrl résout le chemin relatif au fichier QML
-        doc.open("GET", Qt.resolvedUrl("../data/events.json"));
+        // V2: lecture depuis le chemin live de la config
+        var path = BeeConfig.eventsLivePath || Qt.resolvedUrl("../data/events.json");
+        doc.open("GET", path);
         doc.send();
+    }
+
+    // ─── Connexion IPC pour rafraîchissement instantané ───────
+    Connections {
+        target: BeeConfig
+        function onEventsReloadRequested() {
+            loadEvents();
+        }
     }
 
     // ─── Fond glassmorphism ───────────────────────────────────

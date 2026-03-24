@@ -1,0 +1,16 @@
+[Unit]
+Description=Bee-Live Sync Daemon v2 — Bee-Hive OS Calendar Sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/beehive_os/scripts/bee_sync_daemon.py
+Restart=on-failure
+RestartSec=30
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:%h/.cache/beehive/bee_sync.log
+StandardError=append:%h/.cache/beehive/bee_sync.log
+
+[Install]
+WantedBy=default.target

@@ -39,6 +39,34 @@ def merge_config(local_path, template_path):
         # Keep template version since this is an upgrade
         print(f"🚀 Upgrading to version: {template_cfg['version']}")
 
+    # ─── Migration Bee-Live Sync v2 (v1 → v2) ───────────────────────────────────
+    # Migrer events_ics_url vers calendars[] si nécessaire
+    legacy_url = local_cfg.get("events_ics_url", "")
+    if legacy_url and not local_cfg.get("calendars"):
+        print(" ↳ Migration events_ics_url → calendars[0] (Bee-Live Sync v2)")
+        new_cfg["calendars"] = [{
+            "id": "default",
+            "type": "ics",
+            "url": legacy_url,
+            "label": "Calendrier",
+            "color": "#FFB81C"
+        }]
+        # Conserver l'ancienne clé pour compatibilité (optionnel)
+        # new_cfg["events_ics_url"] = legacy_url
+
+    # Ajouter section live_sync si absente
+    if "live_sync" not in new_cfg:
+        live_sync_default = template_cfg.get("live_sync", {
+            "enabled": True,
+            "interval_seconds": 900,
+            "max_events": 5,
+            "lookahead_days": 14
+        })
+        new_cfg["live_sync"] = live_sync_default
+        print(" ↳ Ajout section live_sync (défaut v2)")
+
+    # ─────────────────────────────────────────────────────────────────────────────
+
     # Sauvegarder
     backup_path = local_path + ".bak"
     try:
