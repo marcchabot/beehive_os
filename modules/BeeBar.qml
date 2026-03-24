@@ -196,7 +196,7 @@ Rectangle {
                 }
                 Rectangle {
                     visible: BeeBarState.focusActive
-                    width: 6; height: 6; radius: 3; color: "#4CAF50"
+                    width: 6; height: 6; radius: 3; color: BeeTheme.accent
                     SequentialAnimation on opacity {
                         running: BeeBarState.focusActive; loops: Animation.Infinite
                         NumberAnimation { to: 0.3; duration: 1200; easing.type: Easing.InOutSine }
@@ -205,7 +205,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 20; color: Qt.rgba(1,1,1,0.08); Layout.alignment: Qt.AlignVCenter }
+            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             RowLayout {
                 spacing: 8
@@ -244,7 +244,7 @@ Rectangle {
                         visible: BeeConfig.showCpu; spacing: 6
                         Rectangle {
                             width: 40; height: 4; radius: 2; Layout.alignment: Qt.AlignVCenter
-                            color: Qt.rgba(1,1,1,0.08)
+                            color: BeeTheme.separator
                             Rectangle {
                                 width: parent.width * (Math.min(beeBar.cpuPercent, 100) / 100)
                                 height: parent.height; radius: 2; color: beeBar.cpuPercent > 80 ? '#FF4444' : BeeTheme.accent
@@ -258,7 +258,7 @@ Rectangle {
                         visible: BeeConfig.showRam; spacing: 6
                         Rectangle {
                             width: 40; height: 4; radius: 2; Layout.alignment: Qt.AlignVCenter
-                            color: Qt.rgba(1,1,1,0.08)
+                            color: BeeTheme.separator
                             Rectangle {
                                 width: parent.width * (Math.min(beeBar.ramPercent, 100) / 100)
                                 height: parent.height; radius: 2; color: beeBar.ramPercent > 85 ? '#FF4444' : BeeTheme.accent
@@ -286,7 +286,7 @@ Rectangle {
                 visible: BeeConfig.showDisk; spacing: 6
                 Rectangle {
                     width: 40; height: 4; radius: 2; Layout.alignment: Qt.AlignVCenter
-                    color: Qt.rgba(1,1,1,0.08)
+                    color: BeeTheme.separator
                     Rectangle {
                         width: parent.width * (Math.min(beeBar.diskPercent, 100) / 100)
                         height: parent.height; radius: 2; color: beeBar.diskPercent > 90 ? '#FF4444' : BeeTheme.accent
@@ -301,7 +301,7 @@ Rectangle {
                 visible: BeeConfig.showBattery; spacing: 6
                 Rectangle {
                     width: 40; height: 4; radius: 2; Layout.alignment: Qt.AlignVCenter
-                    color: Qt.rgba(1,1,1,0.08)
+                    color: BeeTheme.separator
                     Rectangle {
                         width: parent.width * (Math.min(beeBar.batteryPercent, 100) / 100)
                         height: parent.height; radius: 2; color: beeBar.batteryPercent < 20 ? '#FF4444' : BeeTheme.accent
@@ -311,11 +311,11 @@ Rectangle {
                 Text { text: beeBar.batteryPercent + "%"; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
             }
 
-            Rectangle { width: 1; height: 20; color: Qt.rgba(1,1,1,0.08); Layout.alignment: Qt.AlignVCenter }
+            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             BeeWeather { city: BeeConfig.weatherCity; lat: BeeConfig.weatherLat; lon: BeeConfig.weatherLon; Layout.alignment: Qt.AlignVCenter }
 
-            Rectangle { width: 1; height: 20; color: Qt.rgba(1,1,1,0.08); Layout.alignment: Qt.AlignVCenter }
+            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             Column {
                 Layout.alignment: Qt.AlignVCenter
@@ -332,7 +332,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 20; color: Qt.rgba(1,1,1,0.08); Layout.alignment: Qt.AlignVCenter }
+            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             Rectangle {
                 width: 28; height: 28; radius: 7; Layout.alignment: Qt.AlignVCenter

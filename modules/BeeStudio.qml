@@ -68,7 +68,7 @@ Item {
                 anchors { right: parent.right; top: parent.top; margins: 6 }
                 width: 20; height: 20; radius: 10
                 color: BeeTheme.accent
-                Text { text: "✓"; anchors.centerIn: parent; color: "#111"; font { pixelSize: 10; bold: true } }
+                Text { text: "✓"; anchors.centerIn: parent; color: BeeTheme.textPrimary; font { pixelSize: 10; bold: true } }
             }
 
             // Overlay hover

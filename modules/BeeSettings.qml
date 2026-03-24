@@ -207,7 +207,7 @@ Rectangle {
                     Layout.fillWidth: true
                     spacing: 10
                     Text {
-                        text: (BeeConfig.tr.common text: "Affichage BeeBar 📊"text: "Affichage BeeBar 📊" BeeConfig.tr.common.beebar_stats_title) || "Affichage BeeBar 📊"
+                        text: (BeeConfig.tr.common && BeeConfig.tr.common.beebar_stats_title) || "Affichage BeeBar 📊"
                         color: BeeTheme.accent
                         font { bold: true; pixelSize: 13; letterSpacing: 1 }
                     }

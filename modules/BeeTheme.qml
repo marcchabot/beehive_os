@@ -88,6 +88,7 @@ QtObject {
         readonly property color glassBorder:   Qt.rgba(1,     0.722, 0.11,  0.2)
         readonly property color backdropBg:    Qt.rgba(0.02,  0.02,  0.04,  0.88)
         readonly property real  auraAlpha:     0.6
+        readonly property color separator:     Qt.rgba(1, 1, 1, 0.08)
         readonly property string wallpaper:    "../assets/wallpaper_dark_bee.png"
     }
 
@@ -104,6 +105,7 @@ QtObject {
         readonly property color glassBorder:   Qt.rgba(0.65,  0.46,  0.03,  0.4)
         readonly property color backdropBg:    Qt.rgba(0.93,  0.89,  0.84,  0.90)
         readonly property real  auraAlpha:     0.4
+        readonly property color separator:     Qt.rgba(0, 0, 0, 0.08)
         readonly property string wallpaper:    "../assets/wallpaper_light_bee.png"
     }
 
@@ -131,6 +133,7 @@ QtObject {
     property color glassBg:       lerpColor(_dark.glassBg,       _light.glassBg,       _progress)
     property color glassBorder:   lerpColor(_dark.glassBorder,   _light.glassBorder,   _progress)
     property color backdropBg:    lerpColor(_dark.backdropBg,    _light.backdropBg,    _progress)
+    property color separator:     lerpColor(_dark.separator,     _light.separator,     _progress)
 
     // ─── Glow BeeAura : interpolé + pulsé ────────────────────
     // alpha oscille entre 70 % et 100 % de la valeur de la palette.
