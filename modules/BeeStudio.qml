@@ -968,8 +968,8 @@ Item {
                                 anchors.fill: parent; anchors.margins: 16; spacing: 12
 
                                 Text {
-                                    text: BeeBarState.notificationHistory.length > 0
-                                        ? BeeBarState.notificationHistory.length + " notification" + (BeeBarState.notificationHistory.length > 1 ? "s" : "")
+                                    text: BeeBarState.historyModel.length > 0
+                                        ? BeeBarState.historyModel.length + " notification" + (BeeBarState.historyModel.length > 1 ? "s" : "")
                                         : "Aucune notification"
                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                     font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
@@ -977,7 +977,7 @@ Item {
 
                                 // État vide
                                 Item {
-                                    visible: BeeBarState.notificationHistory.length === 0
+                                    visible: BeeBarState.historyModel.length === 0
                                     Layout.fillWidth: true; Layout.fillHeight: true
                                     ColumnLayout {
                                         anchors.centerIn: parent; spacing: 14
@@ -996,10 +996,10 @@ Item {
 
                                 // Liste
                                 ListView {
-                                    visible: BeeBarState.notificationHistory.length > 0
+                                    visible: BeeBarState.historyModel.length > 0
                                     Layout.fillWidth: true; Layout.fillHeight: true
                                     clip: true; spacing: 8
-                                    model: BeeBarState.notificationHistory
+                                    model: BeeBarState.historyModel
 
                                     delegate: Rectangle {
                                         width: ListView.view ? ListView.view.width : 0
@@ -1079,7 +1079,7 @@ Item {
                                 spacing: 10
                                 Item { Layout.fillWidth: true }
                                 Rectangle {
-                                    visible: BeeBarState.notificationHistory.length > 0
+                                    visible: BeeBarState.historyModel.length > 0
                                     height: 30; radius: 15; width: clearHistLbl.implicitWidth + 24
                                     color: Qt.rgba(1.0, 0.3, 0.3, 0.12)
                                     border.color: Qt.rgba(1.0, 0.3, 0.3, 0.40); border.width: 1

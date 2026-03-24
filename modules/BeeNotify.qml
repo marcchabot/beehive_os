@@ -77,15 +77,19 @@ Item {
             }
 
             // ─── Entry/exit animation ──────────────────────
-            ListView.onAdd: SequentialAnimation {
+            SequentialAnimation {
+                id: addAnim
                 NumberAnimation { target: notifyBox; property: "x"; from: 450; to: 0; duration: 500; easing.type: Easing.OutBack }
             }
+            ListView.onAdd: addAnim.start()
 
-            ListView.onRemove: SequentialAnimation {
+            SequentialAnimation {
+                id: removeAnim
                 PropertyAction { target: notifyBox; property: "ListView.delayRemove"; value: true }
                 NumberAnimation { target: notifyBox; property: "opacity"; to: 0; duration: 300 }
                 PropertyAction { target: notifyBox; property: "ListView.delayRemove"; value: false }
             }
+            ListView.onRemove: removeAnim.start()
 
             // ─── Contenu ───────────────────────────────────
             RowLayout {
