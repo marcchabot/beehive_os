@@ -10,11 +10,14 @@
 ### 🛡️ The Welcome Screen
 ![BeeWelcome](assets/screenshots/showcase_welcome.png)
 
+### 📊 The Dashboard (MayaDash)
+![Dashboard](assets/screenshots/showcase_dashboard.png)
+
 ### 🌙 Cyber-Amber (Dark Theme)
 ![Cyber-Amber](assets/screenshots/showcase_cyber_amber_dark.png)
 
-### 📊 The Dashboard
-![Dashboard](assets/screenshots/showcase_dashboard.png)
+### 💻 Tiling Mode (Kitty + Zed)
+![Tiling](assets/screenshots/showcase_tiling.png)
 
 ### 🍯 Honey-Veil (Light Theme)
 ![Honey-Veil](assets/screenshots/showcase_honey_veil_light.png)
