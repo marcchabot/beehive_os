@@ -70,8 +70,21 @@ ShellRoot {
         BeeBarState.motionActive  = BeeConfig.motionMode
     }
 
-    function toggleDash()   { dashVisible   = !dashVisible }
+    function toggleDash()   { 
+        if (!_debounce("dash")) return
+        dashVisible   = !dashVisible 
+    }
     function toggleSearch() { searchVisible = !searchVisible }
+
+    // ─── Debounce Logic ──────────────────────────────────────
+    property var _lastIpcTimes: ({})
+    function _debounce(key) {
+        var now = Date.now()
+        var last = _lastIpcTimes[key] || 0
+        if (now - last < 250) return false
+        _lastIpcTimes[key] = now
+        return true
+    }
 
     IpcHandler {
         target: "root"
@@ -92,6 +105,7 @@ ShellRoot {
         }
         // ─── BeePower Menu ─────────────────────
         function showPower() {
+            if (!root._debounce("power")) return
             console.log("Shell: showPower() called")
             // Toggle BeePower visibility via BeeBarState
             BeeBarState.powerVisible = !BeeBarState.powerVisible
