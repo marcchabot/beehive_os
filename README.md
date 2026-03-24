@@ -80,6 +80,26 @@ beehive_os/
 
 ---
 
+## 🍯 Honey-Sync — Live Calendar 📅 *(NEW)*
+
+Bee-Hive OS includes **Honey-Sync**, a local script to fetch your Google Calendar events and display them in the MayaDash.
+
+1. **Install `gog` CLI** (Google Workspace CLI):
+   ```bash
+   go install github.com/mmcdole/gog@latest
+   ```
+2. **Authorize `gog`** with your Google account:
+   ```bash
+   gog auth login
+   ```
+3. **Sync your nectar**:
+   ```bash
+   python3 scripts/honey_sync.py
+   ```
+4. (Optional) Add a cron job or systemd timer to sync every hour!
+
+---
+
 ## 🎨 Design System — BeeAura (Nexus)
 
 | Element       | Value                               |
