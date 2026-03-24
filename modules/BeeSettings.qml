@@ -141,6 +141,67 @@ Rectangle {
                     }
                 }
 
+                // ── Sélecteur de langue / Language selector ───
+                RowLayout {
+                    spacing: 20
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+                        Text {
+                            text: settingsRoot._s.language || "Langue"
+                            color: BeeTheme.textPrimary
+                            font { bold: true; pixelSize: 14 }
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                        Text {
+                            text: settingsRoot._s.language_desc || "Changer la langue de l'interface."
+                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4)
+                            font.pixelSize: 11
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    Row {
+                        spacing: 8
+                        Repeater {
+                            model: [
+                                { code: "fr", label: "🇫🇷 FR" },
+                                { code: "en", label: "🇬🇧 EN" }
+                            ]
+                            Rectangle {
+                                property bool isActive: BeeConfig.uiLang === modelData.code
+                                width: 62; height: 28; radius: 8
+                                color: isActive
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
+                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, isActive ? 0.65 : 0.20)
+                                border.width: 1
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                                Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
+                                    font { pixelSize: 12; bold: isActive }
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        BeeConfig.setLang(modelData.code)
+                                        BeeConfig.saveConfig()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // ── BeePalette — v0.5 : transitions animées ───
                 SettingRow {
                     label:   settingsRoot._s.palette   || "BeePalette 🎨"
@@ -235,7 +296,54 @@ Rectangle {
                                 { label: "BAT", prop: "showBattery" }
                             ]
                             Rectangle {
-                                width: 75; height: 32; radius: 8
+                                width: 55; height: 32; radius: 8
+                                color: BeeConfig[modelData.prop]
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
+                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, BeeConfig[modelData.prop] ? 0.6 : 0.2)
+                                border.width: 1
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary
+                                    font { pixelSize: 11; bold: BeeConfig[modelData.prop] }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        BeeConfig[modelData.prop] = !BeeConfig[modelData.prop]
+                                        BeeConfig.saveConfig()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── BeeBar Stats ──────────────────────────────
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    Text {
+                        text: "Affichage BeeBar 📊"
+                        color: BeeTheme.accent
+                        font { bold: true; pixelSize: 13; letterSpacing: 1 }
+                    }
+                    Flow {
+                        Layout.fillWidth: true
+                        spacing: 10
+                        Repeater {
+                            model: [
+                                { label: "CPU", prop: "showCpu" },
+                                { label: "RAM", prop: "showRam" },
+                                { label: "NET", prop: "showNet" },
+                                { label: "DISK", prop: "showDisk" },
+                                { label: "BAT", prop: "showBattery" }
+                            ]
+                            Rectangle {
+                                width: 55; height: 32; radius: 8
                                 color: BeeConfig[modelData.prop]
                                     ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
                                     : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
@@ -262,72 +370,6 @@ Rectangle {
                 }
 
                 // ── Effets Sonores ────────────────────────────
-                SettingRow {
-                    label:   settingsRoot._s.sound      || "Effets Sonores"
-                    desc:    settingsRoot._s.sound_desc  || "Enable hive ambient sounds."
-                    checked: true
-                }
-
-                // ── Sélecteur de langue / Language selector ───
-                RowLayout {
-                    spacing: 20
-
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 2
-                        Text {
-                            text: settingsRoot._s.language || "Langue"
-                            color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 14 }
-                            Behavior on color { ColorAnimation { duration: 600 } }
-                        }
-                        Text {
-                            text: settingsRoot._s.language_desc || "Changer la langue de l'interface."
-                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4)
-                            font.pixelSize: 11
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                        }
-                    }
-
-                    Row {
-                        spacing: 8
-                        Repeater {
-                            model: [
-                                { code: "fr", label: "🇫🇷 FR" },
-                                { code: "en", label: "🇬🇧 EN" }
-                            ]
-                            Rectangle {
-                                property bool isActive: BeeConfig.uiLang === modelData.code
-                                width: 62; height: 28; radius: 8
-                                color: isActive
-                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
-                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
-                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, isActive ? 0.65 : 0.20)
-                                border.width: 1
-                                Behavior on color { ColorAnimation { duration: 150 } }
-                                Behavior on border.color { ColorAnimation { duration: 150 } }
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData.label
-                                    color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
-                                    font { pixelSize: 12; bold: isActive }
-                                    Behavior on color { ColorAnimation { duration: 150 } }
-                                }
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        BeeConfig.setLang(modelData.code)
-                                        BeeConfig.saveConfig()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 
