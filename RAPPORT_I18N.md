@@ -220,4 +220,4 @@ Pour ajouter une nouvelle langue (ex. espagnol) :
 
 ---
 
-*Rapport généré par Claude Sonnet 4.6 — Bee-Hive OS Sprint i18n 🐝🌍*
+*Rapport de sprint — Bee-Hive OS i18n 🐝🌍*
