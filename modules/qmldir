@@ -16,6 +16,7 @@ BeeEvents    1.0 BeeEvents.qml
 BeeWeather   1.0 BeeWeather.qml
 BeeSearch    1.0 BeeSearch.qml
 BeeSettings  1.0 BeeSettings.qml
+BeeControl   1.0 BeeControl.qml
 BeePower     1.0 BeePower.qml
 BeeWallpaper 1.0 BeeWallpaper.qml
 BeeStudio    1.0 BeeStudio.qml
