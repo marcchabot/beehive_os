@@ -13,9 +13,9 @@ import sys
 
 # 1. Configuration - Customize your calendars here!
 CALENDARS = [
-    {"id": "primary", "label": "Perso"},
     {"id": "family01761025763253819175@group.calendar.google.com", "label": "Famille"},
     {"id": "e2vcp5c26oqp0aobdfpoceg687mr8h4h@import.calendar.google.com", "label": "Pharmacie"},
+    {"id": "primary", "label": "Perso"},
     {"id": "641157bb2b2c0a399e538051e15f77aea90c5b1ab8a8bfa31dea87586bc6e486@group.calendar.google.com", "label": "XPS (Noah)"}
 ]
 
