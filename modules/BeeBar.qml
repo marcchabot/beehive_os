@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeBar.qml — Bee-Hive OS Status Bar 🐝

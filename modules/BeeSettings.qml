@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeSettings.qml — Panneau de configuration Bee-Hive OS 🐝⚙️

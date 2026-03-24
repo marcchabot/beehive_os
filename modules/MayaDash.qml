@@ -3,6 +3,7 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import "."
 
 // ═══════════════════════════════════════════════════════════════
 // MayaDash.qml — Tableau de bord Maya (Bee-Hive OS) 🐝

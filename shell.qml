@@ -11,21 +11,16 @@ ShellRoot {
     property bool searchVisible: false
     property bool osdVisible: false
 
-    // Initialiser BeeBarState depuis BeeConfig au boot
-    Connections {
-        target: BeeConfig
-        function onVibeModeChanged() {
-            BeeBarState.vibeActive = BeeConfig.vibeMode
-        }
-        function onFocusModeChanged() {
-            BeeBarState.focusActive = BeeConfig.focusMode
-        }
-        function onCornersModeChanged() {
-            BeeBarState.cornersActive = BeeConfig.cornersMode
-        }
-        function onMotionModeChanged() {
-            BeeBarState.motionActive = BeeConfig.motionMode
-        }
+    // ─── Debounce Logic ──────────────────────────────────────
+    property var _lastIpcTimes: ({})
+    function _debounce(key) {
+        var now = Date.now()
+        var last = root._lastIpcTimes[key] || 0
+        if (now - last < 250) return false
+        var times = root._lastIpcTimes
+        times[key] = now
+        root._lastIpcTimes = times // Trigger property update
+        return true
     }
 
     // ─── BeePower Action Handler ───────────────────────────────
@@ -33,11 +28,8 @@ ShellRoot {
         target: BeePower
         function onActionRequested(cmd) {
             console.log("BeePower: action requested →", cmd)
-            // Parse command format: "app:name", "toggle:setting", "shell:command", etc.
             if (cmd.startsWith("app:")) {
                 var appName = cmd.substring(4)
-                var desktopFile = "/usr/share/applications/" + appName + ".desktop"
-                // Try to launch via desktop file
                 var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"] }', root, "BeePowerAppLauncher")
                 proc.start()
             } else if (cmd.startsWith("toggle:")) {
@@ -49,42 +41,21 @@ ShellRoot {
                     BeeConfig.focusMode = !BeeConfig.focusMode
                     BeeConfig.saveConfig()
                 } else if (setting === "settings") {
-                    // Open BeeStudio
                     toggleDash()
-                    // TODO: Actually open BeeStudio panel (needs integration)
-                    console.log("BeePower: toggle:settings → should open BeeStudio")
                 }
             } else if (cmd.startsWith("shell:")) {
                 var shellCmd = cmd.substring(6)
                 var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"] }', root, "BeePowerShell")
                 proc.start()
-            } else {
-                console.warn("BeePower: Unknown command format →", cmd)
             }
         }
     }
-    Component.onCompleted: {
-        BeeBarState.vibeActive    = BeeConfig.vibeMode
-        BeeBarState.focusActive   = BeeConfig.focusMode
-        BeeBarState.cornersActive = BeeConfig.cornersMode
-        BeeBarState.motionActive  = BeeConfig.motionMode
-    }
 
     function toggleDash()   { 
-        if (!_debounce("dash")) return
-        dashVisible   = !dashVisible 
+        if (!root._debounce("dash")) return
+        dashVisible = !dashVisible 
     }
     function toggleSearch() { searchVisible = !searchVisible }
-
-    // ─── Debounce Logic ──────────────────────────────────────
-    property var _lastIpcTimes: ({})
-    function _debounce(key) {
-        var now = Date.now()
-        var last = _lastIpcTimes[key] || 0
-        if (now - last < 250) return false
-        _lastIpcTimes[key] = now
-        return true
-    }
 
     IpcHandler {
         target: "root"
@@ -100,89 +71,62 @@ ShellRoot {
             BeeConfig.saveConfig()
         }
         function testOSD() {
-            console.log("TEST OSD - Function called!")
             BeeBarState.showOSD("volume", 50)
         }
         // ─── BeePower Menu ─────────────────────
         function showPower() {
             if (!root._debounce("power")) return
-            console.log("Shell: showPower() called")
-            // Toggle BeePower visibility via BeeBarState
             BeeBarState.powerVisible = !BeeBarState.powerVisible
         }
 
         // ─── Settings / Studio / Launcher ───────
-        function showSettings() {
-            console.log("Shell: showSettings() called")
-            root.settingsVisible = true
-        }
-        function showStudio() {
-            console.log("Shell: showStudio() called")
-            root.studioVisible = true
-        }
-        function showLauncher() {
-            console.log("Shell: showLauncher() called")
-            root.searchVisible = true
-        }
-        function showSearch() {
-            console.log("Shell: showSearch() called")
-            root.searchVisible = true
-        }
-        // ─── BeeAura Notifications (relayé depuis beenotifier.py) ──
+        function showSettings() { root.settingsVisible = true }
+        function showStudio()   { root.studioVisible   = true }
+        function showLauncher() { root.searchVisible   = true }
+        function showSearch()   { root.searchVisible   = true }
+        
+        // ─── BeeAura Notifications ──
         function dispatchNotification(title: string, body: string, icon: string) {
             BeeBarState.dispatchNotification(title, body, icon)
         }
-        // ─── BeeAura OSD (relayé depuis bee-osd-cmd.sh) ───────────
+        // ─── BeeAura OSD ───────────
         function showOSD(type: string, value: int) {
             BeeBarState.showOSD(type, value)
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Fenêtre Sentinelle : Stealth Trigger — Layer Top
-    // ═══════════════════════════════════════════════════════
+    // Sentinelle Stealth
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
             required property var modelData
             screen: modelData
-
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
             exclusiveZone: 0
             focusable: false
-            WlrLayershell.keyboardFocus: WlrLayershell.None
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
             color: "transparent"
-
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onEntered: {
-                    if (BeeConfig.stealthMode) {
-                        BeeBarState.forceVisible = true
-                    }
-                }
+                onEntered: { if (BeeConfig.stealthMode) BeeBarState.forceVisible = true }
             }
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Fenêtre 1 : Widgets — Layer Background
-    // ═══════════════════════════════════════════════════════
+    // Widgets Background
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
             id: widgetPanel
             required property var modelData
             screen: modelData
-
             WlrLayershell.layer: WlrLayer.Background
             WlrLayershell.namespace: "beehive-bg"
             exclusiveZone: -1
             focusable: false
-            WlrLayershell.keyboardFocus: WlrLayershell.None
             anchors { top: true; bottom: true; left: true; right: true }
             color: "transparent"
 
@@ -212,23 +156,19 @@ ShellRoot {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // FENÊTRE CORNERS — Layer: Overlay (Par-dessus tout)
-    // ═══════════════════════════════════════════════════════
+    // Overlay Elements
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
             required property var modelData
             screen: modelData
-
             WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.namespace: "beehive-corners"
+            WlrLayershell.namespace: "beehive-overlay"
             exclusiveZone: -1
             focusable: false
-            WlrLayershell.keyboardFocus: WlrLayershell.None
             anchors { top: true; bottom: true; left: true; right: true }
             color: "transparent"
-            mask: Region {} // Click-through total
+            mask: Region {} 
 
             BeeCorners { 
                 active: BeeBarState.cornersActive 
@@ -237,63 +177,40 @@ ShellRoot {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // FENÊTRE OSD — Layer: Top, coin bas-centre, taille fixe
-    // Petite fenêtre → peu de surface → moins de risque de blocage
-    // ═══════════════════════════════════════════════════════
+    // OSD & Notifications
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
             required property var modelData
             screen: modelData
-
             WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "beehive-osd"
+            WlrLayershell.namespace: "beehive-aura"
             exclusiveZone: -1
             focusable: false
-            WlrLayershell.keyboardFocus: WlrLayershell.None
-            anchors { bottom: true; left: true; right: true }
-            implicitHeight: 150
+            anchors { fill: parent }
             color: "transparent"
-            mask: Region {}   // ← fenêtre invisible pour la souris (officiel Quickshell)
+            mask: Region {} 
 
-            BeeOSD { anchors.fill: parent }
+            BeeOSD { 
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 80
+            }
+            
+            BeeNotify { 
+                anchors.top: parent.top
+                anchors.right: parent.right
+            }
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // FENÊTRE NOTIFY — Layer: Top, coin haut-droit, taille fixe
-    // ═══════════════════════════════════════════════════════
-    Variants {
-        model: Quickshell.screens
-        delegate: PanelWindow {
-            required property var modelData
-            screen: modelData
-
-            WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "beehive-notify"
-            exclusiveZone: -1
-            focusable: false
-            WlrLayershell.keyboardFocus: WlrLayershell.None
-            anchors { top: true; right: true }
-            implicitWidth: 420
-            implicitHeight: 600
-            color: "transparent"
-            mask: Region {}   // ← fenêtre invisible pour la souris (officiel Quickshell)
-
-            BeeNotify { anchors.fill: parent }
-        }
-    }
-
-    // ─── Timer de lancement ───
+    // Timer de lancement
     property string _pendingCmd: ""
     Timer {
         id: launchTimer
         interval: 200
-        repeat: false
         onTriggered: {
             if (!root._pendingCmd) return
-            console.log("Shell: lancement →", root._pendingCmd)
             var proc = Qt.createQmlObject(
                 'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "nohup ' + root._pendingCmd.replace(/"/g, '\\"') + ' >/dev/null 2>&1 & disown"] }',
                 root, "launchProc"
@@ -302,10 +219,9 @@ ShellRoot {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Fenêtre 3 : BeeSettings — Layer Top
-    // ═══════════════════════════════════════════════════════
+    // Panneaux Interactifs
     property bool settingsVisible: false
+    property bool studioVisible: false
 
     Loader {
         active: root.settingsVisible
@@ -314,43 +230,21 @@ ShellRoot {
             delegate: PanelWindow {
                 required property var modelData
                 screen: modelData
-
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-settings"
-                exclusiveZone: -1
                 focusable: true
-                WlrLayershell.keyboardFocus: WlrLayershell.None
-                anchors { top: true; bottom: true; left: true; right: true }
+                anchors { fill: parent }
                 color: "transparent"
 
                 BeeSettings {
-                    id: beeSettingsOverlay
                     anchors.centerIn: parent
                     visible: true
-                    onCornersToggled: (val) => { BeeBarState.cornersActive = val }
-                    onMotionToggled:  (val) => { BeeBarState.motionActive  = val }
-                    onVibeToggled:    (val) => {
-                        BeeBarState.vibeActive = val
-                        BeeConfig.vibeMode = val
-                        BeeConfig.saveConfig()
-                    }
-                    onStealthToggled: (val) => {
-                        BeeConfig.stealthMode = val
-                        BeeConfig.saveConfig()
-                    }
-                    onFocusToggled: (val) => {
-                        BeeBarState.focusActive = val
-                    }
-                    // Fermer quand l'utilisateur clique ✕
                     onVisibleChanged: { if (!visible) root.settingsVisible = false }
                 }
             }
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Fenêtre 4 : BeePower — Layer Top
-    // ═══════════════════════════════════════════════════════
     Loader {
         active: BeeBarState.powerVisible
         sourceComponent: Variants {
@@ -358,15 +252,11 @@ ShellRoot {
             delegate: PanelWindow {
                 required property var modelData
                 screen: modelData
-
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-power"
-                exclusiveZone: -1
                 focusable: true
-                WlrLayershell.keyboardFocus: WlrLayershell.None
-                anchors { top: true; bottom: true; left: true; right: true }
+                anchors { fill: parent }
                 color: "transparent"
-
                 BeePower {
                     anchors.fill: parent
                     onCloseRequested: BeeBarState.powerVisible = false
@@ -380,32 +270,22 @@ ShellRoot {
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // Fenêtre 6 : BeeSearch — Overlay
-    // ═══════════════════════════════════════════════════════
     Loader {
         active: root.searchVisible
         sourceComponent: Variants {
             model: Quickshell.screens
             delegate: PanelWindow {
-                id: searchPanel
                 required property var modelData
                 screen: modelData
-
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.namespace: "beehive-search"
-                exclusiveZone: -1
                 focusable: true
                 WlrLayershell.keyboardFocus: WlrLayershell.Exclusive
-                anchors { top: true; bottom: true; left: true; right: true }
+                anchors { fill: parent }
                 color: "transparent"
-
                 BeeSearch {
-                    id: beeSearch
                     anchors.fill: parent
                     shown: true
-                    onOpenSettings: { root.settingsVisible = true }
-                    onOpenStudio:   { root.studioVisible = true }
                     onLaunchRequested: (cmd) => {
                         root._pendingCmd = cmd
                         root.searchVisible = false
@@ -417,8 +297,6 @@ ShellRoot {
         }
     }
 
-    // ─── Studio (Isolé) ───
-    property bool studioVisible: false
     Loader {
         active: root.studioVisible
         sourceComponent: Variants {
@@ -429,30 +307,13 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-studio"
                 focusable: true
-                anchors { top: true; bottom: true; left: true; right: true }
+                anchors { fill: parent }
                 color: "transparent"
                 BeeStudio { 
                     anchors.fill: parent
                     visible: true
                     onVisibleChanged: { if (!visible) root.studioVisible = false }
                 }
-            }
-        }
-    }
-
-    // ─── Réception des requêtes inter-fenêtres (State → Root) ──
-    Connections {
-        target: BeeBarState
-        function onOpenSettingsRequestedChanged() {
-            if (BeeBarState.openSettingsRequested) {
-                root.settingsVisible = true
-                BeeBarState.openSettingsRequested = false
-            }
-        }
-        function onOpenStudioRequestedChanged() {
-            if (BeeBarState.openStudioRequested) {
-                root.studioVisible = true
-                BeeBarState.openStudioRequested = false
             }
         }
     }

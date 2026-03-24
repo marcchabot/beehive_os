@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeEvents.qml — Prochains événements du calendrier 🐝📅

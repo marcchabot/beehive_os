@@ -48,6 +48,14 @@ QtObject {
     // ─── BeeEvents ────────────────────────────────────────────
     property bool eventsEnabled: true
 
+    // ─── Sync properties to BeeBarState ─────────────────────
+    // Ensures visual components (Layer Background) react to 
+    // settings changed in BeeSettings (Layer Top).
+    onFocusModeChanged:  BeeBarState.focusActive = focusMode
+    onVibeModeChanged:   BeeBarState.vibeActive  = vibeMode
+    onCornersModeChanged: BeeBarState.cornersActive = cornersMode
+    onMotionModeChanged:  BeeBarState.motionActive  = motionMode
+
     // ─── UI language (i18n) ────────────────────────────────────
     property string uiLang: "fr"
     property var    tr:     ({})
