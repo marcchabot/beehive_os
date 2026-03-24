@@ -15,6 +15,9 @@ Item {
     id: beeStudio
     anchors.fill: parent
 
+    // ─── Mode embarqué (dans BeeControl) — masque la sidebar ────
+    property bool embedded: false
+
     // ─── Catégorie active ────────────────────────────────────────
     property int activeCategory: 0   // 0=Alvéoles 1=Fonds d'écran 2=Historique
 
@@ -262,6 +265,7 @@ Item {
                 id: sidebar
                 Layout.preferredWidth: 210
                 Layout.fillHeight: true
+                visible: !beeStudio.embedded
 
                 // Séparateur droit
                 Rectangle {

@@ -135,6 +135,8 @@ Rectangle {
             Item {
                 BeeStudio {
                     anchors.fill: parent
+                    embedded: true
+                    activeCategory: 0
                     visible: controlRoot.currentTab === 0
                 }
             }
@@ -194,6 +196,7 @@ Rectangle {
                         Layout.fillWidth: true; Layout.fillHeight: true
                         BeeStudio {
                             anchors.fill: parent
+                            embedded: true
                             activeCategory: 1   // Wallpapers tab
                             visible: controlRoot.currentTab === 1
                         }
