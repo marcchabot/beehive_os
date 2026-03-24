@@ -180,7 +180,9 @@ QtObject {
         if (cfg.pinned_apps !== undefined && Array.isArray(cfg.pinned_apps))
             pinnedApps = cfg.pinned_apps
 
-        if (cfg.bee_events !== undefined)
+        if (cfg.events_enabled !== undefined)
+            eventsEnabled = cfg.events_enabled === true
+        else if (cfg.bee_events !== undefined)
             eventsEnabled = cfg.bee_events.enabled !== false
 
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
@@ -298,6 +300,7 @@ QtObject {
             battery: showBattery
         }
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
+        cfg.events_enabled = eventsEnabled
         console.log("BeeConfig: Sauvegarde de pinned_apps →", JSON.stringify(cfg.pinned_apps))
         cfg.theme = BeeTheme.mode
         cfg.nectar_sync = BeeTheme.nectarSync
