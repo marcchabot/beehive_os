@@ -96,6 +96,20 @@ ShellRoot {
             // Toggle BeePower visibility via BeeBarState
             BeeBarState.powerVisible = !BeeBarState.powerVisible
         }
+
+        // ─── Settings / Studio / Launcher ───────
+        function showSettings() {
+            console.log("Shell: showSettings() called")
+            root.settingsVisible = true
+        }
+        function showStudio() {
+            console.log("Shell: showStudio() called")
+            root.studioVisible = true
+        }
+        function showLauncher() {
+            console.log("Shell: showLauncher() called")
+            root.searchVisible = true
+        }
         // ─── BeeAura Notifications (relayé depuis beenotifier.py) ──
         function dispatchNotification(title: string, body: string, icon: string) {
             BeeBarState.dispatchNotification(title, body, icon)
