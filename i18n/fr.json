@@ -244,6 +244,7 @@
     "no_other_wallpapers": "Aucun autre fond d'écran trouvé dans",
     "version_info": "Bee-Hive OS v0.9.0 · BeeMotion 3D · BeeVibe 🐝",
     "beehive_label": "BEE-HIVE",
-    "focus_label": "FOCUS"
+    "focus_label": "FOCUS",
+    "beebar_stats_title": "Affichage BeeBar 📊"
   }
 }

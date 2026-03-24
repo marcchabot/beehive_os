@@ -202,54 +202,12 @@ Rectangle {
                     }
                 }
 
-                // ── BeePalette — v0.5 : transitions animées ───
-                SettingRow {
-                    label:   settingsRoot._s.palette   || "BeePalette 🎨"
-                    desc:    settingsRoot._s.palette_desc || "Switch between HoneyDark 🌙 and HoneyLight ☀️."
-                    checked: BeeTheme.mode === "HoneyLight"
-                    onToggled: (val) => {
-                        BeeTheme.setMode(val ? "HoneyLight" : "HoneyDark")
-                        BeeConfig.saveConfig()
-                    }
-                }
-
-                // ── Nectar Sync 🍯 — v0.6 ─────────────────────
-                SettingRow {
-                    label:   settingsRoot._s.nectar_sync      || "Nectar Sync 🍯"
-                    desc:    settingsRoot._s.nectar_sync_desc  || "Automatic theme adaptation to the chosen wallpaper."
-                    checked: BeeTheme.nectarSync
-                    onToggled: (val) => {
-                        BeeTheme.nectarSync = val
-                        BeeConfig.saveConfig()
-                    }
-                }
-
-                // ── BeeMotion ─────────────────────────────────
-                SettingRow {
-                    label:   settingsRoot._s.motion      || "BeeMotion (Parallax)"
-                    desc:    settingsRoot._s.motion_desc  || "3D depth effect on the MayaDash."
-                    checked: BeeConfig.motionMode
-                    onToggled: (val) => {
-                        BeeConfig.motionMode = val
-                        BeeConfig.saveConfig()
-                        settingsRoot.motionToggled(val)
-                    }
-                }
-
-                // ── BeeVibe ───────────────────────────────────
-                SettingRow {
-                    label:   settingsRoot._s.vibe      || "BeeVibe (Audio)"
-                    desc:    settingsRoot._s.vibe_desc  || "Audio visualizer integrated into the cells."
-                    checked: BeeConfig.vibeMode
-                    onToggled: (val) => settingsRoot.vibeToggled(val)
-                }
-
                 // ── BeeBar Stats — Déplacé sous la langue ─────
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 10
                     Text {
-                        text: "Affichage BeeBar 📊"
+                        text: (BeeConfig.tr.common text: "Affichage BeeBar 📊"text: "Affichage BeeBar 📊" BeeConfig.tr.common.beebar_stats_title) || "Affichage BeeBar 📊"
                         color: BeeTheme.accent
                         font { bold: true; pixelSize: 13; letterSpacing: 1 }
                     }
@@ -258,11 +216,11 @@ Rectangle {
                         spacing: 10
                         Repeater {
                             model: [
-                                { label: "CPU", prop: "showCpu" },
-                                { label: "RAM", prop: "showRam" },
-                                { label: "NET", prop: "showNet" },
-                                { label: "DISK", prop: "showDisk" },
-                                { label: "BAT", prop: "showBattery" }
+                                { label: BeeConfig.tr.bar.tooltip_cpu || "CPU", prop: "showCpu" },
+                                { label: BeeConfig.tr.bar.tooltip_ram || "RAM", prop: "showRam" },
+                                { label: BeeConfig.tr.bar.tooltip_net || "NET", prop: "showNet" },
+                                { label: BeeConfig.tr.bar.tooltip_disk || "DISK", prop: "showDisk" },
+                                { label: BeeConfig.tr.bar.tooltip_battery || "BAT", prop: "showBattery" }
                             ]
                             Rectangle {
                                 width: 55; height: 32; radius: 8
