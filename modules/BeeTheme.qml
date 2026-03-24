@@ -96,16 +96,16 @@ QtObject {
     property QtObject light: QtObject {
         id: _light
         readonly property color bg:            "#F5F0E8"
-        readonly property color accent:        "#A67608"
+        readonly property color accent:        "#8A6106" // Plus sombre pour meilleur contraste
         readonly property color secondary:     "#EDE6D8"
         readonly property color textPrimary:   "#1A1A1A"
-        readonly property color textSecondary: "#52473A"
-        readonly property color barBg:         Qt.rgba(0.96,  0.94,  0.91,  0.92)
-        readonly property color glassBg:       Qt.rgba(1,     1,     1,     0.90) // Très clair et presque opaque
+        readonly property color textSecondary: "#453B30" // Plus sombre pour lisibilité
+        readonly property color barBg:         Qt.rgba(0.94,  0.92,  0.88,  0.94) // Plus "Beige/Miel"
+        readonly property color glassBg:       Qt.rgba(1,     1,     1,     0.92)
         readonly property color glassBorder:   Qt.rgba(0.65,  0.46,  0.03,  0.4)
         readonly property color backdropBg:    Qt.rgba(0.93,  0.89,  0.84,  0.90)
         readonly property real  auraAlpha:     0.4
-        readonly property color separator:     Qt.rgba(0, 0, 0, 0.08)
+        readonly property color separator:     Qt.rgba(0, 0, 0, 0.12) // Plus marqué en Light
         readonly property string wallpaper:    "../assets/wallpaper_light_bee.png"
     }
 
