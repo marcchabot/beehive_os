@@ -90,6 +90,12 @@ ShellRoot {
             console.log("TEST OSD - Function called!")
             BeeBarState.showOSD("volume", 50)
         }
+        // ─── BeePower Menu ─────────────────────
+        function showPower() {
+            console.log("Shell: showPower() called")
+            // Toggle BeePower visibility via BeeBarState
+            BeeBarState.powerVisible = !BeeBarState.powerVisible
+        }
         // ─── BeeAura Notifications (relayé depuis beenotifier.py) ──
         function dispatchNotification(title: string, body: string, icon: string) {
             BeeBarState.dispatchNotification(title, body, icon)
