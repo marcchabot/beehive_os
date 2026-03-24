@@ -110,6 +110,10 @@ ShellRoot {
             console.log("Shell: showLauncher() called")
             root.searchVisible = true
         }
+        function showSearch() {
+            console.log("Shell: showSearch() called")
+            root.searchVisible = true
+        }
         // ─── BeeAura Notifications (relayé depuis beenotifier.py) ──
         function dispatchNotification(title: string, body: string, icon: string) {
             BeeBarState.dispatchNotification(title, body, icon)
