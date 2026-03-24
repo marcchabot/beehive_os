@@ -51,7 +51,11 @@ Rectangle {
         spacing: 20
         ColumnLayout {
             Layout.fillWidth: true; spacing: 2
-            Text { text: label; color: BeeTheme.textPrimary; font { bold: true; pixelSize: 14 }; Behavior on color { ColorAnimation { duration: 600 } } }
+            Text {
+                text: label; color: BeeTheme.textPrimary
+                font { bold: true; pixelSize: 14 }
+                Behavior on color { ColorAnimation { duration: 600 } }
+            }
             Text { text: desc; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         }
         Switch { checked: parent.checked; onCheckedChanged: parent.toggled(checked) }
