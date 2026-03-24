@@ -45,7 +45,7 @@ The goal was a mind-blowing launch the weekend of March 20-21, 2026.
 - [x] **Public Template**: `user_config.example.json` created — anonymized data (FR/EN), ready for new users. *(v1.3.7 — March 21)*
 - [x] **i18n — Core Structure**: `i18n/` folder created with `fr.json` and `en.json` files. `qsTr()` integration plan documented. *(v1.3.7 — March 21)*
 - [x] **i18n (Full)**: `qsTr()` integration in all QML files + language selector in BeeSettings.
-- [ ] **Bee-Live Sync v2**: Decouple data synchronization from the Git flow (Live API).
+- [x] **Bee-Live Sync v2**: Decouple data synchronization from the Git flow; implement live daemon + IPC for real-time calendar updates.
 - [x] **"General Public" Documentation**: New `README.md` with a one-line installation guide for CachyOS.
 
 ---
