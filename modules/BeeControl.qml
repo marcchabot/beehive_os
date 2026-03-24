@@ -76,8 +76,8 @@ Rectangle {
     Rectangle {
         anchors { top: parent.top; right: parent.right; margins: 16 }
         width: 32; height: 32; radius: 16; z: 100
-        color: closeHov.containsMouse ? "#ff555522" : "#ffffff08"
-        border.color: closeHov.containsMouse ? "#ff555566" : BeeTheme.accent
+        color: closeHov.containsMouse ? Qt.rgba(1.0, 0.3, 0.3, 0.2) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+        border.color: closeHov.containsMouse ? Qt.rgba(1.0, 0.3, 0.3, 0.6) : BeeTheme.accent
         border.width: 1
         Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font { bold: true; pixelSize: 14 } }
         MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: controlRoot.visible = false }
