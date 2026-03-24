@@ -244,6 +244,95 @@ Rectangle {
                     onToggled: (val) => settingsRoot.vibeToggled(val)
                 }
 
+                // ── BeeBar Stats — Déplacé sous la langue ─────
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 10
+                    Text {
+                        text: "Affichage BeeBar 📊"
+                        color: BeeTheme.accent
+                        font { bold: true; pixelSize: 13; letterSpacing: 1 }
+                    }
+                    Flow {
+                        Layout.fillWidth: true
+                        spacing: 10
+                        Repeater {
+                            model: [
+                                { label: "CPU", prop: "showCpu" },
+                                { label: "RAM", prop: "showRam" },
+                                { label: "NET", prop: "showNet" },
+                                { label: "DISK", prop: "showDisk" },
+                                { label: "BAT", prop: "showBattery" }
+                            ]
+                            Rectangle {
+                                width: 55; height: 32; radius: 8
+                                color: BeeConfig[modelData.prop]
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
+                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, BeeConfig[modelData.prop] ? 0.6 : 0.2)
+                                border.width: 1
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary
+                                    font { pixelSize: 11; bold: BeeConfig[modelData.prop] }
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        BeeConfig[modelData.prop] = !BeeConfig[modelData.prop]
+                                        BeeConfig.saveConfig()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── BeePalette — v0.5 : transitions animées ───
+                SettingRow {
+                    label:   settingsRoot._s.palette   || "BeePalette 🎨"
+                    desc:    settingsRoot._s.palette_desc || "Switch between HoneyDark 🌙 and HoneyLight ☀️."
+                    checked: BeeTheme.mode === "HoneyLight"
+                    onToggled: (val) => {
+                        BeeTheme.setMode(val ? "HoneyLight" : "HoneyDark")
+                        BeeConfig.saveConfig()
+                    }
+                }
+
+                // ── Nectar Sync 🍯 — v0.6 ─────────────────────
+                SettingRow {
+                    label:   settingsRoot._s.nectar_sync      || "Nectar Sync 🍯"
+                    desc:    settingsRoot._s.nectar_sync_desc  || "Automatic theme adaptation to the chosen wallpaper."
+                    checked: BeeTheme.nectarSync
+                    onToggled: (val) => {
+                        BeeTheme.nectarSync = val
+                        BeeConfig.saveConfig()
+                    }
+                }
+
+                // ── BeeMotion ─────────────────────────────────
+                SettingRow {
+                    label:   settingsRoot._s.motion      || "BeeMotion (Parallax)"
+                    desc:    settingsRoot._s.motion_desc  || "3D depth effect on the MayaDash."
+                    checked: BeeConfig.motionMode
+                    onToggled: (val) => {
+                        BeeConfig.motionMode = val
+                        BeeConfig.saveConfig()
+                        settingsRoot.motionToggled(val)
+                    }
+                }
+
+                // ── BeeVibe ───────────────────────────────────
+                SettingRow {
+                    label:   settingsRoot._s.vibe      || "BeeVibe (Audio)"
+                    desc:    settingsRoot._s.vibe_desc  || "Audio visualizer integrated into the cells."
+                    checked: BeeConfig.vibeMode
+                    onToggled: (val) => settingsRoot.vibeToggled(val)
+                }
+
                 // ── Bee-Hive Time (Analog) ─────────────────────
                 SettingRow {
                     label:   settingsRoot._s.clock      || "Bee-Hive Time (Horloge) 🕰️"
@@ -273,100 +362,6 @@ Rectangle {
                     desc:    settingsRoot._s.stealth_desc   || "BeeBar hides after 3s of inactivity."
                     checked: BeeConfig.stealthMode
                     onToggled: (val) => settingsRoot.stealthToggled(val)
-                }
-
-                // ── BeeBar Stats ──────────────────────────────
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 10
-                    Text {
-                        text: "Affichage BeeBar 📊"
-                        color: BeeTheme.accent
-                        font { bold: true; pixelSize: 13; letterSpacing: 1 }
-                    }
-                    Flow {
-                        Layout.fillWidth: true
-                        spacing: 10
-                        Repeater {
-                            model: [
-                                { label: "CPU", prop: "showCpu" },
-                                { label: "RAM", prop: "showRam" },
-                                { label: "NET", prop: "showNet" },
-                                { label: "DISK", prop: "showDisk" },
-                                { label: "BAT", prop: "showBattery" }
-                            ]
-                            Rectangle {
-                                width: 55; height: 32; radius: 8
-                                color: BeeConfig[modelData.prop]
-                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
-                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
-                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, BeeConfig[modelData.prop] ? 0.6 : 0.2)
-                                border.width: 1
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData.label
-                                    color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary
-                                    font { pixelSize: 11; bold: BeeConfig[modelData.prop] }
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        BeeConfig[modelData.prop] = !BeeConfig[modelData.prop]
-                                        BeeConfig.saveConfig()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // ── BeeBar Stats ──────────────────────────────
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 10
-                    Text {
-                        text: "Affichage BeeBar 📊"
-                        color: BeeTheme.accent
-                        font { bold: true; pixelSize: 13; letterSpacing: 1 }
-                    }
-                    Flow {
-                        Layout.fillWidth: true
-                        spacing: 10
-                        Repeater {
-                            model: [
-                                { label: "CPU", prop: "showCpu" },
-                                { label: "RAM", prop: "showRam" },
-                                { label: "NET", prop: "showNet" },
-                                { label: "DISK", prop: "showDisk" },
-                                { label: "BAT", prop: "showBattery" }
-                            ]
-                            Rectangle {
-                                width: 55; height: 32; radius: 8
-                                color: BeeConfig[modelData.prop]
-                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22)
-                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
-                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, BeeConfig[modelData.prop] ? 0.6 : 0.2)
-                                border.width: 1
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData.label
-                                    color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary
-                                    font { pixelSize: 11; bold: BeeConfig[modelData.prop] }
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        BeeConfig[modelData.prop] = !BeeConfig[modelData.prop]
-                                        BeeConfig.saveConfig()
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
 
                 // ── Effets Sonores ────────────────────────────
