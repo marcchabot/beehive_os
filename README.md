@@ -5,6 +5,28 @@
 
 ---
 
+## 🍯 Showcase — The Visual Nectar
+
+### 🛡️ The Welcome Screen
+![BeeWelcome](assets/screenshots/showcase_welcome.png)
+
+### 🌙 Cyber-Amber (Dark Theme)
+![Cyber-Amber](assets/screenshots/showcase_cyber_amber_dark.png)
+
+### 📊 The Dashboard
+![Dashboard](assets/screenshots/showcase_dashboard.png)
+
+### 🍯 Honey-Veil (Light Theme)
+![Honey-Veil](assets/screenshots/showcase_honey_veil_light.png)
+
+### 🔍 Search & Launcher
+![BeeSearch](assets/screenshots/showcase_search.png)
+
+### ⏻ Login Screen (SDDM)
+![BeeLogin](assets/screenshots/showcase_login.png)
+
+---
+
 ## ⚠️ REQUIRED — Hyprland Keybinds
 
 **Without these, Bee-Hive OS won't respond to any keyboard shortcut.**
@@ -217,8 +239,9 @@ To update without losing your personal settings (cells, weather, pinned apps):
 - [x] BeeVibe — Cava audio visualizer (v0.8.4)
 - [x] Stealth Mode — Auto-hide with sentinel (v0.8.3)
 - [x] BeePower — Power management ⚡ (v0.8.5)
-- [x] **BeeAura Notifications & OSD** — 100% native Quickshell system (v0.8.6)
-- [x] Nectar Sync 🍯 — Automatic theme adaptation to wallpaper (v0.6.2)
+- [x] **BeeAura Notifications & OSD** — 100% native Quickshell system (v1.0.0)
+- [x] Nectar Sync 🍯 — Automatic theme adaptation to wallpaper (v1.3.0)
+- [x] **Multilingual Support (i18n)** — Full French/English localization (v2.0.0)
 
 ### 🔄 In Progress / Upcoming
 
@@ -226,7 +249,6 @@ To update without losing your personal settings (cells, weather, pinned apps):
 - [ ] "Focus" Mode vs "Dashboard" Mode
 - [ ] Performance optimization (Quickshell profiling)
 - [ ] Persistent notifications widget
-- [ ] Multilingual Support (i18n)
 
 ---
 
