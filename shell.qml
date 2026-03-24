@@ -157,8 +157,8 @@ ShellRoot {
                 dashShown: root.dashVisible && !BeeBarState.focusActive
                 beeMotionEnabled: BeeBarState.motionActive
                 beeVibeEnabled:   BeeBarState.vibeActive
-                onOpenSettings: root.settingsVisible = true
-                onOpenStudio:   root.studioVisible = true
+                onOpenSettings: { root.controlTab = 3; root.controlVisible = true }
+                onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
             }
 
             Clock {
