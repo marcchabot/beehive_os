@@ -252,10 +252,13 @@ Rectangle {
 
             // Tab 3 : System (General)
             Item {
+                ScrollView {
+                    anchors.fill: parent; contentWidth: -1; clip: true
                 ColumnLayout {
-                    anchors { fill: parent; margins: 35 }
+                    anchors { left: parent.left; right: parent.right; margins: 35 }
                     spacing: 25
 
+                    Item { height: 5 }
                     Text { text: "⚙️ System & Preferences"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
                     
                     SectionHeader { title: "LANGUAGE" }
@@ -368,8 +371,9 @@ Rectangle {
                         onToggled: (val) => { BeeConfig.focusMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Focus " + (val ? "activé" : "désactivé"), "🎯") }
                     }
 
-                    Item { Layout.fillHeight: true }
+                    Item { height: 20 }
                 }
+                } // ScrollView
             }
 
             // Tab 4 : History (📜 Logs)

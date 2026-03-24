@@ -228,9 +228,10 @@ Item {
             shadowBlur: 0.8; shadowVerticalOffset: 0; shadowHorizontalOffset: 0
         }
 
-        // Bouton fermeture (Top Right)
+        // Bouton fermeture (Top Right) — masqué en mode embedded
         Rectangle {
             id: closeRect
+            visible: !beeStudio.embedded
             anchors { right: parent.right; top: parent.top; margins: 12 }
             z: 100
             width: 32; height: 32; radius: 16
