@@ -429,13 +429,13 @@ Item {
                             ColumnLayout {
                                 spacing: 2
                                 Text {
-                                    text: "BeeStudio v2.1 🍯"
+                                    text: (BeeConfig.tr.common && BeeConfig.tr.common.bee_studio_title) || (BeeConfig.tr.common && BeeConfig.tr.common.bee_studio_title) || "BeeStudio v2.1 🍯"
                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.22)
                                     font { pixelSize: 9; letterSpacing: 0.5 }
                                 }
                                 Text {
                                     visible: beeStudio._saveDirty
-                                    text: "● unsaved"
+                                    text: (BeeConfig.tr.common && BeeConfig.tr.common.unsaved) || (BeeConfig.tr.common && BeeConfig.tr.common.unsaved) || "● unsaved"
                                     color: Qt.rgba(1.0, 0.75, 0.2, 0.70)
                                     font { pixelSize: 8; italic: true }
                                 }
@@ -480,13 +480,13 @@ Item {
                                 ColumnLayout {
                                     spacing: 1
                                     Text {
-                                        text: "Cells"
+                                        text: (BeeConfig.tr.common && BeeConfig.tr.common.cells) || (BeeConfig.tr.common && BeeConfig.tr.common.cells) || "Cells"
                                         color: BeeTheme.accent
                                         font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
                                         Behavior on color { ColorAnimation { duration: 600 } }
                                     }
                                     Text {
-                                        text: "Dashboard cell editor"
+                                        text: (BeeConfig.tr.common && BeeConfig.tr.common.dashboard_cell_editor) || (BeeConfig.tr.common && BeeConfig.tr.common.dashboard_cell_editor) || "Dashboard cell editor"
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                         font.pixelSize: 10
                                     }
@@ -572,7 +572,7 @@ Item {
                                                             }
                                                             Text {
                                                                 visible: model.customizable === false
-                                                                text: "🔒 protected"; font.pixelSize: 8
+                                                                text: (BeeConfig.tr.common && BeeConfig.tr.common.protected) || (BeeConfig.tr.common && BeeConfig.tr.common.protected) || "🔒 protected"; font.pixelSize: 8
                                                                 color: Qt.rgba(1.0, 0.65, 0.2, 0.65)
                                                             }
                                                         }
@@ -845,7 +845,7 @@ Item {
                                             visible: parent.text.length === 0
                                             anchors { fill: parent }
                                             verticalAlignment: Text.AlignVCenter
-                                            text: "~/Pictures/Wallpapers"
+                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers"text: (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers" BeeConfig.tr.common.wallpapers_folder) || (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
                                             font.pixelSize: 11
                                         }
@@ -886,7 +886,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: "BEE-HIVE ORIGINALS 🍯"
+                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯" BeeConfig.tr.common.beehive_originals) || (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }
@@ -903,7 +903,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: "MY LIBRARY 🖼"
+                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼" BeeConfig.tr.common.my_library) || (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }

@@ -190,7 +190,7 @@ Rectangle {
                 spacing: 10
                 Text { text: '🐝'; font.pixelSize: 18 }
                 Text {
-                    text: BeeBarState.focusActive ? 'FOCUS' : 'BEE-HIVE'
+                    text: BeeBarState.focusActive ? (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS' : (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
                     font { bold: true; pixelSize: 13; letterSpacing: 2 }
                     color: BeeBarState.focusActive ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7) : BeeTheme.accent
                 }

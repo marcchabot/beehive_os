@@ -243,7 +243,7 @@ Item {
 
         // Petit label
         Text {
-            text: "🐝 Bee-Hive Time"
+            text: (BeeConfig.tr.common && BeeConfig.tr.common.bee_hive_time) || "🐝 Bee-Hive Time"
             color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
             Behavior on color { ColorAnimation { duration: 600 } }
             font { pixelSize: 9; letterSpacing: 1.5 }

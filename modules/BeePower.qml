@@ -81,7 +81,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
-                text: "BEE POWER"
+                text: (BeeConfig.tr.power && BeeConfig.tr.power.title) || "BEE POWER"
                 font.bold: true
                 font.pixelSize: 15
                 font.letterSpacing: 3

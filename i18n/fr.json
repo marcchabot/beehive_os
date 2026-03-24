@@ -233,14 +233,16 @@
     "bee_power": "BEE POWER",
     "bee_hive_time": "🐝 Bee-Hive Time",
     "bee_studio_title": "BeeStudio v2.1 🍯",
-    "unsaved": "● unsaved",
-    "cells": "Cells",
-    "dashboard_cell_editor": "Dashboard cell editor",
-    "protected": "🔒 protected",
-    "wallpapers_folder": "~/Pictures/Wallpapers",
-    "beehive_originals": "BEE-HIVE ORIGINALS 🍯",
-    "my_library": "MY LIBRARY 🖼",
-    "no_other_wallpapers": "No other wallpapers found in",
-    "version_info": "Bee-Hive OS v0.9.0 · BeeMotion 3D · BeeVibe 🐝"
+    "unsaved": "● non enregistré",
+    "cells": "Cellules",
+    "dashboard_cell_editor": "Éditeur de cellules",
+    "protected": "🔒 protégé",
+    "wallpapers_folder": "~/Images/Fonds d'écran",
+    "beehive_originals": "ORIGINAUX BEE-HIVE 🍯",
+    "my_library": "MA BIBLIOTHÈQUE 🖼",
+    "no_other_wallpapers": "Aucun autre fond d'écran trouvé dans",
+    "version_info": "Bee-Hive OS v0.9.0 · BeeMotion 3D · BeeVibe 🐝",
+    "beehive_label": "BEE-HIVE",
+    "focus_label": "FOCUS"
   }
 }
