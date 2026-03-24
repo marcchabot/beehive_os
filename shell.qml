@@ -97,6 +97,7 @@ ShellRoot {
         function showStudio()   { root.controlTab = 0; root.controlVisible = true }
         function showLauncher() { root.searchVisible   = true }
         function showSearch()   { root.searchVisible   = true }
+        function showWelcome()  { root.welcomeVisible  = true }
         
         // ─── BeeAura Notifications ──
         function dispatchNotification(title: string, body: string, icon: string) {
