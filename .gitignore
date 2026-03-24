@@ -1,8 +1,24 @@
+# ─── User configuration (personal, never committed) ───────────
+user_config.json
+
+# ─── Private / sensitive data ─────────────────────────────────
+client_secret.json
+google_access.json
+GATEWAY_TOKEN.txt
+pending_messages.json
+# data/
+
+# ─── Credentials & secrets ────────────────────────────────────
 .git-credentials
-node_modules/
+*.token
+*.key
+*.pem
+
+# ─── Logs & temporary files ───────────────────────────────────
 *.log
 *.bak
-user_config.json
-data/*.json
-!data/events.json
-data/events.json
+*.tmp
+/tmp/
+
+# ─── Node / tooling (not used by Bee-Hive OS itself) ──────────
+node_modules/
