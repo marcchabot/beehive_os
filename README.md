@@ -82,11 +82,27 @@ beehive_os/
 
 ## 🍯 Honey-Sync — Live Calendar 📅 *(NEW)*
 
-Bee-Hive OS includes **Honey-Sync**, a local script to fetch your Google Calendar events and display them in the MayaDash.
+Bee-Hive OS includes two local scripts to fetch your Calendar events and display them in the MayaDash.
 
-1. **Install `gog` CLI** (Google Workspace CLI):
+### Method 1: The Universal Way (ICS/iCalendar) - Recommended
+Works with Google, Outlook, iCloud, Fastmail, and any calendar that supports secret `.ics` links. No auth required!
+
+1. Open `user_config.json` and add your secret iCal link:
+   ```json
+   "events_ics_url": "https://calendar.google.com/calendar/ical/your-secret-link/basic.ics",
+   "events_enabled": true
+   ```
+2. Sync your nectar:
    ```bash
-   # Arch Linux / CachyOS (Recommended)
+   python3 scripts/honey_sync_ics.py
+   ```
+
+### Method 2: The Google Workspace CLI (gog)
+If you prefer a direct authenticated API connection without sharing `.ics` links.
+
+1. **Install `gog` CLI**:
+   ```bash
+   # Arch Linux / CachyOS
    yay -S gogcli
    
    # Or via Go
@@ -111,7 +127,8 @@ Bee-Hive OS includes **Honey-Sync**, a local script to fetch your Google Calenda
    ```bash
    python3 scripts/honey_sync.py
    ```
-   *(Optional) Add a cron job or systemd timer to sync every hour!*
+
+*(Optional) Add a cron job or systemd timer to run either script every hour!*
 
 ---
 
