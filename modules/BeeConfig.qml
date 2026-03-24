@@ -206,8 +206,12 @@ QtObject {
             if (cfg.dashboard.cells && cfg.dashboard.cells.length > 0) {
                 _cells.clear()
                 // Load user-configured cells first
-                for (var i = 0; i < cfg.dashboard.cells.length; i++)
-                    _cells.append(cfg.dashboard.cells[i])
+                for (var i = 0; i < cfg.dashboard.cells.length; i++) {
+                    var cell = cfg.dashboard.cells[i]
+                    // Force customizable if not explicitly false (handles missing prop)
+                    if (cell.customizable === undefined) cell.customizable = true
+                    _cells.append(cell)
+                }
                 // If less than 8 cells, pad with defaults to ensure full dashboard
                 var totalCells = _cells.count
                 if (totalCells < 8) {
