@@ -343,8 +343,6 @@ Rectangle {
             }
         }
     }
-
-    Rectangle { width: parent.width; height: 1; anchors.bottom: parent.bottom; color: BeeTheme.accent; opacity: 0.3 }
 }
 
 
