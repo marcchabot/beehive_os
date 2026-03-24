@@ -219,9 +219,13 @@ QtObject {
                     var defaults = []
                     // Try to get localized defaults first
                     var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
-                    for (var i = 0; i < cellKeys.length; i++) {
-                        var cell = trCell(cellKeys[i])
-                        if (cell) defaults.push(cell)
+                    for (var k = 0; k < cellKeys.length; k++) {
+                        var cellData = trCell(cellKeys[k])
+                        if (cellData) {
+                            // Ensure Bee-Hive logo is protected, others open
+                            cellData.customizable = (cellKeys[k] !== "beehive")
+                            defaults.push(cellData)
+                        }
                     }
                     // Fallback to English if not all localized
                     if (defaults.length < 8) {
@@ -237,23 +241,35 @@ QtObject {
                     }
                     // Pad remaining cells with defaults that are not already present
                     for (var i = totalCells; i < 8; i++) {
-                        var defIdx = i
+                        var defIdx = 0
                         // Find a default that's not already used
-                        while (defIdx < defaults.length && _cells.count > 0) {
-                            var found = false
+                        var foundValid = false
+                        while (defIdx < defaults.length) {
+                            var alreadyUsed = false
                             for (var j = 0; j < _cells.count; j++) {
                                 if (_cells.get(j).title === defaults[defIdx].title) {
-                                    found = true
+                                    alreadyUsed = true
                                     break
                                 }
                             }
-                            if (!found) break
+                            if (!alreadyUsed) {
+                                foundValid = true
+                                break
+                            }
                             defIdx++
                         }
-                        if (defIdx < defaults.length)
-                            _cells.append(defaults[defIdx])
-                        else
+                        
+                        if (foundValid) {
+                            var d = defaults[defIdx]
+                            _cells.append({
+                                icon: d.icon, title: d.title, subtitle: d.subtitle, 
+                                detail: d.detail, action: d.action, 
+                                highlighted: d.highlighted, 
+                                customizable: (d.customizable !== false) // Force boolean true
+                            })
+                        } else {
                             _cells.append({ icon: "▣", title: "Cell " + (i+1), subtitle: "Empty", detail: "", action: "none", highlighted: false, customizable: true })
+                        }
                     }
                 }
             } else {
