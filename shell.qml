@@ -187,7 +187,7 @@ ShellRoot {
             WlrLayershell.namespace: "beehive-aura"
             exclusiveZone: -1
             focusable: false
-            anchors { fill: parent }
+            anchors { top: true; bottom: true; left: true; right: true }
             color: "transparent"
             mask: Region {} 
 
@@ -233,7 +233,7 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-settings"
                 focusable: true
-                anchors { fill: parent }
+                anchors { top: true; bottom: true; left: true; right: true }
                 color: "transparent"
 
                 BeeSettings {
@@ -255,7 +255,7 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-power"
                 focusable: true
-                anchors { fill: parent }
+                anchors { top: true; bottom: true; left: true; right: true }
                 color: "transparent"
                 BeePower {
                     anchors.fill: parent
@@ -281,7 +281,7 @@ ShellRoot {
                 WlrLayershell.namespace: "beehive-search"
                 focusable: true
                 WlrLayershell.keyboardFocus: WlrLayershell.Exclusive
-                anchors { fill: parent }
+                anchors { top: true; bottom: true; left: true; right: true }
                 color: "transparent"
                 BeeSearch {
                     anchors.fill: parent
@@ -307,7 +307,7 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "beehive-studio"
                 focusable: true
-                anchors { fill: parent }
+                anchors { top: true; bottom: true; left: true; right: true }
                 color: "transparent"
                 BeeStudio { 
                     anchors.fill: parent
