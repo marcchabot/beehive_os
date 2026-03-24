@@ -88,8 +88,8 @@ echo -e "${AMBER}💉 Injecting hive venom (configs)...${RESET}"
 # Hyprland
 mkdir -p "$HOME/.config/hypr"
 if ! grep -q "beehive_hypr.conf" "$HOME/.config/hypr/hyprland.conf" 2>/dev/null; then
-    echo -e "\n# --- BEE-HIVE OS CONFIG ---\nsource = ~/beehive_os/config/beehive_hypr.conf" >> "$HOME/.config/hypr/hyprland.conf"
-    echo "✅ Hyprland configured."
+    echo -e "\n# --- BEE-HIVE OS CONFIG ---\nsource = ~/beehive_os/config/beehive_hypr.conf\nsource = ~/beehive_os/config/beehive_keybinds.conf" >> "$HOME/.config/hypr/hyprland.conf"
+    echo "✅ Hyprland configured (Theme + Keybinds + Autostart)."
 fi
 
 # Kitty
