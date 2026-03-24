@@ -92,15 +92,26 @@ Bee-Hive OS includes **Honey-Sync**, a local script to fetch your Google Calenda
    # Or via Go
    go install github.com/steipete/gogcli/cmd/gog@latest
    ```
-2. **Authorize `gog`** with your Google account:
+
+2. **Setup OAuth Credentials**:
+   To connect to Google, `gog` requires a Desktop App OAuth Client ID.
+   *   Go to Google Cloud Console > Credentials > Create "Desktop app" OAuth Client.
+   *   Download the JSON file.
+   *   Provide it to `gog`:
+       ```bash
+       gog auth credentials path/to/downloaded/client_secret.json
+       ```
+
+3. **Authorize `gog`** with your Google account:
    ```bash
    gog auth login
    ```
-3. **Sync your nectar**:
+
+4. **Sync your nectar**:
    ```bash
    python3 scripts/honey_sync.py
    ```
-4. (Optional) Add a cron job or systemd timer to sync every hour!
+   *(Optional) Add a cron job or systemd timer to sync every hour!*
 
 ---
 
