@@ -10,7 +10,10 @@
 ### 🛡️ The Welcome Screen
 ![BeeWelcome](assets/screenshots/showcase_welcome.png)
 
-### 📊 The Dashboard (MayaDash)
+### 🍯 The MayaDash (Honeycomb Dashboard)
+![MayaDash](assets/screenshots/showcase_mayadash.png)
+
+### 📊 System Widgets (Clock & Events)
 ![Dashboard](assets/screenshots/showcase_dashboard.png)
 
 ### 🌙 Cyber-Amber (Dark Theme)
