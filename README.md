@@ -5,6 +5,30 @@
 
 ---
 
+## ⚠️ REQUIRED — Hyprland Keybinds
+
+**Without these, Bee-Hive OS won't respond to any keyboard shortcut.**
+
+Add this single line to your `~/.config/hypr/hyprland.conf` :
+
+```ini
+source = ~/beehive_os/config/beehive_keybinds.conf
+```
+
+This enables all core shortcuts:
+
+| Keybind | Action |
+|---------|--------|
+| `Super + D` | 🍯 Toggle Dashboard (MayaDash) |
+| `Super + Space` | 🔍 App Launcher (BeeSearch) |
+| `Super + Escape` | ⚙️ The Hive (Control Center) |
+| `Super + P` | ⏻ Power Menu |
+| `Super + F12` | 🌙 Toggle HoneyDark / HoneyLight |
+
+> 💡 **First launch tip:** Bee-Hive OS will show a welcome screen on first run with these instructions built-in!
+
+---
+
 ## 🏗️ Architecture
 
 ```

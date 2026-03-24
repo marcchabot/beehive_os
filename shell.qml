@@ -10,6 +10,19 @@ ShellRoot {
     property bool dashVisible: false
     property bool searchVisible: false
     property bool osdVisible: false
+    property bool welcomeVisible: false
+
+    // ─── First Run Detection ──────────────────────────────────
+    Process {
+        id: firstRunCheck
+        command: ["bash", "-c", "test -f ~/.config/beehive/.bee_welcomed && echo yes || echo no"]
+        running: true
+        stdout: SplitParser {
+            onRead: (line) => {
+                root.welcomeVisible = (line.trim() === "no")
+            }
+        }
+    }
 
     // ─── Debounce Logic ──────────────────────────────────────
     property var _lastIpcTimes: ({})
@@ -295,6 +308,30 @@ ShellRoot {
                         launchTimer.restart()
                     }
                     onShownChanged: { if (!shown) root.searchVisible = false }
+                }
+            }
+        }
+    }
+
+    // ─── First Run Welcome Screen ─────────────────────────────
+    Loader {
+        active: root.welcomeVisible
+        sourceComponent: Variants {
+            model: Quickshell.screens
+            delegate: PanelWindow {
+                required property var modelData
+                screen: modelData
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.namespace: "beehive-welcome"
+                focusable: true
+                anchors { top: true; bottom: true; left: true; right: true }
+                color: "transparent"
+                BeeWelcome {
+                    anchors.fill: parent
+                    onDismissed: {
+                        root.welcomeVisible = false
+                        root.controlVisible = true   // Ouvre The Hive après le welcome
+                    }
                 }
             }
         }
