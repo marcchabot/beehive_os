@@ -190,8 +190,53 @@ QtObject {
             dashTitle = cfg.dashboard.title || dashTitle
             if (cfg.dashboard.cells && cfg.dashboard.cells.length > 0) {
                 _cells.clear()
+                // Load user-configured cells first
                 for (var i = 0; i < cfg.dashboard.cells.length; i++)
                     _cells.append(cfg.dashboard.cells[i])
+                // If less than 8 cells, pad with defaults to ensure full dashboard
+                var totalCells = _cells.count
+                if (totalCells < 8) {
+                    console.log("BeeConfig: Padding cells from", totalCells, "to 8 with defaults")
+                    var defaults = []
+                    // Try to get localized defaults first
+                    var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
+                    for (var i = 0; i < cellKeys.length; i++) {
+                        var cell = trCell(cellKeys[i])
+                        if (cell) defaults.push(cell)
+                    }
+                    // Fallback to English if not all localized
+                    if (defaults.length < 8) {
+                        defaults = []
+                        defaults.push({ icon: "📅",  title: "Calendar",        subtitle: "Schedule",             detail: "3 events today\n1 reminder",               action: "app:calendar",    highlighted: false, customizable: true })
+                        defaults.push({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:email",       highlighted: false, customizable: true })
+                        defaults.push({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true,  customizable: false })
+                        defaults.push({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false, customizable: true })
+                        defaults.push({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false, customizable: true })
+                        defaults.push({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false, customizable: true })
+                        defaults.push({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false, customizable: true })
+                        defaults.push({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
+                    }
+                    // Pad remaining cells with defaults that are not already present
+                    for (var i = totalCells; i < 8; i++) {
+                        var defIdx = i
+                        // Find a default that's not already used
+                        while (defIdx < defaults.length && _cells.count > 0) {
+                            var found = false
+                            for (var j = 0; j < _cells.count; j++) {
+                                if (_cells.get(j).title === defaults[defIdx].title) {
+                                    found = true
+                                    break
+                                }
+                            }
+                            if (!found) break
+                            defIdx++
+                        }
+                        if (defIdx < defaults.length)
+                            _cells.append(defaults[defIdx])
+                        else
+                            _cells.append({ icon: "▣", title: "Cell " + (i+1), subtitle: "Empty", detail: "", action: "none", highlighted: false, customizable: true })
+                    }
+                }
             } else {
                 loadDefaults()
             }
