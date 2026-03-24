@@ -86,6 +86,8 @@ Item {
                         BeeTheme.wallpaperOverride = parent.parent.parent.src
                         if (BeeTheme.nectarSync && parent.parent.parent.mode !== "")
                             BeeTheme.setMode(parent.parent.parent.mode)
+                        var name = parent.parent.parent.label || parent.parent.parent.src.split("/").pop()
+                        BeeBarState.logAction("Design", "Wallpaper : " + name, "🖼")
                     }
                 }
                 Rectangle {
@@ -772,7 +774,7 @@ Item {
                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
                                     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
                                     Text { text: tr("save_button"); color: BeeTheme.accent; font { pixelSize: 11; bold: true } anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
-                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { BeeConfig.saveConfig(); beeStudio._saveDirty = false } }
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { BeeConfig.saveConfig(); beeStudio._saveDirty = false; BeeBarState.logAction("My Hive", "Alvéoles sauvegardées", "🍯") } }
                                 }
                             }
                         }

@@ -275,6 +275,87 @@ Rectangle {
                         }
                     }
 
+                    SectionHeader { title: "CALENDAR 📅" }
+                    ColumnLayout {
+                        Layout.fillWidth: true; spacing: 10
+
+                        SettingRow {
+                            label: "Upcoming Events Widget"
+                            desc: "Show upcoming events panel on the desktop (bottom-left)."
+                            checked: BeeConfig.eventsEnabled
+                            onToggled: (val) => { BeeConfig.eventsEnabled = val; BeeConfig.saveConfig(); BeeBarState.logAction("Calendar", "Widget événements " + (val ? "activé" : "désactivé"), "📅") }
+                        }
+
+                        // ICS URL field
+                        ColumnLayout {
+                            Layout.fillWidth: true; spacing: 6
+                            RowLayout {
+                                Text { text: "🔗"; font.pixelSize: 16 }
+                                Text { text: "ICS Calendar URL"; color: BeeTheme.textPrimary; font { bold: true; pixelSize: 13 } }
+                            }
+                            Text {
+                                text: "Export your calendar from Google, Outlook or Apple and paste the URL below."
+                                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
+                                font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true; spacing: 10
+
+                                Rectangle {
+                                    Layout.fillWidth: true; height: 38; radius: 10
+                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                                    border.color: icsField.activeFocus ? BeeTheme.accent : BeeTheme.separator
+                                    border.width: 1
+                                    Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                                    TextInput {
+                                        id: icsField
+                                        anchors { fill: parent; leftMargin: 12; rightMargin: 12; topMargin: 8; bottomMargin: 8 }
+                                        text: BeeConfig.icsUrl
+                                        color: BeeTheme.textPrimary
+                                        font.pixelSize: 12
+                                        clip: true
+                                        placeholderText: "https://calendar.google.com/calendar/ical/..."
+                                        onEditingFinished: {
+                                            BeeConfig.icsUrl = text
+                                            BeeConfig.saveConfig()
+                                        }
+                                        // Placeholder text
+                                        Text {
+                                            visible: !parent.text && !parent.activeFocus
+                                            text: parent.placeholderText
+                                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                            font.pixelSize: 11
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                    }
+                                }
+
+                                // Sync Now button
+                                Rectangle {
+                                    width: 90; height: 38; radius: 10
+                                    color: syncHov.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                                    border.color: BeeTheme.accent; border.width: 1
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+                                    Text { anchors.centerIn: parent; text: "⟳ Sync"; color: BeeTheme.accent; font { bold: true; pixelSize: 13 } }
+                                    MouseArea {
+                                        id: syncHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (!icsField.text) return
+                                            BeeConfig.icsUrl = icsField.text
+                                            BeeConfig.saveConfig()
+                                            Qt.createQmlObject(
+                                                'import Quickshell.Io; Process { running: true; command: ["python3", Qt.resolvedUrl("../scripts/honey_sync_ics.py").toString().replace("file://", "")] }',
+                                                parent, "icsSync"
+                                            )
+                                            BeeBarState.logAction("Calendar", "Synchronisation ICS lancée", "📅")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     SectionHeader { title: "PRIVACY & FOCUS" }
                     SettingRow {
                         label: controlRoot._s.stealth || "Stealth Mode 👤"
