@@ -703,15 +703,6 @@ Item {
                                                 FieldLabel { labelText: tr("field_label_action") }
                                                 BeeField { id: actionField; placeholderText: "none | app:nom | toggle:settings"; onTextEdited: { if (!beeStudio._loading) beeStudio.editAction = text } }
 
-                                                FieldLabel { labelText: tr("label_wallpaper_nectar") }
-                                                RowLayout {
-                                                    Layout.fillWidth: true; spacing: 8
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper.png";       label: tr("wallpaper_example_mysterious");  mode: "HoneyDark" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_dark_bee.png"; label: tr("wallpaper_example_dark_bee"); mode: "HoneyDark" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light_bee.png"; label: tr("wallpaper_example_light_bee"); mode: "HoneyLight" }
-                                                    WallCard { width: 110; height: 80; src: "../assets/wallpaper_light.png"; label: tr("wallpaper_example_soft_light"); mode: "HoneyLight" }
-                                                }
-
                                                 RowLayout {
                                                     Layout.fillWidth: true; spacing: 10
                                                     ColumnLayout {
