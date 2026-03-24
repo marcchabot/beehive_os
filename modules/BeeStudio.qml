@@ -845,7 +845,7 @@ Item {
                                             visible: parent.text.length === 0
                                             anchors { fill: parent }
                                             verticalAlignment: Text.AlignVCenter
-                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers"text: (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers" BeeConfig.tr.common.wallpapers_folder) || (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers"
+                                            text: (BeeConfig.tr.common && BeeConfig.tr.common.wallpapers_folder) || "~/Pictures/Wallpapers"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
                                             font.pixelSize: 11
                                         }
@@ -886,7 +886,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯" BeeConfig.tr.common.beehive_originals) || (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"
+                                            text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }
@@ -903,7 +903,7 @@ Item {
                                     ColumnLayout {
                                         spacing: 12; Layout.fillWidth: true
                                         Text {
-                                            text: (BeeConfig.tr.common text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼" BeeConfig.tr.common.my_library) || (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"
+                                            text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                                             font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
                                         }
