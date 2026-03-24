@@ -79,9 +79,18 @@ echo -e "${AMBER}💉 Injecting hive venom (configs)...${RESET}"
 
 # Hyprland
 mkdir -p "$HOME/.config/hypr"
-if ! grep -q "beehive_hypr.conf" "$HOME/.config/hypr/hyprland.conf" 2>/dev/null; then
-    echo -e "\n# --- BEE-HIVE OS CONFIG ---\nsource = ~/beehive_os/config/beehive_hypr.conf\nsource = ~/beehive_os/config/beehive_keybinds.conf" >> "$HOME/.config/hypr/hyprland.conf"
-    echo "✅ Hyprland configured (Theme + Keybinds + Autostart)."
+CONF_FILE="$HOME/.config/hypr/hyprland.conf"
+
+# Ensure Theme is sourced
+if ! grep -q "beehive_hypr.conf" "$CONF_FILE" 2>/dev/null; then
+    echo -e "\n# --- BEE-HIVE OS CONFIG ---\nsource = ~/beehive_os/config/beehive_hypr.conf" >> "$CONF_FILE"
+    echo "✅ Hyprland Theme configured."
+fi
+
+# Ensure Keybinds are sourced
+if ! grep -q "beehive_keybinds.conf" "$CONF_FILE" 2>/dev/null; then
+    echo "source = ~/beehive_os/config/beehive_keybinds.conf" >> "$CONF_FILE"
+    echo "✅ Hyprland Keybinds & Autostart configured."
 fi
 
 # Kitty
