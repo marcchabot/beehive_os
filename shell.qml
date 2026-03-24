@@ -286,6 +286,8 @@ ShellRoot {
                 BeeSearch {
                     anchors.fill: parent
                     shown: true
+                    onOpenSettings: { root.settingsVisible = true }
+                    onOpenStudio:   { root.studioVisible   = true }
                     onLaunchRequested: (cmd) => {
                         root._pendingCmd = cmd
                         root.searchVisible = false
