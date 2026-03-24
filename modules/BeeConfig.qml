@@ -47,6 +47,7 @@ QtObject {
 
     // ─── BeeEvents ────────────────────────────────────────────
     property bool eventsEnabled: true
+    property string icsUrl: ""  // URL ICS (Google Calendar, Outlook, Apple…)
 
     // ─── Sync properties to BeeBarState ─────────────────────
     // Ensures visual components (Layer Background) react to 
@@ -184,6 +185,9 @@ QtObject {
             eventsEnabled = cfg.events_enabled === true
         else if (cfg.bee_events !== undefined)
             eventsEnabled = cfg.bee_events.enabled !== false
+
+        if (cfg.events_ics_url !== undefined)
+            icsUrl = cfg.events_ics_url
 
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
             uiLang = cfg.lang

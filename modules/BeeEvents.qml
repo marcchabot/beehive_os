@@ -290,18 +290,43 @@ Item {
     scale: visible ? 1.0 : 0.92
     Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
 
-    // ─── Auto-refresh timer (every 5 minutes) ─────────────────
+    // ─── ICS Sync : lance honey_sync_ics.py si icsUrl est définie ──
+    function syncICS() {
+        if (!BeeConfig.icsUrl || BeeConfig.icsUrl === "") return
+        Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ["python3", Qt.resolvedUrl("../scripts/honey_sync_ics.py").toString().replace("file://", "")] }',
+            beeEvents, "icsSync"
+        )
+    }
+
+    // ─── Auto-refresh timer (every 15 minutes) ────────────────
     Timer {
         id: refreshTimer
-        interval: 300000  // 5 minutes
+        interval: 900000  // 15 minutes
         running: true
         repeat: true
+        onTriggered: {
+            syncICS()
+            Qt.callLater(loadEvents)
+        }
+    }
+
+    // ─── Timer pour recharger après sync ICS (délai 3s) ──────
+    Timer {
+        id: reloadAfterSync
+        interval: 3000
+        repeat: false
         onTriggered: loadEvents()
     }
 
     Component.onCompleted: {
         scale = 0.92
-        loadEvents()
+        if (BeeConfig.icsUrl && BeeConfig.icsUrl !== "") {
+            syncICS()
+            reloadAfterSync.start()
+        } else {
+            loadEvents()
+        }
         appearAnim.start()
     }
 
