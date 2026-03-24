@@ -98,7 +98,7 @@ Rectangle {
                     Repeater {
                         model: [
                             { keys: "Super + D",      desc: "🍯 Toggle Dashboard" },
-                            { keys: "Super + Space",  desc: "🔍 App Launcher (BeeSearch)" },
+                            { keys: "Super + Z",      desc: "🔍 App Launcher (BeeSearch)" },
                             { keys: "Super + Escape", desc: "⚙️  The Hive (Control Center)" },
                             { keys: "Super + P",      desc: "⏻  Power Menu" },
                             { keys: "Super + F12",    desc: "🌙 Toggle Dark / Light Theme" },
