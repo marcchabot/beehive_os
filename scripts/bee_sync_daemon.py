@@ -20,9 +20,9 @@ import aiohttp
 from icalendar import Calendar
 
 # ─── Chemins ────────────────────────────────────────────────────────────────
-CONFIG_DIR   = Path.home() / ".config" / "beehive_os"
-LIVE_JSON    = CONFIG_DIR / "events_live.json"
-USER_CONFIG  = Path.home() / "beehive_os" / "user_config.json"
+BEEHIVE_ROOT = Path.home() / "beehive_os"
+LIVE_JSON    = BEEHIVE_ROOT / "data" / "events_live.json"
+USER_CONFIG  = BEEHIVE_ROOT / "user_config.json"
 LOG_FILE     = Path.home() / ".cache" / "beehive" / "bee_sync.log"
 
 # ─── Icônes auto-détectées ───────────────────────────────────────────────────
