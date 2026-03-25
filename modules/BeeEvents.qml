@@ -28,7 +28,7 @@ Item {
     // ─── Footer hover state property ──────────────────
     property bool footerHovered: false
 
-    readonly property int maxEvents: 3
+    readonly property int maxEvents: 6
 
     function loadEvents() {
         var doc = new XMLHttpRequest();
