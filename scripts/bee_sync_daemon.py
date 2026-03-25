@@ -124,8 +124,8 @@ class GoogleAPISource:
     """Source calendrier via Google Calendar API — supporte les événements récurrents."""
 
     SCOPES     = ["https://www.googleapis.com/auth/calendar.readonly"]
-    TOKEN_PATH = Path.home() / ".config" / "beehive" / "google_calendar_token.json"
-    CREDS_PATH = Path.home() / ".config" / "beehive" / "google_credentials.json"
+    TOKEN_PATH = BEEHIVE_ROOT / "config" / "google_calendar_token.json"
+    CREDS_PATH = BEEHIVE_ROOT / "config" / "google_credentials.json"
 
     def __init__(self, source_cfg: dict):
         self.id          = source_cfg["id"]
@@ -393,7 +393,7 @@ async def main():
 def run_oauth_flow():
     """
     Lance le flow OAuth2 interactif (première authentification).
-    Nécessite google_credentials.json dans ~/.config/beehive/.
+    Nécessite google_credentials.json dans ~/beehive_os/config/.
     Utilisation : python3 bee_sync_daemon.py --auth
     """
     token_path = GoogleAPISource.TOKEN_PATH
