@@ -31,72 +31,70 @@ Item {
     readonly property int maxEvents: 6
 
     function loadEvents() {
+        var fallbackDone = false;
         var doc = new XMLHttpRequest();
         doc.onreadystatechange = function() {
-            if (doc.readyState === XMLHttpRequest.DONE) {
-                // Si le statut est une erreur (ex: 404), on tente le fallback sur le fichier local statique
-                if (doc.status !== 200 && doc.status !== 0) {
-                    var staticPath = Qt.resolvedUrl("../data/events.json");
-                    if (doc.responseURL !== staticPath) {
-                        console.log("BeeEvents: Échec chargement path live, tentative fallback sur", staticPath);
-                        doc.open("GET", staticPath);
-                        doc.send();
-                        return;
-                    }
+            if (doc.readyState !== XMLHttpRequest.DONE) return;
+
+            // Fallback unique vers le fichier statique local — flag évite la boucle infinie
+            var tryFallback = function() {
+                if (fallbackDone) {
+                    console.warn("BeeEvents: Fallback déjà tenté, abandon.");
+                    eventsModel.clear();
+                    return;
+                }
+                fallbackDone = true;
+                var staticPath = Qt.resolvedUrl("../data/events.json");
+                console.log("BeeEvents: Fallback sur", staticPath);
+                doc.open("GET", staticPath);
+                doc.send();
+            };
+
+            if (doc.status !== 200 && doc.status !== 0) {
+                console.log("BeeEvents: Échec chargement (status", doc.status, "), tentative fallback.");
+                tryFallback();
+                return;
+            }
+
+            var text = doc.responseText.trim();
+            if (text === "") {
+                tryFallback();
+                return;
+            }
+
+            try {
+                var data = JSON.parse(text);
+                // Support format v2 (objet avec events[]) et v1 (tableau direct)
+                var eventsArray = Array.isArray(data) ? data : (data.events || []);
+
+                if (data._meta) {
+                    BeeConfig.liveSyncMeta = data._meta;
                 }
 
-                if (doc.status === 200 || doc.status === 0) {
-                    try {
-                        var text = doc.responseText.trim();
-                        if (text === "") {
-                            // Fichier live vide ou manquant — fallback sur données statiques
-                            var staticPath = Qt.resolvedUrl("../data/events.json");
-                            if (doc.responseURL !== staticPath) {
-                                doc.open("GET", staticPath);
-                                doc.send();
-                            } else {
-                                eventsModel.clear();
-                            }
-                            return;
-                        }
-                        var data = JSON.parse(text);
-                        // ... rest of the logic ...
-                        // Support format v2 (objet avec events[]) et v1 (tableau direct)
-                        var eventsArray = Array.isArray(data) ? data : (data.events || []);
-
-                        // Mettre à jour les métadonnées de sync
-                        if (data._meta) {
-                            BeeConfig.liveSyncMeta = data._meta;
-                        }
-
-                        var nowSec = Date.now() / 1000;
-                        // Filtre : événements dans les 30 dernières minutes ou futurs
-                        var upcoming = eventsArray.filter(function(e) {
-                            return !e.timestamp || e.timestamp >= nowSec - 1800;
-                        });
-                        eventsModel.clear();
-                        var limit = Math.min(upcoming.length, maxEvents);
-                        for (var i = 0; i < limit; i++) {
-                            eventsModel.append({
-                                evtIcon:   upcoming[i].icon  || "📅",
-                                evtTitle:  upcoming[i].title || "Événement",
-                                evtTime:   upcoming[i].time  || "",
-                                evtSub:    upcoming[i].sub   || "",
-                                evtUrgent: upcoming[i].urge === true || upcoming[i].urgent === true
-                            });
-                        }
-                        // Mettre à jour le compteur pour la cellule dashboard
-                        BeeConfig.liveSyncCount = upcoming.length;
-                    } catch(e) {
-                        console.warn("BeeEvents: Erreur parsing JSON:", e);
-                    }
-                } else {
-                    console.warn("BeeEvents: events.json load error, status:", doc.status);
+                var nowSec = Date.now() / 1000;
+                // Filtre : événements dans les 30 dernières minutes ou futurs
+                var upcoming = eventsArray.filter(function(e) {
+                    return !e.timestamp || e.timestamp >= nowSec - 1800;
+                });
+                eventsModel.clear();
+                var limit = Math.min(upcoming.length, maxEvents);
+                for (var i = 0; i < limit; i++) {
+                    eventsModel.append({
+                        evtIcon:   upcoming[i].icon  || "📅",
+                        evtTitle:  upcoming[i].title || "Événement",
+                        evtTime:   upcoming[i].time  || "",
+                        evtSub:    upcoming[i].sub   || "",
+                        evtUrgent: upcoming[i].urge === true || upcoming[i].urgent === true
+                    });
                 }
+                // Mettre à jour le compteur pour la cellule dashboard
+                BeeConfig.liveSyncCount = upcoming.length;
+            } catch(e) {
+                console.warn("BeeEvents: Erreur parsing JSON:", e);
+                eventsModel.clear();
             }
         }
-        // Qt.resolvedUrl résout le chemin relatif au fichier QML
-        // V2: lecture depuis le chemin live de la config
+        // V2: lecture depuis le chemin live du daemon, fallback sur données statiques
         var path = BeeConfig.eventsLivePath || Qt.resolvedUrl("../data/events.json");
         doc.open("GET", path);
         doc.send();
@@ -107,6 +105,16 @@ Item {
         target: BeeConfig
         function onEventsReloadRequested() {
             loadEvents();
+        }
+        // Déclenche la sync ICS et le rechargement une fois la config disponible.
+        // Corrige la race condition : onCompleted s'exécute avant la fin du XHR de BeeConfig.
+        function onConfigLoaded() {
+            if (BeeConfig.icsUrl && BeeConfig.icsUrl !== "") {
+                syncICS();
+                reloadAfterSync.restart();
+            } else {
+                loadEvents();
+            }
         }
     }
 
@@ -273,12 +281,9 @@ Item {
 
     Component.onCompleted: {
         scale = 0.92
-        if (BeeConfig.icsUrl && BeeConfig.icsUrl !== "") {
-            syncICS()
-            reloadAfterSync.start()
-        } else {
-            loadEvents()
-        }
+        // Charge immédiatement les données en cache (si présentes) pour un affichage instantané.
+        // La sync ICS et le rechargement "propre" se font dans onConfigLoaded() après le XHR async.
+        loadEvents()
         appearAnim.start()
     }
 

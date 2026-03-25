@@ -76,6 +76,7 @@ QtObject {
     property int liveSyncCount: 0
 
     signal eventsReloadRequested()
+    signal configLoaded()
 
     function reloadLiveEvents() {
         eventsReloadRequested()
@@ -335,6 +336,7 @@ QtObject {
         if (cfg.nectar_sync !== undefined) BeeTheme.nectarSync = cfg.nectar_sync === true
 
         root._loaded = true
+        root.configLoaded()
     }
 
     // ─── Sauvegarde vers user_config.json ────────────────────
