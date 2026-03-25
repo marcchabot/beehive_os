@@ -198,12 +198,66 @@ Item {
 
         Item { width: 1; height: 4 }
 
-        // Liste des 3 prochains événements
+        // Liste des prochains événements
         Repeater {
             model: eventsModel
 
             delegate: Item {
-                // ... (delegate code)
+                width: parent.width
+                height: 44
+
+                // Icône
+                Text {
+                    id: evtIconLabel
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: model.evtIcon
+                    font.pixelSize: 18
+                }
+
+                // Titre + heure + sous-titre
+                Column {
+                    anchors.left: evtIconLabel.right
+                    anchors.leftMargin: 8
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 2
+
+                    Text {
+                        width: parent.width
+                        text: model.evtTitle
+                        elide: Text.ElideRight
+                        color: model.evtUrgent ? BeeTheme.accent : BeeTheme.textPrimary
+                        font.pixelSize: 12
+                        font.weight: model.evtUrgent ? Font.Bold : Font.Normal
+                    }
+
+                    Row {
+                        spacing: 4
+                        Text {
+                            text: model.evtTime
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.85)
+                            font.pixelSize: 10
+                        }
+                        Text {
+                            visible: model.evtSub !== ""
+                            text: "·  " + model.evtSub
+                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.50)
+                            font.pixelSize: 10
+                        }
+                    }
+                }
+
+                // Séparateur entre événements (sauf le dernier)
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 26
+                    height: 1
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                    visible: index < eventsModel.count - 1
+                }
             }
         }
 
