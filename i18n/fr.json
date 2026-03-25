@@ -47,12 +47,12 @@
   },
 
   "dashboard": {
-    "default_title": "Mon Tableau de bord",
-    "no_events": "Aucun événement à venir"
+    "default_title": "Mon Tableau de bord"
   },
 
   "events": {
     "upcoming": "Prochains événements",
+    "no_events": "Aucun événement à venir 🍯",
     "see_calendar": "Voir le calendrier →"
   },
 

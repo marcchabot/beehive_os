@@ -69,8 +69,9 @@ QtObject {
     property ListModel calendars: ListModel { id: _calendars }
 
     // ─── Bee-Live Sync v2 ────────────────────────────────────
-    property string eventsLivePath: StandardPaths.writableLocation(
-        StandardPaths.ConfigLocation) + "/beehive_os/events_live.json"
+    // Par défaut, on laisse vide pour utiliser le fichier local (data/events.json)
+    // Sauf si l'utilisateur définit un chemin spécifique dans user_config.json
+    property string eventsLivePath: ""
     property var liveSyncMeta: null
     property int liveSyncCount: 0
 
@@ -213,6 +214,11 @@ QtObject {
             eventsEnabled = cfg.events_enabled === true
         else if (cfg.bee_events !== undefined)
             eventsEnabled = cfg.bee_events.enabled !== false
+
+        if (cfg.events_live_path !== undefined)
+            eventsLivePath = cfg.events_live_path
+        else if (cfg.bee_events !== undefined && cfg.bee_events.live_path !== undefined)
+            eventsLivePath = cfg.bee_events.live_path
 
         if (cfg.events_ics_url !== undefined)
             icsUrl = cfg.events_ics_url

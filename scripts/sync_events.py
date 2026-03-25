@@ -9,8 +9,8 @@ from urllib import request
 from urllib.error import URLError
 
 # ═══════════════════════════════════════════════════════════════
-# 🐝 BEE-HIVE OS : HONEY-SYNC (v2.0) 🍯
-# Synchronise Google Calendar et Office365 (ICS) vers data/events.json
+# Bee-Hive OS : sync_events.py (Portable Version) 🐝📅
+# Synchronise Google Calendar et ICS vers data/events.json
 # ═══════════════════════════════════════════════════════════════
 
 # 1. Configuration des calendriers
@@ -79,6 +79,7 @@ def fetch_events():
     
     # Préparation de l'environnement pour 'gog'
     env = os.environ.copy()
+    # Si on est dans l'environnement OpenClaw, on utilise les chemins Maya
     maya_config = os.path.expanduser("~/.openclaw/config/gogcli/")
     if os.path.exists(maya_config):
         env["XDG_CONFIG_HOME"] = maya_config
