@@ -215,15 +215,22 @@ QtObject {
         if (cfg.events_ics_url !== undefined)
             icsUrl = cfg.events_ics_url
 
-        if (cfg.calendars && Array.isArray(cfg.calendars)) {
-            _calendars.clear()
-            for (var c = 0; c < cfg.calendars.length; c++) {
-                _calendars.append(cfg.calendars[c])
+        // Migration intelligente v1 -> v2
+        var hasLegacyUrl = (cfg.events_ics_url && cfg.events_ics_url !== "")
+        var calendarsList = (cfg.calendars && Array.isArray(cfg.calendars)) ? cfg.calendars : []
+        
+        // Vérifier si la legacy URL est déjà dans la liste
+        var alreadyMigrated = false
+        for (var i = 0; i < calendarsList.length; i++) {
+            if (calendarsList[i].url === cfg.events_ics_url) {
+                alreadyMigrated = true
+                break
             }
-            console.log("BeeConfig: " + _calendars.count + " calendriers chargés depuis user_config.json")
-        } else if (cfg.events_ics_url && cfg.events_ics_url !== "") {
-            // Migration automatique v1 -> v2 en mémoire si calendars est absent
-            _calendars.clear()
+        }
+
+        _calendars.clear()
+        // Si on a une legacy URL non migrée, on l'ajoute en premier
+        if (hasLegacyUrl && !alreadyMigrated) {
             _calendars.append({
                 id: "famille",
                 type: "ics",
@@ -231,7 +238,15 @@ QtObject {
                 label: "Famille",
                 color: "#FFB81C"
             })
-            console.log("BeeConfig: Migration v1 -> v2 (mémoire) effectuée pour " + cfg.events_ics_url)
+            console.log("BeeConfig: Legacy URL migrée dans la liste.")
+        }
+
+        // Ajouter les autres calendriers de la config
+        for (var c = 0; c < calendarsList.length; c++) {
+            // Éviter les doublons si on vient de migrer
+            if (calendarsList[c].url !== cfg.events_ics_url || !hasLegacyUrl) {
+                _calendars.append(calendarsList[c])
+            }
         }
 
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
