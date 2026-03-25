@@ -4,8 +4,8 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeEvents.qml — Prochains événements du calendrier 🐝📅
-// Sprint v0.7.1 — Optimisation robustesse JSON + filtrage date
-// Widget flottant : 3 prochains rendez-vous (sync_events.py)
+// Sprint v0.7.2 — Filtrage strict : événements du jour uniquement
+// Widget flottant : événements d'aujourd'hui (sync_events.py)
 // Positionnement : bas-gauche, au-dessus de la barre Hyprland
 // ═══════════════════════════════════════════════════════════════
 
@@ -71,10 +71,13 @@ Item {
                     BeeConfig.liveSyncMeta = data._meta;
                 }
 
-                var nowSec = Date.now() / 1000;
-                // Filtre : événements dans les 30 dernières minutes ou futurs
+                // Filtre : événements d'aujourd'hui uniquement
+                var now = new Date();
+                var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
+                var todayEnd   = todayStart + 86400;
                 var upcoming = eventsArray.filter(function(e) {
-                    return !e.timestamp || e.timestamp >= nowSec - 1800;
+                    if (!e.timestamp) return true;  // pas de timestamp → inclus (ex: all-day)
+                    return e.timestamp >= todayStart && e.timestamp < todayEnd;
                 });
                 eventsModel.clear();
                 var limit = Math.min(upcoming.length, maxEvents);
