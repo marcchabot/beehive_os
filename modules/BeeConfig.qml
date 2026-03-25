@@ -63,7 +63,8 @@ QtObject {
 
     // ─── BeeEvents ────────────────────────────────────────────
     property bool eventsEnabled: true
-    property string icsUrl: ""  // URL ICS (Google Calendar, Outlook, Apple…)
+    property string icsUrl: ""  // URL ICS (Legacy support)
+    property ListModel calendars: ListModel { id: _calendars }
 
     // ─── Bee-Live Sync v2 ────────────────────────────────────
     property string eventsLivePath: StandardPaths.writableLocation(
@@ -214,6 +215,13 @@ QtObject {
         if (cfg.events_ics_url !== undefined)
             icsUrl = cfg.events_ics_url
 
+        if (cfg.calendars && Array.isArray(cfg.calendars)) {
+            _calendars.clear()
+            for (var c = 0; c < cfg.calendars.length; c++) {
+                _calendars.append(cfg.calendars[c])
+            }
+        }
+
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
             uiLang = cfg.lang
             loadI18n(uiLang)
@@ -332,6 +340,21 @@ QtObject {
         }
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
         cfg.events_enabled = eventsEnabled
+        
+        // Save calendars array
+        var calArray = []
+        for (var k = 0; k < _calendars.count; k++) {
+            var cal = _calendars.get(k)
+            calArray.push({
+                id: cal.id,
+                type: cal.type || "ics",
+                url: cal.url || "",
+                label: cal.label || "",
+                color: cal.color || "#FFB81C"
+            })
+        }
+        cfg.calendars = calArray
+
         console.log("BeeConfig: Sauvegarde de pinned_apps →", JSON.stringify(cfg.pinned_apps))
         cfg.theme = BeeTheme.mode
         cfg.nectar_sync = BeeTheme.nectarSync

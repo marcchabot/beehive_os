@@ -278,81 +278,102 @@ Rectangle {
                         }
                     }
 
-                    SectionHeader { title: "CALENDAR 📅" }
+                    SectionHeader { title: (BeeConfig.uiLang === "fr" ? "CALENDRIERS 📅" : "CALENDARS 📅") }
                     ColumnLayout {
-                        Layout.fillWidth: true; spacing: 10
+                        Layout.fillWidth: true; spacing: 15
 
                         SettingRow {
-                            label: "Upcoming Events Widget"
-                            desc: "Show upcoming events panel on the desktop (bottom-left)."
+                            label: (BeeConfig.uiLang === "fr" ? "Widget Événements" : "Upcoming Events Widget")
+                            desc: (BeeConfig.uiLang === "fr" ? "Afficher le panneau des rendez-vous sur le bureau." : "Show upcoming events panel on the desktop (bottom-left).")
                             checked: BeeConfig.eventsEnabled
                             onToggled: (val) => { BeeConfig.eventsEnabled = val; BeeConfig.saveConfig(); BeeBarState.logAction("Calendar", "Widget événements " + (val ? "activé" : "désactivé"), "📅") }
                         }
 
-                        // ICS URL field
-                        ColumnLayout {
-                            Layout.fillWidth: true; spacing: 6
-                            RowLayout {
-                                Text { text: "🔗"; font.pixelSize: 16 }
-                                Text { text: "ICS Calendar URL"; color: BeeTheme.textPrimary; font { bold: true; pixelSize: 13 } }
-                            }
-                            Text {
-                                text: "Export your calendar from Google, Outlook or Apple and paste the URL below."
-                                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
-                                font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true; spacing: 10
-
-                                Rectangle {
-                                    Layout.fillWidth: true; height: 38; radius: 10
-                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
-                                    border.color: icsField.activeFocus ? BeeTheme.accent : BeeTheme.separator
-                                    border.width: 1
-                                    Behavior on border.color { ColorAnimation { duration: 150 } }
-
-                                    TextInput {
-                                        id: icsField
-                                        anchors { fill: parent; leftMargin: 12; rightMargin: 12; topMargin: 8; bottomMargin: 8 }
-                                        text: BeeConfig.icsUrl
-                                        color: BeeTheme.textPrimary
-                                        font.pixelSize: 12
-                                        clip: true
-                                        onEditingFinished: {
-                                            BeeConfig.icsUrl = text
-                                            BeeConfig.saveConfig()
-                                        }
+                        // V2 Multi-Calendar Management
+                        Repeater {
+                            model: BeeConfig.calendars
+                            delegate: ColumnLayout {
+                                Layout.fillWidth: true; spacing: 8
+                                
+                                RowLayout {
+                                    spacing: 10
+                                    Rectangle {
+                                        width: 12; height: 12; radius: 6
+                                        color: model.color || BeeTheme.accent
                                     }
                                     Text {
-                                        visible: !icsField.text && !icsField.activeFocus
-                                        text: "https://calendar.google.com/calendar/ical/..."
-                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
-                                        font.pixelSize: 11
-                                        anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
+                                        text: model.label || "Calendar"
+                                        color: BeeTheme.textPrimary; font { bold: true; pixelSize: 13 }
                                     }
-                                }
-
-                                // Sync Now button
-                                Rectangle {
-                                    width: 90; height: 38; radius: 10
-                                    color: syncHov.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
-                                    border.color: BeeTheme.accent; border.width: 1
-                                    Behavior on color { ColorAnimation { duration: 150 } }
-                                    Text { anchors.centerIn: parent; text: "⟳ Sync"; color: BeeTheme.accent; font { bold: true; pixelSize: 13 } }
-                                    MouseArea {
-                                        id: syncHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                    Item { Layout.fillWidth: true }
+                                    
+                                    // Remove button
+                                    Button {
+                                        text: "✕"
+                                        flat: true
                                         onClicked: {
-                                            if (!icsField.text) return
-                                            BeeConfig.icsUrl = icsField.text
+                                            BeeConfig.calendars.remove(index)
                                             BeeConfig.saveConfig()
-                                            Qt.createQmlObject(
-                                                'import Quickshell.Io; Process { running: true; command: ["python3", Qt.resolvedUrl("../scripts/honey_sync_ics.py").toString().replace("file://", "")] }',
-                                                parent, "icsSync"
-                                            )
-                                            BeeBarState.logAction("Calendar", "Synchronisation ICS lancée", "📅")
+                                            BeeBarState.logAction("Calendar", "Calendrier supprimé : " + model.label, "🗑️")
                                         }
                                     }
                                 }
+
+                                RowLayout {
+                                    Layout.fillWidth: true; spacing: 10
+                                    Rectangle {
+                                        Layout.fillWidth: true; height: 38; radius: 10
+                                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                                        border.color: icsIn.activeFocus ? BeeTheme.accent : BeeTheme.separator
+                                        border.width: 1
+                                        
+                                        TextInput {
+                                            id: icsIn
+                                            anchors { fill: parent; leftMargin: 12; rightMargin: 12; verticalCenter: parent.verticalCenter }
+                                            text: model.url; color: BeeTheme.textPrimary; font.pixelSize: 11; clip: true
+                                            onEditingFinished: {
+                                                if (text !== model.url) {
+                                                    BeeConfig.calendars.setProperty(index, "url", text)
+                                                    BeeConfig.saveConfig()
+                                                }
+                                            }
+                                        }
+                                        Text {
+                                            visible: !icsIn.text && !icsIn.activeFocus
+                                            text: "ICS URL (Google, Outlook...)"
+                                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                            font.pixelSize: 11
+                                            anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
+                                        }
+                                    }
+                                }
+                                Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator; opacity: 0.5 }
+                            }
+                        }
+
+                        // Add Calendar Button
+                        Button {
+                            text: (BeeConfig.uiLang === "fr" ? "+ Ajouter un calendrier" : "+ Add Calendar")
+                            Layout.alignment: Qt.AlignLeft
+                            onClicked: {
+                                BeeConfig.calendars.append({
+                                    id: "cal_" + Date.now(),
+                                    label: (BeeConfig.uiLang === "fr" ? "Nouveau Calendrier" : "New Calendar"),
+                                    url: "",
+                                    color: "#FFB81C",
+                                    type: "ics"
+                                })
+                                BeeConfig.saveConfig()
+                            }
+                        }
+
+                        // Global Sync Now
+                        Button {
+                            text: (BeeConfig.uiLang === "fr" ? "⟳ Synchroniser tout" : "⟳ Sync All")
+                            Layout.fillWidth: true
+                            onClicked: {
+                                BeeConfig.reloadLiveEvents()
+                                BeeBarState.logAction("Calendar", "Synchronisation globale lancée", "📅")
                             }
                         }
                     }
