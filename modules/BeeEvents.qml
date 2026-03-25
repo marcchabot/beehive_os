@@ -76,7 +76,7 @@ Item {
                 var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
                 var todayEnd   = todayStart + 86400;
                 var upcoming = eventsArray.filter(function(e) {
-                    if (!e.timestamp) return true;  // pas de timestamp → inclus (ex: all-day)
+                    if (!e.timestamp) return false;  // pas de timestamp → exclus
                     return e.timestamp >= todayStart && e.timestamp < todayEnd;
                 });
                 eventsModel.clear();
