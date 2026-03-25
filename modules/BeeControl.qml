@@ -308,13 +308,19 @@ Rectangle {
                                     Item { Layout.fillWidth: true }
                                     
                                     // Remove button
-                                    Button {
-                                        text: "✕"
-                                        flat: true
-                                        onClicked: {
-                                            BeeConfig.calendars.remove(index)
-                                            BeeConfig.saveConfig()
-                                            BeeBarState.logAction("Calendar", "Calendrier supprimé : " + model.label, "🗑️")
+                                    Rectangle {
+                                        width: 28; height: 28; radius: 14
+                                        color: delHov.containsMouse ? "#442222" : "transparent"
+                                        border.color: delHov.containsMouse ? "#ff5555" : "transparent"
+                                        border.width: 1
+                                        Text { text: "🗑️"; anchors.centerIn: parent; font.pixelSize: 14; opacity: delHov.containsMouse ? 1.0 : 0.6 }
+                                        MouseArea {
+                                            id: delHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                BeeConfig.calendars.remove(index)
+                                                BeeConfig.saveConfig()
+                                                BeeBarState.logAction("Calendar", "Calendrier supprimé", "🗑️")
+                                            }
                                         }
                                     }
                                 }
@@ -323,8 +329,8 @@ Rectangle {
                                     Layout.fillWidth: true; spacing: 10
                                     Rectangle {
                                         Layout.fillWidth: true; height: 38; radius: 10
-                                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
-                                        border.color: icsIn.activeFocus ? BeeTheme.accent : BeeTheme.separator
+                                        color: Qt.rgba(0, 0, 0, 0.2)
+                                        border.color: icsIn.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
                                         border.width: 1
                                         
                                         TextInput {
@@ -340,40 +346,57 @@ Rectangle {
                                         }
                                         Text {
                                             visible: !icsIn.text && !icsIn.activeFocus
-                                            text: "ICS URL (Google, Outlook...)"
+                                            text: "URL du calendrier (.ics)"
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                                             font.pixelSize: 11
                                             anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
                                         }
                                     }
                                 }
-                                Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator; opacity: 0.5 }
+                                Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator; opacity: 0.3 }
                             }
                         }
 
-                        // Add Calendar Button
-                        Button {
-                            text: (BeeConfig.uiLang === "fr" ? "+ Ajouter un calendrier" : "+ Add Calendar")
-                            Layout.alignment: Qt.AlignLeft
-                            onClicked: {
-                                BeeConfig.calendars.append({
-                                    id: "cal_" + Date.now(),
-                                    label: (BeeConfig.uiLang === "fr" ? "Nouveau Calendrier" : "New Calendar"),
-                                    url: "",
-                                    color: "#FFB81C",
-                                    type: "ics"
-                                })
-                                BeeConfig.saveConfig()
+                        // Add Calendar Button (Stylisé)
+                        Rectangle {
+                            width: 180; height: 36; radius: 10
+                            color: addHov.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2) : "transparent"
+                            border.color: BeeTheme.accent; border.width: 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: (BeeConfig.uiLang === "fr" ? "+ Ajouter un calendrier" : "+ Add Calendar")
+                                color: BeeTheme.accent; font { bold: true; pixelSize: 12 }
+                            }
+                            MouseArea {
+                                id: addHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    BeeConfig.calendars.append({
+                                        id: "cal_" + Date.now(),
+                                        label: (BeeConfig.uiLang === "fr" ? "Nouveau Calendrier" : "New Calendar"),
+                                        url: "",
+                                        color: "#FFB81C",
+                                        type: "ics"
+                                    })
+                                    BeeConfig.saveConfig()
+                                }
                             }
                         }
 
-                        // Global Sync Now
-                        Button {
-                            text: (BeeConfig.uiLang === "fr" ? "⟳ Synchroniser tout" : "⟳ Sync All")
-                            Layout.fillWidth: true
-                            onClicked: {
-                                BeeConfig.reloadLiveEvents()
-                                BeeBarState.logAction("Calendar", "Synchronisation globale lancée", "📅")
+                        // Global Sync Now (Stylisé)
+                        Rectangle {
+                            Layout.fillWidth: true; height: 42; radius: 12
+                            color: BeeTheme.accent; opacity: syncHov.containsMouse ? 0.9 : 1.0
+                            Text {
+                                anchors.centerIn: parent
+                                text: (BeeConfig.uiLang === "fr" ? "⟳ Synchroniser tout" : "⟳ Sync All")
+                                color: "#000000"; font { bold: true; pixelSize: 13 }
+                            }
+                            MouseArea {
+                                id: syncHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    BeeConfig.reloadLiveEvents()
+                                    BeeBarState.logAction("Calendar", "Synchronisation globale lancée", "📅")
+                                }
                             }
                         }
                     }
