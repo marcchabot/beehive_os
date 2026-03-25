@@ -1,10 +1,12 @@
 pragma Singleton
 import QtQuick
+import QtCore
 import Quickshell
+import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════
 // BeeBarState.qml — Shared Stealth Mode state
-// Singleton accessible from shell.qml AND BeeBar.qml
+// v2.1 : Persistent History + OSD/Notify integration 🐝📜
 // ═══════════════════════════════════════════════════════════
 QtObject {
     id: root
@@ -34,6 +36,37 @@ QtObject {
 
     property var historyModel: []
     readonly property int maxHistorySize: 50
+    
+    readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
+    
+    property Process saveProc: Process {
+        id: _saveProc
+        running: false
+    }
+
+    function loadHistory() {
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET", "file://" + historyPath)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (xhr.status === 200 || xhr.status === 0) {
+                try {
+                    var data = JSON.parse(xhr.responseText)
+                    if (Array.isArray(data)) historyModel = data
+                } catch(e) {}
+            }
+        }
+        xhr.send()
+    }
+
+    function saveHistory() {
+        var jsonStr = JSON.stringify(historyModel, null, 2)
+        _saveProc.running = false
+        _saveProc.command = ["bash", "-c", "mkdir -p $(dirname " + historyPath + ") && cat << 'BEEEOF' > " + historyPath + "\n" + jsonStr + "\nBEEEOF"]
+        _saveProc.running = true
+    }
+
+    Component.onCompleted: loadHistory()
 
     function logAction(category, message, icon = "🐝", type = "info") {
         // 1. Send visual toast (BeeNotify)
@@ -52,6 +85,7 @@ QtObject {
         if (updated.length > maxHistorySize)
             updated = updated.slice(0, maxHistorySize)
         historyModel = updated
+        saveHistory()
     }
 
     // Alias for backward compatibility if needed
@@ -61,12 +95,14 @@ QtObject {
 
     function clearHistory() {
         historyModel = []
+        saveHistory()
     }
 
     function removeHistoryEntry(index) {
         var updated = historyModel.slice()
         updated.splice(index, 1)
         historyModel = updated
+        saveHistory()
     }
 
     // ─── BeeAura OSD System 🎚️ ────────────────────────────────

@@ -57,5 +57,12 @@ The goal was a mind-blowing launch the weekend of March 20-21, 2026.
 - **Multi-config**: `my_config.json` file that overrides `user_config.json` to facilitate community updates.
 
 ---
+
+### Phase 5: Persistence & Stability (March 25 Sprint — v2.1.0) 🐝🛡️📜
+- [x] **Bug Fix**: Import `QtCore` to resolve `StandardPaths` reference error in `BeeConfig.qml`.
+- [x] **History Persistence**: Notification history (`BeeBarState.historyModel`) is now saved to `~/.cache/beehive_os/history.json`.
+- [x] **Framework Stability**: Improved singleton architecture and I/O error handling.
+
 ---
-*Maya's Note: Every day at 08:30, I launch a "Reflection Sprint" to evaluate progress and plan the day's tasks. Current version: **v1.7.0** (March 24, 2026).*
+---
+*Maya's Note: Every day at 08:30, I launch a "Reflection Sprint" to evaluate progress and plan the day's tasks. Current version: **v2.1.0** (March 25, 2026).*

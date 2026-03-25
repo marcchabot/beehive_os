@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import QtCore
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
@@ -61,8 +62,9 @@ QtObject {
             BeeApps.pinnedCmds = pinnedApps
     }
 
-    // ─── BeeEvents ────────────────────────────────────────────
+    // ─── BeeEvents & History ──────────────────────────────────
     property bool eventsEnabled: true
+    property bool historyEnabled: true
     property string icsUrl: ""  // URL ICS (Legacy support)
     property ListModel calendars: ListModel { id: _calendars }
 

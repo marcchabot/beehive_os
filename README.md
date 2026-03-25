@@ -254,7 +254,7 @@ To update without losing your personal settings (cells, weather, pinned apps):
 - [ ] Bee-Hive sound effects (discreet and elegant)
 - [ ] "Focus" Mode vs "Dashboard" Mode
 - [ ] Performance optimization (Quickshell profiling)
-- [ ] Persistent notifications widget
+- [x] Persistent notifications widget (v2.1) 🐝📜
 
 ---
 
