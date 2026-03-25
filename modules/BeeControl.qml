@@ -299,10 +299,10 @@ Rectangle {
                                     spacing: 10
                                     Rectangle {
                                         width: 12; height: 12; radius: 6
-                                        color: model.color || BeeTheme.accent
+                                        color: (model.color && model.color !== "") ? model.color : BeeTheme.accent
                                     }
                                     Text {
-                                        text: model.label || "Calendar"
+                                        text: (model.label && model.label !== "") ? model.label : "Calendar"
                                         color: BeeTheme.textPrimary; font { bold: true; pixelSize: 13 }
                                     }
                                     Item { Layout.fillWidth: true }

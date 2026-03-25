@@ -220,6 +220,18 @@ QtObject {
             for (var c = 0; c < cfg.calendars.length; c++) {
                 _calendars.append(cfg.calendars[c])
             }
+            console.log("BeeConfig: " + _calendars.count + " calendriers chargés depuis user_config.json")
+        } else if (cfg.events_ics_url && cfg.events_ics_url !== "") {
+            // Migration automatique v1 -> v2 en mémoire si calendars est absent
+            _calendars.clear()
+            _calendars.append({
+                id: "famille",
+                type: "ics",
+                url: cfg.events_ics_url,
+                label: "Famille",
+                color: "#FFB81C"
+            })
+            console.log("BeeConfig: Migration v1 -> v2 (mémoire) effectuée pour " + cfg.events_ics_url)
         }
 
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
