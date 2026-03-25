@@ -126,7 +126,7 @@ class BeeSyncDaemon:
         self.sources  : List[CalendarSource]  = []
         self.interval : int                   = 900  # 15 min par défaut
         self._running : bool                  = True
-        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        LIVE_JSON.parent.mkdir(parents=True, exist_ok=True)  # Créer ~/beehive_os/data/
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     def load_config(self) -> bool:
