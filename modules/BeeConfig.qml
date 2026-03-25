@@ -220,6 +220,12 @@ QtObject {
         else if (cfg.bee_events !== undefined && cfg.bee_events.live_path !== undefined)
             eventsLivePath = cfg.bee_events.live_path
 
+        // Auto-compute default if not set: use ~/.config/beehive_os/events_live.json
+        if (!eventsLivePath) {
+            var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation)
+            eventsLivePath = "file://" + homeDir + "/.config/beehive_os/events_live.json"
+        }
+
         if (cfg.events_ics_url !== undefined)
             icsUrl = cfg.events_ics_url
 

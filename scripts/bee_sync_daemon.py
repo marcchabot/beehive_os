@@ -210,8 +210,7 @@ class BeeSyncDaemon:
         """Envoie un signal IPC à Quickshell pour rafraîchir BeeEvents."""
         try:
             subprocess.run(
-                ["quickshell", "-p", str(Path.home() / "beehive_os" / "shell.qml"),
-                 "ipc", "call", "root", "refreshEvents"],
+                ["quickshell", "ipc", "call", "root", "refreshEvents"],
                 timeout=2, capture_output=True
             )
         except Exception as exc:

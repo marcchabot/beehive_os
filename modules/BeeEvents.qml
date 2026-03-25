@@ -49,7 +49,14 @@ Item {
                     try {
                         var text = doc.responseText.trim();
                         if (text === "") {
-                            eventsModel.clear();
+                            // Fichier live vide ou manquant — fallback sur données statiques
+                            var staticPath = Qt.resolvedUrl("../data/events.json");
+                            if (doc.responseURL !== staticPath) {
+                                doc.open("GET", staticPath);
+                                doc.send();
+                            } else {
+                                eventsModel.clear();
+                            }
                             return;
                         }
                         var data = JSON.parse(text);
