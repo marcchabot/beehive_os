@@ -12,7 +12,7 @@ import os
 import signal
 import subprocess
 import sys
-from datetime import datetime, timezone, time as dtime
+from datetime import datetime, timezone, time as dtime, timedelta
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -120,6 +120,145 @@ class CalendarSource:
 
         return sorted(events, key=lambda e: e["timestamp"])
 
+class GoogleAPISource:
+    """Source calendrier via Google Calendar API — supporte les événements récurrents."""
+
+    SCOPES     = ["https://www.googleapis.com/auth/calendar.readonly"]
+    TOKEN_PATH = Path.home() / ".config" / "beehive" / "google_calendar_token.json"
+    CREDS_PATH = Path.home() / ".config" / "beehive" / "google_credentials.json"
+
+    def __init__(self, source_cfg: dict):
+        self.id          = source_cfg["id"]
+        self.type        = "google_api"
+        self.calendar_id = source_cfg.get("calendar_id", "primary")
+        self.label       = source_cfg.get("label", self.id)
+        self.color       = source_cfg.get("color", "#FFB81C")
+        self.url         = ""   # champ vide pour compatibilité meta
+        self.last_ok     = None
+        self.error       = None
+
+    async def fetch_events(self, session: aiohttp.ClientSession) -> List[dict]:
+        """Récupère les événements via Google Calendar API (récurrences incluses)."""
+        try:
+            creds = self._get_credentials()
+            if creds is None:
+                self.error = (
+                    "Credentials Google absents ou invalides. "
+                    f"Lancez: python3 {__file__} --auth"
+                )
+                logging.error(f"[{self.id}] {self.error}")
+                return []
+
+            loop   = asyncio.get_event_loop()
+            events = await loop.run_in_executor(None, self._fetch_events_sync, creds)
+            self.last_ok = datetime.now(timezone.utc).isoformat()
+            self.error   = None
+            return events
+
+        except Exception as exc:
+            self.error = str(exc)
+            logging.warning(f"[{self.id}] Erreur Google API: {exc}")
+            return []
+
+    def _get_credentials(self):
+        """Charge les credentials OAuth2 et les rafraîchit si nécessaire."""
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+
+        creds = None
+        if self.TOKEN_PATH.exists():
+            creds = Credentials.from_authorized_user_file(
+                str(self.TOKEN_PATH), self.SCOPES
+            )
+
+        if creds and creds.expired and creds.refresh_token:
+            logging.info(f"[{self.id}] Rafraîchissement du token Google…")
+            creds.refresh(Request())
+            self._save_token(creds)
+
+        return creds if (creds and creds.valid) else None
+
+    def _save_token(self, creds):
+        self.TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.TOKEN_PATH, "w") as f:
+            f.write(creds.to_json())
+
+    def _fetch_events_sync(self, creds) -> List[dict]:
+        """Appel synchrone à l'API (exécuté dans un thread via run_in_executor)."""
+        from googleapiclient.discovery import build
+
+        service  = build("calendar", "v3", credentials=creds, cache_discovery=False)
+        now_utc  = datetime.now(timezone.utc)
+        time_min = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+        time_max = (now_utc + timedelta(days=60)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        result = service.events().list(
+            calendarId=self.calendar_id,
+            timeMin=time_min,
+            timeMax=time_max,
+            maxResults=200,
+            singleEvents=True,   # développe les récurrences en occurrences individuelles
+            orderBy="startTime",
+        ).execute()
+
+        items  = result.get("items", [])
+        events = []
+        for item in items:
+            ev = self._parse_google_event(item)
+            if ev:
+                events.append(ev)
+        return events
+
+    def _parse_google_event(self, item: dict) -> Optional[dict]:
+        start = item.get("start", {})
+        dt_str = start.get("dateTime") or start.get("date")
+        if not dt_str:
+            return None
+
+        all_day = "date" in start and "dateTime" not in start
+
+        if all_day:
+            dt_local = datetime.strptime(dt_str, "%Y-%m-%d")
+            ts       = dt_local.replace(tzinfo=timezone.utc).timestamp()
+        else:
+            # dateTime inclut le fuseau horaire
+            from datetime import timezone as _tz
+            dt_aware = datetime.fromisoformat(dt_str)
+            ts       = dt_aware.timestamp()
+            dt_local = datetime.fromtimestamp(ts)
+
+        now_ts = datetime.now(timezone.utc).timestamp()
+        if ts < now_ts - 1800:
+            return None
+
+        summary  = item.get("summary", "")
+        location = item.get("location", "")
+        uid      = item.get("id", f"{self.id}_{ts}")
+
+        return {
+            "id":        f"{self.id}_{uid[:24]}",
+            "source_id": self.id,
+            "icon":      get_event_icon(summary),
+            "title":     summary,
+            "time":      "" if all_day else dt_local.strftime("%Hh%M"),
+            "date":      dt_local.strftime("%Y-%m-%d"),
+            "timestamp": ts,
+            "sub":       self.label,
+            "location":  location,
+            "urgent":    False,
+            "all_day":   all_day,
+            "color":     self.color,
+        }
+
+
+def _build_source(cfg: dict):
+    """Instancie la bonne classe de source selon le champ 'type'."""
+    src_type = cfg.get("type", "ics")
+    if src_type == "google_api":
+        return GoogleAPISource(cfg)
+    return CalendarSource(cfg)
+
+
 class BeeSyncDaemon:
     def __init__(self):
         self.config   : dict                  = {}
@@ -148,7 +287,7 @@ class BeeSyncDaemon:
                                   "url": legacy_url, "label": "Calendrier",
                                   "color": "#FFB81C"}]
 
-        self.sources  = [CalendarSource(c) for c in calendars_cfg]
+        self.sources  = [_build_source(c) for c in calendars_cfg]
         self.interval = self.config.get("live_sync", {}).get("interval_seconds", 900)
         logging.info(f"Config chargée: {len(self.sources)} source(s), intervalle {self.interval}s")
         return True
@@ -251,5 +390,40 @@ async def main():
         loop.add_signal_handler(sig, daemon.stop)
     await daemon.run()
 
+def run_oauth_flow():
+    """
+    Lance le flow OAuth2 interactif (première authentification).
+    Nécessite google_credentials.json dans ~/.config/beehive/.
+    Utilisation : python3 bee_sync_daemon.py --auth
+    """
+    token_path = GoogleAPISource.TOKEN_PATH
+    creds_path = GoogleAPISource.CREDS_PATH
+
+    if not creds_path.exists():
+        print(f"ERREUR : fichier de credentials introuvable : {creds_path}")
+        print("Téléchargez-le depuis Google Cloud Console (OAuth 2.0 Client ID) et placez-le là.")
+        sys.exit(1)
+
+    try:
+        from google_auth_oauthlib.flow import InstalledAppFlow
+    except ImportError:
+        print("ERREUR : google-auth-oauthlib manquant. Installez-le avec : pip install google-auth-oauthlib")
+        sys.exit(1)
+
+    flow  = InstalledAppFlow.from_client_secrets_file(
+        str(creds_path), GoogleAPISource.SCOPES
+    )
+    creds = flow.run_local_server(port=0)
+
+    token_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(token_path, "w") as f:
+        f.write(creds.to_json())
+
+    print(f"Authentification réussie. Token sauvegardé : {token_path}")
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    if len(sys.argv) > 1 and sys.argv[1] == "--auth":
+        run_oauth_flow()
+    else:
+        asyncio.run(main())
