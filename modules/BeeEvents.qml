@@ -44,7 +44,7 @@ Item {
                     return;
                 }
                 fallbackDone = true;
-                var staticPath = Qt.resolvedUrl("../data/events.json");
+                var staticPath = Qt.resolvedUrl("../data/events_live.json");
                 console.log("BeeEvents: Fallback sur", staticPath);
                 doc.open("GET", staticPath);
                 doc.send();
