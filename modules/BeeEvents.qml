@@ -44,9 +44,10 @@ Item {
                     return;
                 }
                 fallbackDone = true;
-                var staticPath = Qt.resolvedUrl("../data/events_live.json");
-                console.log("BeeEvents: Fallback sur", staticPath);
-                doc.open("GET", staticPath);
+                // Fallback direct vers le chemin par défaut de BeeConfig au lieu du vieux events.json
+                var fallbackPath = "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/beehive_os/data/events_live.json";
+                console.log("BeeEvents: Fallback sur", fallbackPath);
+                doc.open("GET", fallbackPath);
                 doc.send();
             };
 
