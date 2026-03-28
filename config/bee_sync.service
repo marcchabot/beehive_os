@@ -1,0 +1,46 @@
+# bee_sync.service — Bee-Hive OS calendar sync daemon (systemd user service)
+#
+# Install:
+#   cp bee_sync.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now bee_sync
+#
+# Commands:
+#   systemctl --user status bee_sync
+#   systemctl --user restart bee_sync
+#   journalctl --user -u bee_sync -f
+#   kill -HUP $(cat ~/.cache/beehive/bee_sync.pid)   # reload config live
+
+[Unit]
+Description=Bee-Hive OS Calendar Sync Daemon v3.0
+Documentation=https://github.com/marcchabot/beehive_os
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/beehive_os/venv/bin/python3 %h/beehive_os/scripts/bee_sync_daemon.py
+# Fallback if no venv:
+# ExecStart=/usr/bin/python3 %h/beehive_os/scripts/bee_sync_daemon.py
+
+WorkingDirectory=%h/beehive_os
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bee_sync
+
+# Restart policy: restart on crash, not on clean exit (--once mode)
+Restart=on-failure
+RestartSec=30s
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Allow SIGHUP for config reload
+KillSignal=SIGTERM
+SendSIGHUP=yes
+
+# Runtime limits
+MemoryMax=128M
+CPUQuota=10%
+
+[Install]
+WantedBy=default.target
