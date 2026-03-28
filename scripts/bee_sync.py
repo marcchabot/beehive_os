@@ -80,6 +80,7 @@ def fetch_google_gog(cal_cfg):
     label  = cal_cfg.get("label", "Google")
     cal_id = cal_cfg["calendar_id"]
     
+    # On force --days 14 pour être sûr d'avoir les récurrences
     cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--json", "--results-only"]
     events = []
     
@@ -87,7 +88,10 @@ def fetch_google_gog(cal_cfg):
         res = subprocess.run(cmd, env=GOG_ENV, capture_output=True, text=True, check=True)
         data = json.loads(res.stdout)
         
-        for item in data:
+        # 'gog' peut renvoyer un tableau direct ou un objet avec une clé 'events'
+        items = data if isinstance(data, list) else data.get("events", [])
+        
+        for item in items:
             summary = item.get("summary", "Sans titre")
             start = item.get("start", {})
             dt_str = start.get("dateTime") or start.get("date")
@@ -95,19 +99,23 @@ def fetch_google_gog(cal_cfg):
             
             all_day = "dateTime" not in start
             
-            if all_day:
-                dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d").replace(tzinfo=LOCAL_TZ)
-            else:
-                dt = datetime.datetime.fromisoformat(dt_str.replace("Z", "+00:00")).astimezone(LOCAL_TZ)
-            
-            events.append({
-                "icon":      get_icon(summary, label),
-                "title":     summary,
-                "time":      format_relative_date(dt),
-                "sub":       label,
-                "urgent":    "urgent" in summary.lower(),
-                "timestamp": dt.timestamp(),
-            })
+            try:
+                if all_day:
+                    dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d").replace(tzinfo=LOCAL_TZ)
+                else:
+                    dt = datetime.datetime.fromisoformat(dt_str.replace("Z", "+00:00")).astimezone(LOCAL_TZ)
+                
+                events.append({
+                    "icon":      get_icon(summary, label),
+                    "title":     summary,
+                    "time":      format_relative_date(dt),
+                    "sub":       label,
+                    "urgent":    "urgent" in summary.lower(),
+                    "timestamp": dt.timestamp(),
+                })
+            except Exception as e:
+                print(f"[bee_sync] Error parsing event '{summary}': {e}")
+                
     except Exception as exc:
         print(f"[bee_sync] Gog '{label}' error: {exc}")
         
@@ -198,7 +206,9 @@ def main():
             seen.add(key)
             final_events.append(ev)
 
-    final_events = final_events[:MAX_EVENTS]
+    # Respect the max_events from config if present
+    max_ev = config.get("bee_events", {}).get("max_events", MAX_EVENTS)
+    final_events = final_events[:max_ev]
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
