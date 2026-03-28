@@ -71,13 +71,11 @@ Item {
                     BeeConfig.liveSyncMeta = data._meta;
                 }
 
-                // Filtre : événements d'aujourd'hui uniquement
-                var now = new Date();
-                var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
-                var todayEnd   = todayStart + 86400;
+                // Filtre : Prochains événements (à partir de maintenant)
+                var nowTs = new Date().getTime() / 1000;
                 var upcoming = eventsArray.filter(function(e) {
-                    if (!e.timestamp) return false;  // pas de timestamp → exclus
-                    return e.timestamp >= todayStart && e.timestamp < todayEnd;
+                    if (!e.timestamp) return false;
+                    return e.timestamp >= (nowTs - 3600); // Garder les événements commencés il y a moins d'une heure
                 });
                 eventsModel.clear();
                 var limit = Math.min(upcoming.length, maxEvents);
@@ -87,7 +85,7 @@ Item {
                         evtTitle:  upcoming[i].title || "Événement",
                         evtTime:   upcoming[i].time  || "",
                         evtSub:    upcoming[i].sub   || "",
-                        evtUrgent: upcoming[i].urge === true || upcoming[i].urgent === true
+                        evtUrgent: upcoming[i].urgent === true
                     });
                 }
                 // Mettre à jour le compteur pour la cellule dashboard
@@ -109,15 +107,10 @@ Item {
         function onEventsReloadRequested() {
             loadEvents();
         }
-        // Déclenche la sync ICS et le rechargement une fois la config disponible.
-        // Corrige la race condition : onCompleted s'exécute avant la fin du XHR de BeeConfig.
+        // Déclenche la sync et le rechargement une fois la config disponible.
         function onConfigLoaded() {
-            if (BeeConfig.icsUrl && BeeConfig.icsUrl !== "") {
-                syncICS();
-                reloadAfterSync.restart();
-            } else {
-                loadEvents();
-            }
+            runSync();
+            reloadAfterSync.restart();
         }
     }
 
@@ -307,12 +300,11 @@ Item {
     scale: visible ? 1.0 : 0.92
     Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }
 
-    // ─── ICS Sync : lance honey_sync_ics.py si icsUrl est définie ──
-    function syncICS() {
-        if (!BeeConfig.icsUrl || BeeConfig.icsUrl === "") return
+    // ─── Sync : lance bee_sync.py pour tout synchroniser (Google + ICS) ──
+    function runSync() {
         Qt.createQmlObject(
-            'import Quickshell.Io; Process { running: true; command: ["python3", Qt.resolvedUrl("../scripts/honey_sync_ics.py").toString().replace("file://", "")] }',
-            beeEvents, "icsSync"
+            'import Quickshell.Io; Process { running: true; command: ["python3", Qt.resolvedUrl("../scripts/bee_sync.py").toString().replace("file://", "")] }',
+            beeEvents, "beeSync"
         )
     }
 
@@ -323,12 +315,12 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-            syncICS()
+            runSync()
             Qt.callLater(loadEvents)
         }
     }
 
-    // ─── Timer pour recharger après sync ICS (délai 3s) ──────
+    // ─── Timer pour recharger après sync (délai 3s) ──────
     Timer {
         id: reloadAfterSync
         interval: 3000
