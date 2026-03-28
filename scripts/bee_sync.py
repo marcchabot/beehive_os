@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
 bee_sync.py — Bee-Hive OS Calendar Sync (Gog Wrapper Edition)
-Utilise 'gog' pour Google et parsing manuel pour ICS.
-Écrit 'events_live.json' pour Bee-Hive OS.
 """
 import json
 import datetime
@@ -23,7 +21,7 @@ if "/home/node/.openclaw/workspace" in str(PROJECT_ROOT):
 else:
     CONFIG_FILE = PROJECT_ROOT / "user_config.json"
     OUTPUT_FILE = PROJECT_ROOT / "data/events_live.json"
-    GOG_CONFIG = os.path.expanduser("~/.config/gogcli/")
+    GOG_CONFIG = os.expanduser("~/.config/gogcli/")
 
 # Gog Config
 GOG_CMD = "gog"
@@ -61,7 +59,7 @@ def format_relative_date(dt):
     today = now.date()
     target = dt.date()
     
-    time_str = dt.strftime("%Hh%M") if dt.hour or dt.minute else ""
+    time_str = dt.strftime("%Hh%M") if (dt.hour or dt.minute) else ""
     
     if target == today:
         prefix = "Auj."
@@ -213,6 +211,15 @@ def main():
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
         json.dump(final_events, f, indent=2, ensure_ascii=False)
+        
+    # Also write a copy to ~/.config/beehive_os/data/ for redundancy if possible
+    try:
+        home_fallback = Path.home() / ".config/beehive_os/data/events_live.json"
+        home_fallback.parent.mkdir(parents=True, exist_ok=True)
+        with open(home_fallback, "w") as f:
+            json.dump(final_events, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
         
     print(f"Sync complete: {len(final_events)} events written to {OUTPUT_FILE}")
 
