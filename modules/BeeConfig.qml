@@ -225,6 +225,7 @@ QtObject {
         if (!eventsLivePath || eventsLivePath.indexOf("/home/node") !== -1 || (eventsLivePath.indexOf("/beehive_os/data") === -1 && eventsLivePath.indexOf("/.config/beehive_os") === -1)) {
             var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation)
             eventsLivePath = "file://" + homeDir + "/beehive_os/data/events_live.json"
+            console.log("BeeConfig: Resetting eventsLivePath to auto-detected →", eventsLivePath)
         }
 
         if (cfg.events_ics_url !== undefined)
