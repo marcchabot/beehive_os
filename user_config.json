@@ -115,7 +115,7 @@
   "bee_events": {
     "enabled": true,
     "_comment": "Module BeeEvents — Prochains événements du calendrier. true = widget visible, false = masqué.",
-    "max_events": 3,
+    "max_events": 6,
     "_max_events_comment": "Nombre maximum d'événements affichés (1–5 recommandé)."
   },
   "calendars": [
