@@ -222,7 +222,7 @@ QtObject {
             eventsLivePath = cfg.bee_events.live_path
 
         // Auto-compute default if not set: use ~/beehive_os/data/events_live.json
-        if (!eventsLivePath || eventsLivePath.indexOf("/home/node") !== -1) {
+        if (!eventsLivePath || eventsLivePath.indexOf("/home/node") !== -1 || eventsLivePath.indexOf("/beehive_os/data") === -1) {
             var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation)
             eventsLivePath = "file://" + homeDir + "/beehive_os/data/events_live.json"
         }
