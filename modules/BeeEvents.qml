@@ -32,19 +32,12 @@ Item {
     readonly property int maxEvents: 6
 
     function loadEvents() {
-        var fallbackDone = false;
         var doc = new XMLHttpRequest();
         doc.onreadystatechange = function() {
             if (doc.readyState !== XMLHttpRequest.DONE) return;
 
             if (doc.status !== 200 && doc.status !== 0) {
-                console.log("BeeEvents: Échec chargement (status", doc.status, "), tentative fallback.");
-                if (!fallbackDone) {
-                    fallbackDone = true;
-                    var fallbackPath = "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/beehive_os/data/events_live.json";
-                    doc.open("GET", fallbackPath);
-                    doc.send();
-                }
+                console.warn("BeeEvents: Erreur de chargement (Status: " + doc.status + ")");
                 return;
             }
 
@@ -55,13 +48,13 @@ Item {
                 var data = JSON.parse(text);
                 var eventsArray = Array.isArray(data) ? data : (data.events || []);
 
-                // Filtre et Tri (Double Sécurité)
+                // Filtre et Tri (Sécurité Maximale)
                 var nowTs = new Date().getTime() / 1000;
                 var upcoming = eventsArray.filter(function(e) {
-                    return e.timestamp && e.timestamp >= (nowTs - 7200); // 2h de battement
+                    return e.timestamp && e.timestamp >= (nowTs - 7200); // Garder les événements récents (-2h)
                 });
                 
-                // Tri chronologique au cas où le script Python aurait raté un coup
+                // Tri chronologique forcé
                 upcoming.sort(function(a, b) { return a.timestamp - b.timestamp; });
 
                 eventsModel.clear();
@@ -81,9 +74,21 @@ Item {
             }
         }
         
-        // Priorité absolue à events_live.json
-        var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation);
-        var path = BeeConfig.eventsLivePath || ("file://" + homeDir + "/beehive_os/data/events_live.json");
+        // Construction robuste du chemin (évite le double file://)
+        var path = BeeConfig.eventsLivePath;
+        if (!path || path === "") {
+            var home = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString();
+            path = home + "/beehive_os/data/events_live.json";
+        }
+        
+        // S'assurer que le chemin commence par file:// mais pas file://file://
+        if (!path.startsWith("file://")) {
+            path = "file://" + path;
+        } else if (path.startsWith("file://file://")) {
+            path = path.replace("file://file://", "file://");
+        }
+        
+        console.log("BeeEvents: Chargement de " + path);
         doc.open("GET", path);
         doc.send();
     }

@@ -223,8 +223,10 @@ QtObject {
 
         // Auto-compute default if not set: use ~/beehive_os/data/events_live.json
         if (!eventsLivePath || eventsLivePath.indexOf("/home/node") !== -1 || (eventsLivePath.indexOf("/beehive_os/data") === -1 && eventsLivePath.indexOf("/.config/beehive_os") === -1)) {
-            var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation)
-            eventsLivePath = "file://" + homeDir + "/beehive_os/data/events_live.json"
+            var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString()
+            var basePath = homeDir + "/beehive_os/data/events_live.json"
+            if (!basePath.startsWith("file://")) basePath = "file://" + basePath
+            eventsLivePath = basePath
             console.log("BeeConfig: Resetting eventsLivePath to auto-detected →", eventsLivePath)
         }
 
