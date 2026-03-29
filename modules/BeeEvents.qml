@@ -37,68 +37,53 @@ Item {
         doc.onreadystatechange = function() {
             if (doc.readyState !== XMLHttpRequest.DONE) return;
 
-            // Fallback unique vers le fichier statique local — flag évite la boucle infinie
-            var tryFallback = function() {
-                if (fallbackDone) {
-                    console.warn("BeeEvents: Fallback déjà tenté, abandon.");
-                    eventsModel.clear();
-                    return;
-                }
-                fallbackDone = true;
-                // Fallback direct vers le chemin par défaut de BeeConfig au lieu du vieux events.json
-                var fallbackPath = "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/beehive_os/data/events_live.json";
-                console.log("BeeEvents: Fallback sur", fallbackPath);
-                doc.open("GET", fallbackPath);
-                doc.send();
-            };
-
             if (doc.status !== 200 && doc.status !== 0) {
                 console.log("BeeEvents: Échec chargement (status", doc.status, "), tentative fallback.");
-                tryFallback();
+                if (!fallbackDone) {
+                    fallbackDone = true;
+                    var fallbackPath = "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/beehive_os/data/events_live.json";
+                    doc.open("GET", fallbackPath);
+                    doc.send();
+                }
                 return;
             }
 
             var text = doc.responseText.trim();
-            if (text === "") {
-                tryFallback();
-                return;
-            }
+            if (text === "") return;
 
             try {
                 var data = JSON.parse(text);
-                // Support format v2 (objet avec events[]) et v1 (tableau direct)
                 var eventsArray = Array.isArray(data) ? data : (data.events || []);
 
-                if (data._meta) {
-                    BeeConfig.liveSyncMeta = data._meta;
-                }
-
-                // Filtre : Prochains événements (à partir de maintenant)
+                // Filtre et Tri (Double Sécurité)
                 var nowTs = new Date().getTime() / 1000;
                 var upcoming = eventsArray.filter(function(e) {
-                    if (!e.timestamp) return false;
-                    return e.timestamp >= (nowTs - 3600); // Garder les événements commencés il y a moins d'une heure
+                    return e.timestamp && e.timestamp >= (nowTs - 7200); // 2h de battement
                 });
+                
+                // Tri chronologique au cas où le script Python aurait raté un coup
+                upcoming.sort(function(a, b) { return a.timestamp - b.timestamp; });
+
                 eventsModel.clear();
                 var limit = Math.min(upcoming.length, maxEvents);
                 for (var i = 0; i < limit; i++) {
                     eventsModel.append({
                         evtIcon:   upcoming[i].icon  || "📅",
                         evtTitle:  upcoming[i].title || "Événement",
-                        evtTime:   upcoming[i].time  || "",
+                        evtTime:   upcoming[i].time  || "Heure inconnue",
                         evtSub:    upcoming[i].sub   || "",
                         evtUrgent: upcoming[i].urgent === true
                     });
                 }
-                // Mettre à jour le compteur pour la cellule dashboard
                 BeeConfig.liveSyncCount = upcoming.length;
             } catch(e) {
                 console.warn("BeeEvents: Erreur parsing JSON:", e);
-                eventsModel.clear();
             }
         }
-        // V2: lecture depuis le chemin live du daemon, fallback sur données statiques
-        var path = BeeConfig.eventsLivePath || Qt.resolvedUrl("../data/events.json");
+        
+        // Priorité absolue à events_live.json
+        var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation);
+        var path = BeeConfig.eventsLivePath || ("file://" + homeDir + "/beehive_os/data/events_live.json");
         doc.open("GET", path);
         doc.send();
     }
@@ -332,9 +317,6 @@ Item {
 
     Component.onCompleted: {
         scale = 0.92
-        // Charge immédiatement les données en cache (si présentes) pour un affichage instantané.
-        // La sync ICS et le rechargement "propre" se font dans onConfigLoaded() après le XHR async.
-        loadEvents()
         appearAnim.start()
     }
 
