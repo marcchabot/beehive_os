@@ -1,0 +1,281 @@
+BEGIN:VCALENDAR
+METHOD:PUBLISH
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+X-WR-CALNAME:Calendrier
+BEGIN:VTIMEZONE
+TZID:Eastern Standard Time
+BEGIN:STANDARD
+DTSTART:16010101T020000
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=1SU;BYMONTH=11
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T020000
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=2SU;BYMONTH=3
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+DESCRIPTION:Salut à tous\,\n\nJe vous propose une rencontre ce lundi 2 mar
+ s afin de discuter de l'audit particulier demandé par Telus (voir pièces
+  jointes).\nTous les gens qui seront sollicités à y contribuer sont invi
+ tés. Faites moi signe svp si j'ai oublié qlq'un.\n\nPS: Certaines person
+ nes seront en teams à partir de la salle de conférence au 380 et d'autre
+ s le seront à partir du 370.\n\nMerci\nDany\n\n__________________________
+ ______________________________________________________\nMicrosoft Teams me
+ eting\nJoin: https://teams.microsoft.com/meet/23658912957361?p=uqRE8oA7gxs
+ Vn11ZVI\nMeeting ID: 236 589 129 573 61\nPasscode: XG6dM6GR\n_____________
+ ___________________\nNeed help?<https://aka.ms/JoinTeamsMeeting?omkt=en-US
+ > | System reference<https://teams.microsoft.com/l/meetup-join/19%3ameetin
+ g_OTE5NTM0MTAtNzk5MS00ZGYxLWFhODctMzdkZjNmZDA3NjZm%40thread.v2/0?context=%
+ 7b%22Tid%22%3a%22282cf4df-243a-4e44-b93e-07eb84561d77%22%2c%22Oid%22%3a%22
+ 7508b7ad-7275-4d0b-bc57-99052d34506f%22%7d>\nFor organizers: Meeting optio
+ ns<https://teams.microsoft.com/meetingOptions/?organizerId=7508b7ad-7275-4
+ d0b-bc57-99052d34506f&tenantId=282cf4df-243a-4e44-b93e-07eb84561d77&thread
+ Id=19_meeting_OTE5NTM0MTAtNzk5MS00ZGYxLWFhODctMzdkZjNmZDA3NjZm@thread.v2&m
+ essageId=0&language=en-US>\n______________________________________________
+ __________________________________\n
+UID:040000008200E00074C5B7101A82E008000000002ABE59C636A7DC01000000000000000
+ 0100000006FF3174A3959EC4C85B460172B96386E
+SUMMARY:Rencontre - Audit Telus
+DTSTART;TZID=Eastern Standard Time:20260302T100000
+DTEND;TZID=Eastern Standard Time:20260302T110000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION:Local 102 – Salle PMO
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:\n_____________________________________________________________
+ ___________________\nRéunion Microsoft Teams\nRejoindre : https://teams.m
+ icrosoft.com/meet/23322675373664?p=iN3dkhoEOexByQNOKF\nNuméro de réunion
+  : 233 226 753 736 64\nCode secret : sA2wo2kF\n___________________________
+ _____\nBesoin d'aide ?<https://aka.ms/JoinTeamsMeeting?omkt=fr-FR> | Réf
+ érence système<https://teams.microsoft.com/l/meetup-join/19%3ameeting_YT
+ lkOWQxNTQtNDhhZS00YTBiLWJkYTMtNDcxNThjMjdmMjYy%40thread.v2/0?context=%7b%2
+ 2Tid%22%3a%223799b559-d671-400c-be60-118c656184aa%22%2c%22Oid%22%3a%22fb1e
+ 8e14-9064-4c26-b074-4cc28f2d8267%22%7d>\nPour les organisateurs : Options 
+ de réunion<https://teams.microsoft.com/meetingOptions/?organizerId=fb1e8e
+ 14-9064-4c26-b074-4cc28f2d8267&tenantId=3799b559-d671-400c-be60-118c656184
+ aa&threadId=19_meeting_YTlkOWQxNTQtNDhhZS00YTBiLWJkYTMtNDcxNThjMjdmMjYy@th
+ read.v2&messageId=0&language=fr-FR>\n_____________________________________
+ ___________________________________________\n\n
+UID:040000008200E00074C5B7101A82E0080000000070E3769B39AADC01000000000000000
+ 0100000007E9CB6F260AE574C9DF8B4A3E4619FEF
+SUMMARY:Rencontre Daniel - Marc - Mayno
+DTSTART;TZID=Eastern Standard Time:20260303T150000
+DTEND;TZID=Eastern Standard Time:20260303T160000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION:Réunion Microsoft Teams
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Salut à tous\,\n\nRencontre de suivi.\n\nOrdre du jour:\n\n  *
+ \nSuivi Audit Telus\n  *\nSuivi frais de livraisons pour doses commerciale
+ s (Les cas Air Inuit/ Creebec \; Retour sur les livraisons spéciales de d
+ oses commerciales/consentement possible du patient?)\n\nMerci\nDany\n\n___
+ __________________________________________________________________________
+ ___\nMicrosoft Teams meeting\nJoin: https://teams.microsoft.com/meet/23658
+ 912957361?p=uqRE8oA7gxsVn11ZVI\nMeeting ID: 236 589 129 573 61\nPasscode: 
+ XG6dM6GR\n________________________________\nNeed help?<https://aka.ms/Join
+ TeamsMeeting?omkt=en-US> | System reference<https://teams.microsoft.com/l/
+ meetup-join/19%3ameeting_OTE5NTM0MTAtNzk5MS00ZGYxLWFhODctMzdkZjNmZDA3NjZm%
+ 40thread.v2/0?context=%7b%22Tid%22%3a%22282cf4df-243a-4e44-b93e-07eb84561d
+ 77%22%2c%22Oid%22%3a%227508b7ad-7275-4d0b-bc57-99052d34506f%22%7d>\nFor or
+ ganizers: Meeting options<https://teams.microsoft.com/meetingOptions/?orga
+ nizerId=7508b7ad-7275-4d0b-bc57-99052d34506f&tenantId=282cf4df-243a-4e44-b
+ 93e-07eb84561d77&threadId=19_meeting_OTE5NTM0MTAtNzk5MS00ZGYxLWFhODctMzdkZ
+ jNmZDA3NjZm@thread.v2&messageId=0&language=en-US>\n_______________________
+ _________________________________________________________\n
+UID:040000008200E00074C5B7101A82E00800000000AE4B3C5F66AADC01000000000000000
+ 010000000A1ABC1B39894EE46B57FAC668C20DFED
+SUMMARY:Rencontre - Audit Telus
+DTSTART;TZID=Eastern Standard Time:20260305T100000
+DTEND;TZID=Eastern Standard Time:20260305T110000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION:Local-207
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:\n\n\n_________________________________________________________
+ _______________________\nRéunion Microsoft Teams\nJoindre : https://teams
+ .microsoft.com/meet/22617976672771?p=M9pMZ0kbhgIeBu5ddd\nNuméro de réuni
+ on : 226 179 766 727 71\nCode secret : Av37uj6N\n_________________________
+ _______\nBesoin d’aide?<https://aka.ms/JoinTeamsMeeting?omkt=fr-CA> | R
+ éférence système<https://teams.microsoft.com/l/meetup-join/19%3ameeting
+ _NDc3ZWJjNzgtZGNiMC00Nzk3LWE2OWQtZDAyNjA5MWQ0ZGUx%40thread.v2/0?context=%7
+ b%22Tid%22%3a%223799b559-d671-400c-be60-118c656184aa%22%2c%22Oid%22%3a%22f
+ b1e8e14-9064-4c26-b074-4cc28f2d8267%22%7d>\nPour les organisateurs : Optio
+ ns de réunion<https://teams.microsoft.com/meetingOptions/?organizerId=fb1
+ e8e14-9064-4c26-b074-4cc28f2d8267&tenantId=3799b559-d671-400c-be60-118c656
+ 184aa&threadId=19_meeting_NDc3ZWJjNzgtZGNiMC00Nzk3LWE2OWQtZDAyNjA5MWQ0ZGUx
+ @thread.v2&messageId=0&language=fr-CA>\n__________________________________
+ ______________________________________________\n
+UID:040000008200E00074C5B7101A82E008000000006FB048367AADDC01000000000000000
+ 010000000139782AAC56E5A4C8E6B539AF5FA5D2A
+SUMMARY:Discussion Dany 
+DTSTART;TZID=Eastern Standard Time:20260306T095500
+DTEND;TZID=Eastern Standard Time:20260306T102500
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION:Réunion Microsoft Teams
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:\n_____________________________________________________________
+ ___________________\nMicrosoft Teams Besoin d’aide?<https://aka.ms/JoinT
+ eamsMeeting?omkt=fr-CA>\nRejoignez la réunion maintenant<https://teams.mi
+ crosoft.com/l/meetup-join/19%3ameeting_YjMyNWE0YTUtZWM4NC00MGZhLTg4N2UtNTc
+ 2N2JmOWMwNjhk%40thread.v2/0?context=%7b%22Tid%22%3a%223799b559-d671-400c-b
+ e60-118c656184aa%22%2c%22Oid%22%3a%22fb1e8e14-9064-4c26-b074-4cc28f2d8267%
+ 22%7d>\nNuméro de réunion : 294 301 701 284 0\nCode secret : s8DC3Rg9\n_
+ _______________________________\nPour les organisateurs : Options de réun
+ ion<https://teams.microsoft.com/meetingOptions/?organizerId=fb1e8e14-9064-
+ 4c26-b074-4cc28f2d8267&tenantId=3799b559-d671-400c-be60-118c656184aa&threa
+ dId=19_meeting_YjMyNWE0YTUtZWM4NC00MGZhLTg4N2UtNTc2N2JmOWMwNjhk@thread.v2&
+ messageId=0&language=fr-CA>\n_____________________________________________
+ ___________________________________\n\n
+UID:040000008200E00074C5B7101A82E00800000000C0FDDBE46D3FDC01000000000000000
+ 0100000006DF96ECE9C4F534DB9AC25C9060F8454
+SUMMARY:Audition OPQ - Frais de transport 
+DTSTART;TZID=Eastern Standard Time:20260318T090000
+DTEND;TZID=Eastern Standard Time:20260318T170000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:0
+LOCATION:Réunion Microsoft Teams
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:   Dany à bloquer ton agenda svp\, Marc et Daniel\, si j
+ amais vous êtes dispo. vous êtes les bienvenus merci\n\n________________
+ ________________\nDe : Turner\, Sonya <Sonya.Turner@cencora.com>\nEnvoyé 
+ : 6 février 2026 18:09:50 (UTC-05:00) Eastern Time (US & Canada)\nÀ : Tu
+ rner\, Sonya <Sonya.Turner@cencora.com>\; Mayno Huynh <mayno.huynh@pharmac
+ iechabot.com>\; Zurock\, Shanta <Shanta.Zurock@cencora.com>\nSujet : Meeti
+ ng with Mayno\nQuand : 24 mars 2026 10:00-12:00.\nOù : 380 Cure-Labelle\,
+  suite 104\, Laval Fabreville\,H7P 5L3\n\nHello Mayno\,\nPlease confirm if
+  there are any topics you want to discuss\, I do wat to connect on DTT and
+  recent increase in No drug at clinic.\n\n  *   Tour of your operations\n 
+  *   Ways of working opportunities :\n     *   DTT/NDAC\n\nSuite 1\, 380 C
+ ure-Labelle\, suite 104\, Laval Fabreville\,H7P 5L3\nMayno’s cell no: 51
+ 4-781-9328\n\n\nSonya\n___________________________________________________
+ _____________________________\nMicrosoft Teams meeting\nJoin: https://team
+ s.microsoft.com/meet/2655989789399?p=PR6P4mdeAF6AJiCgLb\nMeeting ID: 265 5
+ 98 978 939 9\nPasscode: iH6nr3Un\n________________________________\nNeed h
+ elp?<https://aka.ms/JoinTeamsMeeting?omkt=en-US> | System reference<https:
+ //teams.microsoft.com/l/meetup-join/19%3ameeting_YmE3NTJlZWEtZTM1YS00ODkxL
+ Tg4NjUtYWM2NTkxYjM5MzRl%40thread.v2/0?context=%7b%22Tid%22%3a%220b5ac31e-e
+ 17a-4021-9d04-550f86320765%22%2c%22Oid%22%3a%2220bf4afa-ac0e-4ad0-b883-461
+ 210752bb4%22%7d>\nDial in by phone\n+1 267-368-7238\,\,467435868#<tel:+126
+ 73687238\,\,467435868> United States\, Philadelphia\nFind a local number<h
+ ttps://dialin.teams.microsoft.com/d0777c70-f7a8-47f4-9583-c1703c412064?id=
+ 467435868>\nPhone conference ID: 467 435 868#\nFor organizers: Meeting opt
+ ions<https://teams.microsoft.com/meetingOptions/?organizerId=20bf4afa-ac0e
+ -4ad0-b883-461210752bb4&tenantId=0b5ac31e-e17a-4021-9d04-550f86320765&thre
+ adId=19_meeting_YmE3NTJlZWEtZTM1YS00ODkxLTg4NjUtYWM2NTkxYjM5MzRl@thread.v2
+ &messageId=0&language=en-US> | Reset dial-in PIN<https://dialin.teams.micr
+ osoft.com/usp/pstnconferencing>\n_________________________________________
+ _______________________________________\n\n_______________________________
+ _\nCONFIDENTIALITY NOTICE. This electronic mail transmission may contain p
+ rivileged\, confidential and/or protected personal information and is inte
+ nded only for the review of the party to whom it is addressed. Any unautho
+ rized use or disclosure of the information contained herein may be a viola
+ tion of applicable law. If you have received this transmission in error\, 
+ please immediately return it to the sender\, delete it and destroy it with
+ out reading it. Unintended transmission shall not constitute the waiver of
+  the attorney-client or any other privilege.\n____________________________
+ ____\n
+UID:040000008200E00074C5B7101A82E0080000000050447AC09297DC01000000000000000
+ 010000000D0A9DAFC57B93E4383CFE01987A95FFD
+SUMMARY:Meeting with Mayno
+DTSTART;TZID=Eastern Standard Time:20260324T100000
+DTEND;TZID=Eastern Standard Time:20260324T120000
+CLASS:PUBLIC
+PRIORITY:5
+DTSTAMP:20260329T195548Z
+TRANSP:OPAQUE
+STATUS:CONFIRMED
+SEQUENCE:2
+LOCATION:380 Cure-Labelle\, suite 104\, Laval Fabreville\,H7P 5L3
+X-MICROSOFT-CDO-APPT-SEQUENCE:2
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-ALLDAYEVENT:FALSE
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:FALSE
+END:VEVENT
+END:VCALENDAR
