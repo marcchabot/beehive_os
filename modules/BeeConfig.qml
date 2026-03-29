@@ -221,6 +221,12 @@ QtObject {
         else if (cfg.bee_events !== undefined && cfg.bee_events.live_path !== undefined)
             eventsLivePath = cfg.bee_events.live_path
 
+        // Nettoyage immédiat des chemins malformés hérités des versions précédentes (file://file://)
+        if (eventsLivePath && eventsLivePath.indexOf("file://file://") !== -1) {
+            eventsLivePath = eventsLivePath.replace("file://file://", "file://");
+            console.log("BeeConfig: Correction d'un chemin malformé détecté →", eventsLivePath);
+        }
+
         // Auto-compute default if not set: use ~/beehive_os/data/events_live.json
         if (!eventsLivePath || eventsLivePath.indexOf("/home/node") !== -1 || (eventsLivePath.indexOf("/beehive_os/data") === -1 && eventsLivePath.indexOf("/.config/beehive_os") === -1)) {
             var homeDir = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString()
@@ -386,6 +392,7 @@ QtObject {
         }
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
         cfg.events_enabled = eventsEnabled
+        cfg.events_live_path = eventsLivePath
         
         // Save calendars array
         var calArray = []
