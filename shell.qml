@@ -67,21 +67,30 @@ ShellRoot {
     function toggleDash()   { 
         if (!root._debounce("dash")) return
         dashVisible = !dashVisible 
+        BeeSound.play(dashVisible ? "dash_open" : "dash_close")
     }
-    function toggleSearch() { searchVisible = !searchVisible }
+    function toggleSearch() { 
+        searchVisible = !searchVisible 
+        BeeSound.play(searchVisible ? "dash_open" : "dash_close")
+    }
 
     IpcHandler {
         target: "root"
         function toggleDash()   { root.toggleDash() }
         function toggleSearch() { root.toggleSearch() }
-        function toggleTheme()  { BeeTheme.toggle() }
+        function toggleTheme()  { 
+            BeeTheme.toggle() 
+            BeeSound.play("cell_click")
+        }
         function toggleStealth() {
             BeeConfig.stealthMode = !BeeConfig.stealthMode
             BeeConfig.saveConfig()
+            BeeSound.play("cell_click")
         }
         function toggleFocus() {
             BeeConfig.focusMode = !BeeConfig.focusMode
             BeeConfig.saveConfig()
+            BeeSound.play("cell_click")
         }
         function testOSD() {
             BeeBarState.showOSD("volume", 50)
@@ -90,19 +99,43 @@ ShellRoot {
         function showPower() {
             if (!root._debounce("power")) return
             BeeBarState.powerVisible = !BeeBarState.powerVisible
+            BeeSound.play(BeeBarState.powerVisible ? "dash_open" : "dash_close")
         }
 
         // ─── Settings / Studio / Launcher ───────
-        function showSettings() { root.controlTab = 3; root.controlVisible = true }
-        function showStudio()   { root.controlTab = 0; root.controlVisible = true }
-        function showLauncher() { root.searchVisible   = true }
-        function showSearch()   { root.searchVisible   = true }
-        function showWelcome()  { root.welcomeVisible  = true }
+        function showSettings() { 
+            root.controlTab = 3; 
+            root.controlVisible = true 
+            BeeSound.play("dash_open")
+        }
+        function showStudio()   { 
+            root.controlTab = 0; 
+            root.controlVisible = true 
+            BeeSound.play("dash_open")
+        }
+        function showLauncher() { 
+            root.searchVisible   = true 
+            BeeSound.play("dash_open")
+        }
+        function showSearch()   { 
+            root.searchVisible   = true 
+            BeeSound.play("dash_open")
+        }
+        function showWelcome()  { 
+            root.welcomeVisible  = true 
+            BeeSound.play("dash_open")
+        }
         
         // ─── BeeAura Notifications ──
         function dispatchNotification(title: string, body: string, icon: string) {
             BeeBarState.dispatchNotification(title, body, icon)
         }
+        
+        // ─── Maya Desktop Tap 🐝✨ ──
+        function mayaTap(title: string, body: string) {
+            BeeBarState.dispatchNotification(title, body, "🐝")
+        }
+
         // ─── BeeAura OSD ───────────
         function showOSD(type: string, value: int) {
             BeeBarState.showOSD(type, value)
@@ -259,7 +292,12 @@ ShellRoot {
                     anchors.centerIn: parent
                     visible: true
                     currentTab: root.controlTab
-                    onVisibleChanged: { if (!visible) root.controlVisible = false }
+                    onVisibleChanged: { 
+                        if (!visible) {
+                            root.controlVisible = false
+                            BeeSound.play("dash_close")
+                        }
+                    }
                 }
             }
         }
@@ -279,8 +317,12 @@ ShellRoot {
                 color: "transparent"
                 BeePower {
                     anchors.fill: parent
-                    onCloseRequested: BeeBarState.powerVisible = false
+                    onCloseRequested: {
+                        BeeBarState.powerVisible = false
+                        BeeSound.play("dash_close")
+                    }
                     onActionRequested: (cmd) => {
+                        BeeSound.play("power")
                         root._pendingCmd = cmd
                         BeeBarState.powerVisible = false
                         launchTimer.restart()
@@ -306,14 +348,27 @@ ShellRoot {
                 BeeSearch {
                     anchors.fill: parent
                     shown: true
-                    onOpenSettings: { root.controlTab = 3; root.controlVisible = true }
-                    onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
+                    onOpenSettings: { 
+                        root.controlTab = 3; 
+                        root.controlVisible = true 
+                        BeeSound.play("dash_open")
+                    }
+                    onOpenStudio:   { 
+                        root.controlTab = 0; 
+                        root.controlVisible = true 
+                        BeeSound.play("dash_open")
+                    }
                     onLaunchRequested: (cmd) => {
                         root._pendingCmd = cmd
                         root.searchVisible = false
                         launchTimer.restart()
                     }
-                    onShownChanged: { if (!shown) root.searchVisible = false }
+                    onShownChanged: { 
+                        if (!shown) {
+                            root.searchVisible = false
+                            BeeSound.play("dash_close")
+                        }
+                    }
                 }
             }
         }
@@ -337,6 +392,7 @@ ShellRoot {
                     onDismissed: {
                         root.welcomeVisible = false
                         root.controlVisible = true   // Ouvre The Hive après le welcome
+                        BeeSound.play("dash_open")
                     }
                 }
             }

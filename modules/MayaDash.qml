@@ -28,7 +28,7 @@ Rectangle {
     Behavior on dashScale { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }
 
     // ─── Sons : ouverture / fermeture MayaDash ────────────────
-    onDashShownChanged: BeeSound.play(dashShown ? "dash_open" : "dash_close")
+    // onDashShownChanged: BeeSound.play(dashShown ? "dash_open" : "dash_close") (géré par shell.qml)
 
     // ─── Signaux externes ─────────────────────────────────────
     signal openSettings()

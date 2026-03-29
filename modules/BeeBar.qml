@@ -194,6 +194,16 @@ Rectangle {
                     font { bold: true; pixelSize: 13; letterSpacing: 2 }
                     color: BeeBarState.focusActive ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7) : BeeTheme.accent
                 }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        BeeSound.play("dash_open")
+                        root.toggleDash()
+                    }
+                }
+
                 Rectangle {
                     visible: BeeBarState.focusActive
                     width: 6; height: 6; radius: 3; color: BeeTheme.accent
@@ -216,7 +226,13 @@ Rectangle {
                         color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? BeeTheme.accent : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
                         scale: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? 1.2 : 1.0
                         Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
-                        MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: Hyprland.dispatch("workspace " + (index + 1).toString()) }
+                        MouseArea { 
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor; 
+                            onClicked: {
+                                BeeSound.play("cell_click")
+                                Hyprland.dispatch("workspace " + (index + 1).toString()) 
+                            }
+                        }
                     }
                 }
             }
@@ -277,7 +293,10 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                    onClicked: Hyprland.dispatch("exec kitty btop")
+                    onClicked: {
+                        BeeSound.play("dash_open")
+                        Hyprland.dispatch("exec kitty btop")
+                    }
                 }
             }
 
@@ -339,7 +358,13 @@ Rectangle {
                 color: powerBtnHover.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22) : "transparent"
                 border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.20); border.width: 1
                 Text { anchors.centerIn: parent; text: "⏻"; font.pixelSize: 16; color: BeeTheme.accent }
-                MouseArea { id: powerBtnHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.powerVisible = true }
+                MouseArea { 
+                    id: powerBtnHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        BeeBarState.powerVisible = true 
+                        BeeSound.play("dash_open")
+                    }
+                }
             }
         }
     }

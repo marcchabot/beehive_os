@@ -18,6 +18,7 @@ Item {
         target: BeeBarState
         function onNotificationReceived(title, body, icon) {
             notifyRoot.show(title, body, icon)
+            BeeSound.play("notify")
         }
     }
 

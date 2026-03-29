@@ -19,6 +19,12 @@ Rectangle {
     visible: false
     anchors.centerIn: parent
 
+    onVisibleChanged: {
+        if (visible) {
+            // Pas de son ici, il est déjà géré par les triggers IPC ou boutons
+        }
+    }
+
     // ─── State ──────────────────────────────────────────────
     property int currentTab: 0   // 0=MyHive 1=Design 2=Stats 3=System 4=Logs
     property var _s: BeeConfig.tr.settings || {}
@@ -80,7 +86,7 @@ Rectangle {
         border.color: closeHov.containsMouse ? Qt.rgba(1.0, 0.3, 0.3, 0.6) : BeeTheme.accent
         border.width: 1
         Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font { bold: true; pixelSize: 14 } }
-        MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: controlRoot.visible = false }
+        MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { controlRoot.visible = false } }
     }
 
     // ─── Sidebar + Content ──────────────────────────────────
@@ -119,7 +125,15 @@ Rectangle {
                             Behavior on color { ColorAnimation { duration: 150 } }
                         }
                         Text { text: modelData.icon; anchors.centerIn: parent; font.pixelSize: 22; opacity: controlRoot.currentTab === modelData.idx ? 1.0 : 0.6 }
-                        MouseArea { anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: controlRoot.currentTab = modelData.idx }
+                        MouseArea { 
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (controlRoot.currentTab !== modelData.idx) {
+                                    controlRoot.currentTab = modelData.idx 
+                                    BeeSound.play("cell_click")
+                                }
+                            }
+                        }
                     }
                 }
             }

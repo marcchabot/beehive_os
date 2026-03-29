@@ -165,6 +165,7 @@ Item {
 
     function launchApp(cmd) {
         if (!cmd) return
+        BeeSound.play("cell_click")
 
         // Actions spéciales
         if (cmd === "__settings__") { console.log("BeeSearch: openSettings emitted"); beeSearch.openSettings(); beeSearch.hide(); return }
@@ -497,6 +498,8 @@ Item {
     }
 
     onShownChanged: {
-        if (shown) filterApps(searchInput.text)
+        if (shown) {
+            filterApps(searchInput.text)
+        }
     }
 }

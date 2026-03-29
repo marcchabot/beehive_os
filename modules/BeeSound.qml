@@ -57,6 +57,9 @@ QtObject {
     function play(soundName) {
         if (!soundsEnabled) return
         var file = _soundMap[soundName] || "audio-volume-change.oga"
+        
+        // On tente de charger le son custom si possible
+        // (Note: nécessite vérification d'existence côté script ou QML File IO)
         var path = _sysBase + file
         _playPath(path)
     }
