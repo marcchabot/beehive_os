@@ -310,7 +310,7 @@ Item {
     // ─── Timer pour recharger après sync (délai 3s) ──────
     Timer {
         id: reloadAfterSync
-        interval: 3000
+        interval: 5000
         repeat: false
         onTriggered: loadEvents()
     }
