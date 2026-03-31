@@ -5,6 +5,7 @@ bee_sync.py — Bee-Hive OS Calendar Sync (Robust Edition) 🐝📅
 import json
 import datetime
 import os
+import shutil
 import subprocess
 import zoneinfo
 import sys
@@ -38,11 +39,28 @@ WELL_KNOWN_IDS = {
 
 # Gog Config
 GOG_CMD = "gog"
+
+# Construire un PATH complet qui inclut ~/.local/bin (où gog est souvent installé sur CachyOS)
+_home = os.path.expanduser("~")
+_base_path = os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin")
+_local_bin = os.path.join(_home, ".local", "bin")
+if _local_bin not in _base_path:
+    _base_path = f"{_local_bin}:{_base_path}"
+
 GOG_ENV = {
     "GOG_KEYRING_PASSWORD": "maya",
     "XDG_CONFIG_HOME": GOG_CONFIG,
-    "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin")
+    "HOME": _home,
+    "PATH": _base_path,
 }
+
+def _check_gog_available() -> bool:
+    """Vérifie si 'gog' est accessible dans le PATH configuré."""
+    found = shutil.which(GOG_CMD, path=_base_path)
+    if not found:
+        print(f"[bee_sync] Warning: '{GOG_CMD}' introuvable dans PATH. "
+              f"Installez gog-cli : pip install gog-cli  (ou ~/.local/bin/gog)")
+    return found is not None
 
 LOCAL_TZ   = zoneinfo.ZoneInfo("America/Toronto")
 DAYS_AHEAD = 14
@@ -97,37 +115,48 @@ def format_relative_date(dt):
 def fetch_google_gog(cal_cfg):
     label  = cal_cfg.get("label", "Google")
     cal_id = cal_cfg.get("calendar_id") or cal_cfg.get("id")
-    
+
     # Résolution intelligente de l'ID (alias -> full email)
     if cal_id and cal_id.lower() in WELL_KNOWN_IDS:
         cal_id = WELL_KNOWN_IDS[cal_id.lower()]
-    
+
     if not cal_id:
         print(f"[bee_sync] Warning: No valid ID found for Google calendar '{label}'")
         return []
-        
+
+    # Vérification préventive de gog (évite une exception cryptique)
+    if not _check_gog_available():
+        return []
+
     cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--json", "--results-only"]
     events = []
-    
+
     try:
-        res = subprocess.run(cmd, env=GOG_ENV, capture_output=True, text=True, check=True)
+        res = subprocess.run(cmd, env=GOG_ENV, capture_output=True, text=True, check=False)
+
+        # Gestion explicite des codes d'erreur (exit 2 = auth/config, exit 1 = usage)
+        if res.returncode != 0:
+            stderr_snippet = res.stderr.strip()[:300] if res.stderr else "(pas de stderr)"
+            print(f"[bee_sync] Gog '{label}' exit {res.returncode}: {stderr_snippet}")
+            return []
+
         data = json.loads(res.stdout)
         items = data if isinstance(data, list) else data.get("events", [])
-        
+
         for item in items:
             summary = item.get("summary", "Sans titre")
             start = item.get("start", {})
             dt_str = start.get("dateTime") or start.get("date")
             if not dt_str: continue
-            
+
             all_day = "dateTime" not in start
-            
+
             try:
                 if all_day:
                     dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d").replace(tzinfo=LOCAL_TZ)
                 else:
                     dt = datetime.datetime.fromisoformat(dt_str.replace("Z", "+00:00")).astimezone(LOCAL_TZ)
-                
+
                 events.append({
                     "icon":      get_icon(summary, label),
                     "title":     summary,
@@ -138,12 +167,15 @@ def fetch_google_gog(cal_cfg):
                 })
             except Exception as e:
                 print(f"[bee_sync] Error parsing event '{summary}': {e}")
-                
+
     except FileNotFoundError:
-        print(f"[bee_sync] Error: '{GOG_CMD}' command not found. Please install gog-cli.")
+        print(f"[bee_sync] Error: '{GOG_CMD}' introuvable. "
+              f"PATH utilisé: {_base_path}")
+    except json.JSONDecodeError as exc:
+        print(f"[bee_sync] Gog '{label}' JSON invalide: {exc}")
     except Exception as exc:
-        print(f"[bee_sync] Gog '{label}' error: {exc}")
-        
+        print(f"[bee_sync] Gog '{label}' erreur inattendue: {exc}")
+
     return events
 
 # ═══════════════════════════════════════════════════════════════
