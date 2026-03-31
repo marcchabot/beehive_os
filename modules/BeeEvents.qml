@@ -323,6 +323,7 @@ Item {
     Component.onCompleted: {
         scale = 0.92
         appearAnim.start()
+        loadEvents() // Force un chargement initial
     }
 
     SequentialAnimation {
