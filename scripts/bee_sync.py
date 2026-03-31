@@ -21,7 +21,7 @@ if "/home/node/.openclaw/workspace" in str(PROJECT_ROOT):
 else:
     CONFIG_FILE = PROJECT_ROOT / "user_config.json"
     OUTPUT_FILE = PROJECT_ROOT / "data/events_live.json"
-    GOG_CONFIG = os.expanduser("~/.config/gogcli/")
+    GOG_CONFIG = os.path.join(os.path.expanduser("~"), ".config/gogcli/")
 
 # Gog Config
 GOG_CMD = "gog"
