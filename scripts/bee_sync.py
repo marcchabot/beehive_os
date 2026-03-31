@@ -10,10 +10,12 @@ import zoneinfo
 import sys
 from pathlib import Path
 
-# Paths relative to the project root
+# ═══════════════════════════════════════════════════════════════
+# CONFIGURATION ET CHEMINS
+# ═══════════════════════════════════════════════════════════════
+
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-WORKSPACE_DIR = PROJECT_ROOT.parent
 
 if "/home/node/.openclaw/workspace" in str(PROJECT_ROOT):
     CONFIG_FILE = PROJECT_ROOT / "user_config.json"
@@ -22,7 +24,17 @@ if "/home/node/.openclaw/workspace" in str(PROJECT_ROOT):
 else:
     CONFIG_FILE = PROJECT_ROOT / "user_config.json"
     OUTPUT_FILE = PROJECT_ROOT / "data/events_live.json"
-    GOG_CONFIG = os.path.join(os.path.expanduser("~"), ".config/gogcli/")
+    # Correction de l'erreur os.path.expanduser
+    GOG_CONFIG = os.path.expanduser("~/.config/gogcli/")
+
+# Fallback IDs pour Marc (Si absents du config file)
+WELL_KNOWN_IDS = {
+    "famille":   "family01761025763253819175@group.calendar.google.com",
+    "personnel": "powerland@gmail.com",
+    "perso":     "powerland@gmail.com",
+    "pharmacie": "e2vcp5c26oqp0aobdfpoceg687mr8h4h@import.calendar.google.com",
+    "xps":       "641157bb2b2c0a399e538051e15f77aea90c5b1ab8a8bfa31dea87586bc6e486@group.calendar.google.com"
+}
 
 # Gog Config
 GOG_CMD = "gog"
@@ -35,6 +47,10 @@ GOG_ENV = {
 LOCAL_TZ   = zoneinfo.ZoneInfo("America/Toronto")
 DAYS_AHEAD = 14
 MAX_EVENTS = 12
+
+# ═══════════════════════════════════════════════════════════════
+# UTILITAIRES
+# ═══════════════════════════════════════════════════════════════
 
 def get_icon(title: str, label: str = "") -> str:
     text = (title + " " + label).lower()
@@ -74,13 +90,20 @@ def format_relative_date(dt):
         return f"{prefix} (Journée)"
     return f"{prefix} {time_str}"
 
+# ═══════════════════════════════════════════════════════════════
+# EXTRACTION GOOGLE (VIA GOG)
+# ═══════════════════════════════════════════════════════════════
+
 def fetch_google_gog(cal_cfg):
     label  = cal_cfg.get("label", "Google")
-    # Fallback resilience for ID keys
     cal_id = cal_cfg.get("calendar_id") or cal_cfg.get("id")
     
+    # Résolution intelligente de l'ID (alias -> full email)
+    if cal_id and cal_id.lower() in WELL_KNOWN_IDS:
+        cal_id = WELL_KNOWN_IDS[cal_id.lower()]
+    
     if not cal_id:
-        print(f"[bee_sync] Warning: No ID found for Google calendar '{label}'")
+        print(f"[bee_sync] Warning: No valid ID found for Google calendar '{label}'")
         return []
         
     cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--json", "--results-only"]
@@ -122,6 +145,10 @@ def fetch_google_gog(cal_cfg):
         print(f"[bee_sync] Gog '{label}' error: {exc}")
         
     return events
+
+# ═══════════════════════════════════════════════════════════════
+# EXTRACTION ICS (OFFICE 365)
+# ═══════════════════════════════════════════════════════════════
 
 _WEEKDAY_MAP = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
 
@@ -227,7 +254,7 @@ def fetch_ics_calendar(cal_cfg):
             else: unfolded.append(line)
 
         now          = datetime.datetime.now(LOCAL_TZ)
-        window_start = now - datetime.timedelta(hours=6) # Match UI window
+        window_start = now - datetime.timedelta(hours=6)
         window_end   = now + datetime.timedelta(days=DAYS_AHEAD)
 
         current  = {}
@@ -271,6 +298,10 @@ def fetch_ics_calendar(cal_cfg):
         print(f"[bee_sync] ICS '{label}' error: {exc}")
     return events
 
+# ═══════════════════════════════════════════════════════════════
+# MAIN LOOP
+# ═══════════════════════════════════════════════════════════════
+
 def main():
     try:
         with open(CONFIG_FILE) as f:
@@ -283,7 +314,7 @@ def main():
     all_events = []
     
     for cal in calendars:
-        cal_type = cal.get("type", "google_api") # default to google_api
+        cal_type = cal.get("type", "google_api")
         if cal_type == "google_api":
             all_events.extend(fetch_google_gog(cal))
         elif cal_type == "ics":
