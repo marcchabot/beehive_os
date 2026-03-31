@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-bee_sync.py — Bee-Hive OS Calendar Sync (Gog Wrapper Edition)
+bee_sync.py — Bee-Hive OS Calendar Sync (Robust Edition) 🐝📅
 """
 import json
 import datetime
 import os
 import subprocess
 import zoneinfo
+import sys
 from pathlib import Path
 
 # Paths relative to the project root
@@ -28,7 +29,7 @@ GOG_CMD = "gog"
 GOG_ENV = {
     "GOG_KEYRING_PASSWORD": "maya",
     "XDG_CONFIG_HOME": GOG_CONFIG,
-    "PATH": os.environ.get("PATH", "")
+    "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin")
 }
 
 LOCAL_TZ   = zoneinfo.ZoneInfo("America/Toronto")
@@ -66,7 +67,6 @@ def format_relative_date(dt):
     elif target == today + datetime.timedelta(days=1):
         prefix = "Dem."
     else:
-        # Jour de la semaine abrégé en français
         days = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."]
         prefix = days[dt.weekday()]
         
@@ -76,17 +76,19 @@ def format_relative_date(dt):
 
 def fetch_google_gog(cal_cfg):
     label  = cal_cfg.get("label", "Google")
-    cal_id = cal_cfg["calendar_id"]
+    # Fallback resilience for ID keys
+    cal_id = cal_cfg.get("calendar_id") or cal_cfg.get("id")
     
-    # On force --days 14 pour être sûr d'avoir les récurrences
+    if not cal_id:
+        print(f"[bee_sync] Warning: No ID found for Google calendar '{label}'")
+        return []
+        
     cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--json", "--results-only"]
     events = []
     
     try:
         res = subprocess.run(cmd, env=GOG_ENV, capture_output=True, text=True, check=True)
         data = json.loads(res.stdout)
-        
-        # 'gog' peut renvoyer un tableau direct ou un objet avec une clé 'events'
         items = data if isinstance(data, list) else data.get("events", [])
         
         for item in items:
@@ -114,6 +116,8 @@ def fetch_google_gog(cal_cfg):
             except Exception as e:
                 print(f"[bee_sync] Error parsing event '{summary}': {e}")
                 
+    except FileNotFoundError:
+        print(f"[bee_sync] Error: '{GOG_CMD}' command not found. Please install gog-cli.")
     except Exception as exc:
         print(f"[bee_sync] Gog '{label}' error: {exc}")
         
@@ -122,31 +126,23 @@ def fetch_google_gog(cal_cfg):
 _WEEKDAY_MAP = {"MO": 0, "TU": 1, "WE": 2, "TH": 3, "FR": 4, "SA": 5, "SU": 6}
 
 def _parse_ics_dt(raw_val: str, raw_key: str = "") -> datetime.datetime:
-    """Parse an ICS DTSTART/DTEND value into a timezone-aware datetime."""
-    # raw_val may still have a leading TZID= param if the key was split oddly;
-    # the value portion after the last ':' is the actual datetime string.
     val = raw_val.split(":")[-1] if ":" in raw_val else raw_val
     val = val.strip()
     if "T" in val:
         dt = datetime.datetime.strptime(val.rstrip("Z"), "%Y%m%dT%H%M%S")
         if val.endswith("Z"):
             return dt.replace(tzinfo=datetime.timezone.utc).astimezone(LOCAL_TZ)
-        # TZID in the key property — treat as LOCAL_TZ for simplicity
         return dt.replace(tzinfo=LOCAL_TZ)
     else:
         return datetime.datetime.strptime(val, "%Y%m%d").replace(tzinfo=LOCAL_TZ)
 
 def _expand_rrule(dtstart: datetime.datetime, rrule_str: str,
                   window_start: datetime.datetime, window_end: datetime.datetime) -> list:
-    """Expand a basic RRULE into a list of datetimes within [window_start, window_end].
-    Supports FREQ=DAILY/WEEKLY/MONTHLY/YEARLY, INTERVAL, BYDAY, UNTIL, COUNT.
-    No external libraries required."""
     parts = dict(p.split("=", 1) for p in rrule_str.split(";") if "=" in p)
     freq      = parts.get("FREQ", "")
     interval  = int(parts.get("INTERVAL", 1))
     count_max = int(parts.get("COUNT", 0)) or None
 
-    # Parse UNTIL
     wend = window_end
     if "UNTIL" in parts:
         try:
@@ -155,129 +151,99 @@ def _expand_rrule(dtstart: datetime.datetime, rrule_str: str,
             tz  = datetime.timezone.utc if u.endswith("Z") else LOCAL_TZ
             until = datetime.datetime.strptime(u.rstrip("Z"), fmt).replace(tzinfo=tz).astimezone(LOCAL_TZ)
             wend = min(wend, until)
-        except Exception:
-            pass
+        except Exception: pass
 
-    # Parse BYDAY weekday numbers
     byday_wds = []
     if "BYDAY" in parts:
         for d in parts["BYDAY"].split(","):
             code = d.strip()[-2:]
-            if code in _WEEKDAY_MAP:
-                byday_wds.append(_WEEKDAY_MAP[code])
+            if code in _WEEKDAY_MAP: byday_wds.append(_WEEKDAY_MAP[code])
 
     occurrences = []
     count = 0
-
     if freq == "DAILY":
         dt = dtstart
         while dt <= wend and (count_max is None or count < count_max):
-            if dt >= window_start:
-                occurrences.append(dt)
+            if dt >= window_start: occurrences.append(dt)
             count += 1
             dt += datetime.timedelta(days=interval)
-
     elif freq == "WEEKLY":
         if byday_wds:
-            # Walk forward week-by-week (interval weeks between cycles),
-            # emitting matching weekdays within each cycle.
-            # Find start of the ISO-week containing dtstart (Monday = day 0).
             week_mon = dtstart - datetime.timedelta(days=dtstart.weekday())
-            week_mon = week_mon.replace(hour=dtstart.hour, minute=dtstart.minute,
-                                        second=dtstart.second, microsecond=0)
+            week_mon = week_mon.replace(hour=dtstart.hour, minute=dtstart.minute, second=0, microsecond=0)
             wk = week_mon
             while wk <= wend and (count_max is None or count < count_max):
                 for wd in sorted(byday_wds):
                     dt = wk + datetime.timedelta(days=wd)
-                    if dt < dtstart:
-                        continue
-                    if dt > wend:
-                        break
-                    if dt >= window_start:
-                        occurrences.append(dt)
+                    if dt < dtstart: continue
+                    if dt > wend: break
+                    if dt >= window_start: occurrences.append(dt)
                     count += 1
-                    if count_max and count >= count_max:
-                        break
+                    if count_max and count >= count_max: break
                 wk += datetime.timedelta(weeks=interval)
         else:
             dt = dtstart
             while dt <= wend and (count_max is None or count < count_max):
-                if dt >= window_start:
-                    occurrences.append(dt)
+                if dt >= window_start: occurrences.append(dt)
                 count += 1
                 dt += datetime.timedelta(weeks=interval)
-
     elif freq == "MONTHLY":
         dt = dtstart
         while dt <= wend and (count_max is None or count < count_max):
-            if dt >= window_start:
-                occurrences.append(dt)
+            if dt >= window_start: occurrences.append(dt)
             count += 1
             m = dt.month + interval
             y = dt.year + (m - 1) // 12
             m = ((m - 1) % 12) + 1
-            try:
-                dt = dt.replace(year=y, month=m)
-            except ValueError:
-                break
-
+            try: dt = dt.replace(year=y, month=m)
+            except ValueError: break
     elif freq == "YEARLY":
         dt = dtstart
         while dt <= wend and (count_max is None or count < count_max):
-            if dt >= window_start:
-                occurrences.append(dt)
+            if dt >= window_start: occurrences.append(dt)
             count += 1
-            try:
-                dt = dt.replace(year=dt.year + interval)
-            except ValueError:
-                break
-
+            try: dt = dt.replace(year=dt.year + interval)
+            except ValueError: break
     return occurrences
 
 def fetch_ics_calendar(cal_cfg):
     from urllib import request
     label = cal_cfg.get("label", "ICS")
-    url   = cal_cfg["url"]
+    url   = cal_cfg.get("url") or cal_cfg.get("id")
+    
+    if not url or not url.startswith("http"):
+        print(f"[bee_sync] Warning: Invalid URL for ICS calendar '{label}'")
+        return []
+        
     events = []
-
     try:
         req = request.Request(url, headers={"User-Agent": "Bee-Hive OS bee_sync/1.0"})
         with request.urlopen(req, timeout=10) as resp:
             raw = resp.read().decode("utf-8", errors="replace")
 
-        # Unfold ICS lines (continuation lines start with a space or tab)
         unfolded = []
         for line in raw.splitlines():
-            if line.startswith((' ', '\t')) and unfolded:
-                unfolded[-1] += line[1:]
-            else:
-                unfolded.append(line)
+            if line.startswith((' ', '\t')) and unfolded: unfolded[-1] += line[1:]
+            else: unfolded.append(line)
 
         now          = datetime.datetime.now(LOCAL_TZ)
-        window_start = now - datetime.timedelta(hours=2)
+        window_start = now - datetime.timedelta(hours=6) # Match UI window
         window_end   = now + datetime.timedelta(days=DAYS_AHEAD)
 
         current  = {}
         in_event = False
-
         for line in unfolded:
             if line.startswith("BEGIN:VEVENT"):
                 in_event = True
                 current  = {}
             elif line.startswith("END:VEVENT"):
                 in_event = False
-                if "SUMMARY" not in current or "DTSTART" not in current:
-                    continue
-
+                if "SUMMARY" not in current or "DTSTART" not in current: continue
                 summary = current["SUMMARY"]
-                try:
-                    dtstart = _parse_ics_dt(current["DTSTART"])
-                except Exception:
-                    continue
-
+                try: dtstart = _parse_ics_dt(current["DTSTART"])
+                except Exception: continue
                 rrule = current.get("RRULE", "")
                 if rrule:
-                    # Recurring event: expand within the sync window
                     for dt in _expand_rrule(dtstart, rrule, window_start, window_end):
                         events.append({
                             "icon":      get_icon(summary, label),
@@ -288,7 +254,6 @@ def fetch_ics_calendar(cal_cfg):
                             "timestamp": dt.timestamp(),
                         })
                 else:
-                    # Single occurrence
                     if window_start.timestamp() <= dtstart.timestamp() <= window_end.timestamp():
                         events.append({
                             "icon":      get_icon(summary, label),
@@ -299,14 +264,11 @@ def fetch_ics_calendar(cal_cfg):
                             "timestamp": dtstart.timestamp(),
                         })
             elif in_event and ":" in line:
-                # Store both the base key (before ';') and the full raw key for TZID lookups
                 raw_key, val = line.split(":", 1)
                 base_key = raw_key.split(";")[0]
                 current[base_key] = val
-
     except Exception as exc:
         print(f"[bee_sync] ICS '{label}' error: {exc}")
-
     return events
 
 def main():
@@ -321,9 +283,10 @@ def main():
     all_events = []
     
     for cal in calendars:
-        if cal.get("type") == "google_api":
+        cal_type = cal.get("type", "google_api") # default to google_api
+        if cal_type == "google_api":
             all_events.extend(fetch_google_gog(cal))
-        elif cal.get("type") == "ics":
+        elif cal_type == "ics":
             all_events.extend(fetch_ics_calendar(cal))
 
     all_events.sort(key=lambda x: x["timestamp"])
@@ -336,7 +299,6 @@ def main():
             seen.add(key)
             final_events.append(ev)
 
-    # Respect the max_events from config if present
     max_ev = config.get("bee_events", {}).get("max_events", MAX_EVENTS)
     final_events = final_events[:max_ev]
 
@@ -344,14 +306,12 @@ def main():
     with open(OUTPUT_FILE, "w") as f:
         json.dump(final_events, f, indent=2, ensure_ascii=False)
         
-    # Also write a copy to ~/beehive_os/data/ — this is the path BeeConfig auto-detects
     try:
         home_fallback = Path.home() / "beehive_os/data/events_live.json"
         home_fallback.parent.mkdir(parents=True, exist_ok=True)
         with open(home_fallback, "w") as f:
             json.dump(final_events, f, indent=2, ensure_ascii=False)
-    except Exception:
-        pass
+    except Exception: pass
         
     print(f"Sync complete: {len(final_events)} events written to {OUTPUT_FILE}")
 
