@@ -25,8 +25,8 @@ if "/home/node/.openclaw/workspace" in str(PROJECT_ROOT):
 else:
     CONFIG_FILE = PROJECT_ROOT / "user_config.json"
     OUTPUT_FILE = PROJECT_ROOT / "data/events_live.json"
-    # Correction de l'erreur os.path.expanduser
-    GOG_CONFIG = os.path.expanduser("~/.config/gogcli/")
+    # XDG_CONFIG_HOME doit pointer vers ~/.config (pas ~/.config/gogcli/)
+    GOG_CONFIG = os.path.expanduser("~/.config")
 
 # Fallback IDs pour Marc (Si absents du config file)
 WELL_KNOWN_IDS = {
