@@ -51,7 +51,9 @@ Item {
                 // Filtre et Tri (Sécurité Maximale)
                 var nowTs = new Date().getTime() / 1000;
                 var upcoming = eventsArray.filter(function(e) {
-                    return e.timestamp && e.timestamp >= (nowTs - 7200); // Garder les événements récents (-2h)
+                    // On garde les événements qui ne sont pas passés depuis plus de 6h
+                    // pour s'assurer que les événements de fin de journée restent visibles
+                    return e.timestamp && e.timestamp >= (nowTs - 21600); 
                 });
                 
                 // Tri chronologique forcé
