@@ -5,8 +5,8 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeEvents.qml — Prochains événements du calendrier 🐝📅
-// Sprint v0.7.2 — Filtrage strict : événements du jour uniquement
-// Widget flottant : événements d'aujourd'hui (sync_events.py)
+// Sprint v0.7.2 — Fenêtre de visibilité : now-6h → now+14j
+// Widget flottant : événements à venir (bee_sync.py)
 // Positionnement : bas-gauche, au-dessus de la barre Hyprland
 // ═══════════════════════════════════════════════════════════════
 

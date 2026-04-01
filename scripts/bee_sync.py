@@ -49,6 +49,7 @@ if _local_bin not in _base_path:
 
 GOG_ENV = {
     "GOG_KEYRING_PASSWORD": "maya",
+    "GOG_ACCOUNT": "powerland@gmail.com",
     "XDG_CONFIG_HOME": GOG_CONFIG,
     "HOME": _home,
     "PATH": _base_path,
