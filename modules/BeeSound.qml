@@ -32,15 +32,7 @@ QtObject {
         "osd.mute":      { fileBase: "button-pressed",      cooldownMs: 90  },
         "osd.generic":   { fileBase: "button-pressed",      cooldownMs: 90  },
         "power.action":  { fileBase: "power-plug",          cooldownMs: 300 },
-        "system.error":  { fileBase: "dialog-error",        cooldownMs: 250 },
-
-        // Legacy aliases (compatibility bridge)
-        "dash_open":  { fileBase: "audio-volume-change", cooldownMs: 130 },
-        "dash_close": { fileBase: "audio-volume-change", cooldownMs: 130 },
-        "cell_click": { fileBase: "button-pressed",      cooldownMs: 90  },
-        "notify":     { fileBase: "message",             cooldownMs: 250 },
-        "power":      { fileBase: "power-plug",          cooldownMs: 300 },
-        "error":      { fileBase: "dialog-error",        cooldownMs: 250 }
+        "system.error":  { fileBase: "dialog-error",        cooldownMs: 250 }
     })
     property var _lastEventMs: ({})
 
@@ -67,14 +59,11 @@ QtObject {
     }
 
     // ── API publique ──────────────────────────────────────────────
-    function play(soundName) {
-        return playEvent(soundName, {})
-    }
-
     function playEvent(eventName, opts) {
         if (!soundsEnabled) return false
         var options = opts || {}
-        var cfg = _eventMap[eventName] || _eventMap["dash.open"]
+        var cfg = _eventMap[eventName]
+        if (!cfg) return false
         var cooldown = options.cooldownMs !== undefined ? options.cooldownMs : cfg.cooldownMs
         if (!_acquireCooldown(eventName, cooldown)) return false
 
