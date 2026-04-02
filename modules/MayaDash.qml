@@ -28,7 +28,7 @@ Rectangle {
     Behavior on dashScale { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }
 
     // ─── Sons : ouverture / fermeture MayaDash ────────────────
-    // onDashShownChanged: BeeSound.play(dashShown ? "dash_open" : "dash_close") (géré par shell.qml)
+    // onDashShownChanged: BeeSound.playEvent(dashShown ? "dash.open" : "dash.close", {}) (géré par shell.qml)
 
     // ─── Signaux externes ─────────────────────────────────────
     signal openSettings()
@@ -420,7 +420,7 @@ Rectangle {
             onEntered:  { hexScale.xScale = 1.04; hexScale.yScale = 1.04; hexCell.glowIntensity = 0.9 }
             onExited:  { hexScale.xScale = 1.0;  hexScale.yScale = 1.0;  hexCell.glowIntensity = hexCell.isHighlighted ? 0.8 : 0.3 }
             onClicked: {
-                BeeSound.play("cell_click")
+                BeeSound.playEvent("ui.cell.click", {})
                 mayaDash.handleCellAction(cellData ? cellData.action : "none")
             }
         }

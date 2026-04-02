@@ -199,7 +199,6 @@ Rectangle {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        BeeSound.play("dash_open")
                         root.toggleDash()
                     }
                 }
@@ -229,7 +228,7 @@ Rectangle {
                         MouseArea { 
                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor; 
                             onClicked: {
-                                BeeSound.play("cell_click")
+                                BeeSound.playEvent("ui.cell.click")
                                 Hyprland.dispatch("workspace " + (index + 1).toString()) 
                             }
                         }
@@ -294,7 +293,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        BeeSound.play("dash_open")
+                        BeeSound.playEvent("dash.open")
                         Hyprland.dispatch("exec kitty btop")
                     }
                 }
@@ -362,12 +361,10 @@ Rectangle {
                     id: powerBtnHover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         BeeBarState.powerVisible = true 
-                        BeeSound.play("dash_open")
+                        BeeSound.playEvent("dash.open")
                     }
                 }
             }
         }
     }
 }
-
-

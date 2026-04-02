@@ -165,7 +165,7 @@ Item {
 
     function launchApp(cmd) {
         if (!cmd) return
-        BeeSound.play("cell_click")
+        BeeSound.playEvent("ui.cell.click", {})
 
         // Actions spéciales
         if (cmd === "__settings__") { console.log("BeeSearch: openSettings emitted"); beeSearch.openSettings(); beeSearch.hide(); return }

@@ -50,6 +50,13 @@ QtObject {
     property bool showDisk: true
     property bool showBattery: true
 
+    // ─── BeeSound: Mode Nuit ─────────────────────────────────
+    property bool soundNightMode: true
+    property int soundNightStartHour: 22
+    property int soundNightEndHour: 7
+    property real soundDayGain: 0.35
+    property real soundNightGain: 0.18
+
     // ─── Horloge Analogique (Bee-Hive Time) ───────────────────
     property bool analogClock: true
 
@@ -210,6 +217,20 @@ QtObject {
 
         if (cfg.pinned_apps !== undefined && Array.isArray(cfg.pinned_apps))
             pinnedApps = cfg.pinned_apps
+
+        if (cfg.sound) {
+            if (cfg.sound.night_mode !== undefined) soundNightMode = cfg.sound.night_mode === true
+            if (cfg.sound.night_start_hour !== undefined) soundNightStartHour = Math.max(0, Math.min(23, parseInt(cfg.sound.night_start_hour) || 22))
+            if (cfg.sound.night_end_hour !== undefined) soundNightEndHour = Math.max(0, Math.min(23, parseInt(cfg.sound.night_end_hour) || 7))
+            if (cfg.sound.day_gain !== undefined) {
+                var dayGain = Number(cfg.sound.day_gain)
+                if (!isNaN(dayGain)) soundDayGain = Math.max(0.0, Math.min(1.0, dayGain))
+            }
+            if (cfg.sound.night_gain !== undefined) {
+                var nightGain = Number(cfg.sound.night_gain)
+                if (!isNaN(nightGain)) soundNightGain = Math.max(0.0, Math.min(1.0, nightGain))
+            }
+        }
 
         if (cfg.events_enabled !== undefined)
             eventsEnabled = cfg.events_enabled === true
@@ -389,6 +410,13 @@ QtObject {
             net: showNet,
             disk: showDisk,
             battery: showBattery
+        }
+        cfg.sound = {
+            night_mode: soundNightMode,
+            night_start_hour: soundNightStartHour,
+            night_end_hour: soundNightEndHour,
+            day_gain: soundDayGain,
+            night_gain: soundNightGain
         }
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
         cfg.events_enabled = eventsEnabled

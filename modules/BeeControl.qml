@@ -130,7 +130,7 @@ Rectangle {
                             onClicked: {
                                 if (controlRoot.currentTab !== modelData.idx) {
                                     controlRoot.currentTab = modelData.idx 
-                                    BeeSound.play("cell_click")
+                                    BeeSound.playEvent("ui.cell.click", {})
                                 }
                             }
                         }

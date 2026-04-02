@@ -111,6 +111,13 @@
   },
   "nectar_sync": true,
   "stealth_mode": false,
+  "sound": {
+    "night_mode": true,
+    "night_start_hour": 22,
+    "night_end_hour": 7,
+    "day_gain": 0.35,
+    "night_gain": 0.18
+  },
   "events_enabled": true,
   "bee_events": {
     "enabled": true,

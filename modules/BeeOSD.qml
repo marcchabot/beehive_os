@@ -57,7 +57,7 @@ Item {
             osd.currentType  = type
             osd.currentValue = value
             osdAnim.restart()
-            BeeSound.play("cell_click") // Petit clic de confirmation OSD
+            BeeSound.playEvent("osd." + (type || "generic"), {})
         }
     }
 

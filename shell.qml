@@ -67,11 +67,11 @@ ShellRoot {
     function toggleDash()   { 
         if (!root._debounce("dash")) return
         dashVisible = !dashVisible 
-        BeeSound.play(dashVisible ? "dash_open" : "dash_close")
+        BeeSound.playEvent(dashVisible ? "dash.open" : "dash.close")
     }
     function toggleSearch() { 
         searchVisible = !searchVisible 
-        BeeSound.play(searchVisible ? "dash_open" : "dash_close")
+        BeeSound.playEvent(searchVisible ? "dash.open" : "dash.close")
     }
 
     IpcHandler {
@@ -80,17 +80,17 @@ ShellRoot {
         function toggleSearch() { root.toggleSearch() }
         function toggleTheme()  { 
             BeeTheme.toggle() 
-            BeeSound.play("cell_click")
+            BeeSound.playEvent("ui.cell.click")
         }
         function toggleStealth() {
             BeeConfig.stealthMode = !BeeConfig.stealthMode
             BeeConfig.saveConfig()
-            BeeSound.play("cell_click")
+            BeeSound.playEvent("ui.cell.click")
         }
         function toggleFocus() {
             BeeConfig.focusMode = !BeeConfig.focusMode
             BeeConfig.saveConfig()
-            BeeSound.play("cell_click")
+            BeeSound.playEvent("ui.cell.click")
         }
         function testOSD() {
             BeeBarState.showOSD("volume", 50)
@@ -99,31 +99,31 @@ ShellRoot {
         function showPower() {
             if (!root._debounce("power")) return
             BeeBarState.powerVisible = !BeeBarState.powerVisible
-            BeeSound.play(BeeBarState.powerVisible ? "dash_open" : "dash_close")
+            BeeSound.playEvent(BeeBarState.powerVisible ? "dash.open" : "dash.close")
         }
 
         // ─── Settings / Studio / Launcher ───────
         function showSettings() { 
             root.controlTab = 3; 
             root.controlVisible = true 
-            BeeSound.play("dash_open")
+            BeeSound.playEvent("dash.open")
         }
         function showStudio()   { 
             root.controlTab = 0; 
             root.controlVisible = true 
-            BeeSound.play("dash_open")
+            BeeSound.playEvent("dash.open")
         }
         function showLauncher() { 
             root.searchVisible   = true 
-            BeeSound.play("dash_open")
+            BeeSound.playEvent("dash.open")
         }
         function showSearch()   { 
             root.searchVisible   = true 
-            BeeSound.play("dash_open")
+            BeeSound.playEvent("dash.open")
         }
         function showWelcome()  { 
             root.welcomeVisible  = true 
-            BeeSound.play("dash_open")
+            BeeSound.playEvent("dash.open")
         }
         
         // ─── BeeAura Notifications ──
@@ -295,7 +295,7 @@ ShellRoot {
                     onVisibleChanged: { 
                         if (!visible) {
                             root.controlVisible = false
-                            BeeSound.play("dash_close")
+                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -319,10 +319,10 @@ ShellRoot {
                     anchors.fill: parent
                     onCloseRequested: {
                         BeeBarState.powerVisible = false
-                        BeeSound.play("dash_close")
+                        BeeSound.playEvent("dash.close")
                     }
                     onActionRequested: (cmd) => {
-                        BeeSound.play("power")
+                        BeeSound.playEvent("power.action")
                         root._pendingCmd = cmd
                         BeeBarState.powerVisible = false
                         launchTimer.restart()
@@ -351,12 +351,12 @@ ShellRoot {
                     onOpenSettings: { 
                         root.controlTab = 3; 
                         root.controlVisible = true 
-                        BeeSound.play("dash_open")
+                        BeeSound.playEvent("dash.open")
                     }
                     onOpenStudio:   { 
                         root.controlTab = 0; 
                         root.controlVisible = true 
-                        BeeSound.play("dash_open")
+                        BeeSound.playEvent("dash.open")
                     }
                     onLaunchRequested: (cmd) => {
                         root._pendingCmd = cmd
@@ -366,7 +366,7 @@ ShellRoot {
                     onShownChanged: { 
                         if (!shown) {
                             root.searchVisible = false
-                            BeeSound.play("dash_close")
+                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -392,7 +392,7 @@ ShellRoot {
                     onDismissed: {
                         root.welcomeVisible = false
                         root.controlVisible = true   // Ouvre The Hive après le welcome
-                        BeeSound.play("dash_open")
+                        BeeSound.playEvent("dash.open")
                     }
                 }
             }
