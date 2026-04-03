@@ -155,7 +155,7 @@ ShellRoot {
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
-            exclusiveZone: 0
+            exclusiveZone: 45
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
