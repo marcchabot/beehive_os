@@ -152,10 +152,11 @@ ShellRoot {
         model: Quickshell.screens
         delegate: PanelWindow {
             required property var modelData
+            readonly property int barReserveHeight: 45
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
-            exclusiveZone: 45
+            exclusiveZone: (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4

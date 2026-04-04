@@ -44,6 +44,17 @@ Rectangle {
 
     Timer { id: hideTimer; interval: 3000; onTriggered: if (beeBar.stealthEnabled) beeBar.barVisible = false }
 
+    function syncBarShownState() {
+        BeeBarState.barShown = beeBar._shouldShow
+    }
+
+    onStealthEnabledChanged: {
+        if (stealthEnabled) hideTimer.restart()
+        syncBarShownState()
+    }
+    onBarVisibleChanged: syncBarShownState()
+    Component.onCompleted: syncBarShownState()
+
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true

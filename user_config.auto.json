@@ -1,0 +1,66 @@
+{
+  "theme": "HoneyDark",
+  "auto_theme": {
+    "enabled": true,
+    "engine": "bee_theme_auto.py@0.1.0",
+    "generated_at": "2026-04-04T01:51:41+00:00",
+    "source_wallpaper": "/home/node/.openclaw/workspace/projects/beehive_os/assets/wallpaper.png",
+    "palette": {
+      "bg": "#0E0D0E",
+      "accent": "#F9C52E",
+      "secondary": "#19191A",
+      "textPrimary": "#FFFFFF",
+      "textSecondary": "#737373",
+      "separator": "#504117",
+      "barBg": "rgba(14, 13, 14, 0.92)",
+      "glassBg": "rgba(25, 25, 26, 0.66)",
+      "glassBorder": "rgba(249, 197, 46, 0.28)",
+      "backdropBg": "rgba(11, 10, 11, 0.90)",
+      "auraAlpha": 0.6
+    },
+    "analysis": {
+      "dominant": "#111016",
+      "accent_source": "#FAD958",
+      "average_luminance": 0.0627,
+      "top_colors": [
+        {
+          "hex": "#111016",
+          "ratio": 0.27
+        },
+        {
+          "hex": "#171A24",
+          "ratio": 0.0872
+        },
+        {
+          "hex": "#281A15",
+          "ratio": 0.0819
+        },
+        {
+          "hex": "#1C222E",
+          "ratio": 0.0683
+        },
+        {
+          "hex": "#352319",
+          "ratio": 0.053
+        },
+        {
+          "hex": "#211E22",
+          "ratio": 0.0497
+        },
+        {
+          "hex": "#4D2C17",
+          "ratio": 0.0445
+        },
+        {
+          "hex": "#683917",
+          "ratio": 0.0365
+        }
+      ]
+    },
+    "mapping_notes": {
+      "honey_axis_hue": 42,
+      "mode_logic": "average luminance >= 0.38 => HoneyLight else HoneyDark",
+      "brand_constraint": "accent hue is pulled toward honey to preserve Bee-Hive identity"
+    }
+  }
+}

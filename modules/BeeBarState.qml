@@ -14,6 +14,8 @@ QtObject {
     // true  = sentinel detected mouse → force display
     // false = normal state (handled by BeeBar)
     property bool forceVisible: false
+    // Mirrors the current visual state of BeeBar to drive reserved top space.
+    property bool barShown: true
 
     // Inter-window signals to open Settings/Studio from BeeSearch
     property bool openSettingsRequested: false
