@@ -96,7 +96,6 @@
   "corners_mode": true,
   "motion_mode": true,
   "pinned_apps": [
-    "__settings__",
     "__studio__",
     "kitty"
   ],

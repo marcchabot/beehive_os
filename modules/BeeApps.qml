@@ -71,7 +71,6 @@ QtObject {
 
     // ─── BeeHive static apps (always at the top) ──────────────
     readonly property var _staticApps: [
-        { icon: "🐝", name: "BeeHive Settings", cmd: "__settings__", cat: "BeeHive" },
         { icon: "🎨", name: "BeeStudio",          cmd: "__studio__",   cat: "BeeHive" }
     ]
 
