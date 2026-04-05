@@ -35,6 +35,7 @@ Item {
     property bool   editHighlighted:  false
     property bool   _loading:         false
     property bool   _saveDirty:       false
+    property string autoThemeHint:    ""
 
     // ─── Composant WallCard (Unified Wallpaper) ─────────────────
     component WallCard: Item {
@@ -88,6 +89,7 @@ Item {
                             BeeTheme.setMode(parent.parent.parent.mode)
                         var name = parent.parent.parent.label || parent.parent.parent.src.split("/").pop()
                         BeeBarState.logAction("Design", "Wallpaper : " + name, "🖼")
+                        BeeConfig.applyAutoThemeFromWallpaper(parent.parent.parent.src, false)
                     }
                 }
                 Rectangle {
@@ -151,8 +153,44 @@ Item {
         _saveDirty = true
     }
 
+    function refreshAutoThemeHint() {
+        if (BeeConfig.autoThemeStatus === "ok")
+            autoThemeHint = "Theme auto applique."
+        else if (BeeConfig.autoThemeStatus === "running")
+            autoThemeHint = "Generation du theme en cours..."
+        else if (BeeConfig.autoThemeStatus === "error")
+            autoThemeHint = "Erreur generation auto-theme."
+        else if (BeeConfig.autoThemeStatus === "warn")
+            autoThemeHint = "Overlay genere, palette invalide."
+        else if (BeeConfig.autoThemeStatus === "busy")
+            autoThemeHint = "Generation deja en cours."
+        else if (BeeConfig.autoThemeStatus === "dedup")
+            autoThemeHint = "Wallpaper deja traite."
+        else if (BeeConfig.autoThemeStatus === "invalid")
+            autoThemeHint = "Wallpaper invalide."
+        else
+            autoThemeHint = ""
+    }
+
+    function applyThemeFromCurrentWallpaper(force) {
+        var source = BeeTheme.wallpaperOverride !== "" ? BeeTheme.wallpaperOverride : BeeTheme.wallpaper
+        BeeConfig.applyAutoThemeFromWallpaper(source, force === true)
+        refreshAutoThemeHint()
+    }
+
     // ─── Open/Close ──────────────────────────────────────────────
-    Component.onCompleted: { backdropIn.start(); openAnim.start() }
+    Component.onCompleted: {
+        backdropIn.start()
+        openAnim.start()
+        refreshAutoThemeHint()
+    }
+
+    Connections {
+        target: BeeConfig
+        function onAutoThemeStatusChanged() {
+            refreshAutoThemeHint()
+        }
+    }
 
     function requestClose() { backdropOut.start(); closeAnim.start() }
 
@@ -815,6 +853,26 @@ Item {
                                     Text { text: tr("wallpapers_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
                                     Text { text: tr("subtitle_wallpapers_hover"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
+                                Item { Layout.fillWidth: true }
+                                Rectangle {
+                                    Layout.preferredWidth: 250
+                                    height: 30
+                                    radius: 15
+                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.16)
+                                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.45)
+                                    border.width: 1
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "Appliquer theme depuis wallpaper"
+                                        color: BeeTheme.accent
+                                        font { pixelSize: 10; bold: true }
+                                    }
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: beeStudio.applyThemeFromCurrentWallpaper(true)
+                                    }
+                                }
                             }
                         }
 
@@ -822,7 +880,7 @@ Item {
 
                         // ── Barre dossier ─────────────────────
                         Item {
-                            Layout.fillWidth: true; height: 44
+                            Layout.fillWidth: true; height: 62
                             RowLayout {
                                 anchors { fill: parent; leftMargin: 16; rightMargin: 16 } spacing: 10
                                 Text { text: "📁"; font.pixelSize: 14 }
@@ -855,6 +913,16 @@ Item {
                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                     font.pixelSize: 9
                                 }
+                            }
+                            Text {
+                                anchors { left: parent.left; right: parent.right; bottom: parent.bottom; leftMargin: 44; rightMargin: 16; bottomMargin: 2 }
+                                text: beeStudio.autoThemeHint
+                                color: BeeConfig.autoThemeStatus === "error"
+                                    ? Qt.rgba(1.0, 0.45, 0.45, 0.9)
+                                    : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                                font.pixelSize: 9
+                                elide: Text.ElideRight
+                                visible: beeStudio.autoThemeHint.length > 0
                             }
                         }
 

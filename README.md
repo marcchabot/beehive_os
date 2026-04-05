@@ -202,6 +202,31 @@ If you prefer a direct authenticated API connection without sharing `.ics` links
 QML_XHR_ALLOW_FILE_READ=1 quickshell -p ~/beehive_os
 ```
 
+## 🧪 Auto Theme From Wallpaper (Matugen-like)
+
+- Generator script: `scripts/bee_theme_auto.py`
+- Overlay output: `user_config.auto.json`
+- Runtime merge rule: `user_config.json` (base) + `user_config.auto.json` (theme-only overlay)
+
+### Generate Manually
+
+```bash
+python3 scripts/bee_theme_auto.py --wallpaper /absolute/path/to/wallpaper.png --output user_config.auto.json
+```
+
+### Runtime Behavior
+
+- If `user_config.auto.json` is missing: Bee-Hive starts with base config only.
+- If overlay JSON is invalid: Bee-Hive logs a warning and falls back to base config.
+- Only theme-related keys are overlaid (`theme`, `auto_theme.palette`); dashboard/apps/calendar preferences remain in `user_config.json`.
+- In BeeStudio, selecting a wallpaper triggers auto-theme generation (deduplicated), and the action button can force re-apply.
+
+### Troubleshooting
+
+- Ensure `python3` is available in PATH.
+- Ensure wallpaper path is valid and readable.
+- If generation fails, check Quickshell logs for `BeeThemeAuto:` lines and retry with the BeeStudio action button.
+
 ## 🛠️ Installation
 
 For an automatic installation on CachyOS:
