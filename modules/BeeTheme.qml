@@ -75,37 +75,97 @@ QtObject {
     // ─── Phase de pulsation du glow (0.0 → 1.0 → 0.0 ∞) ─────
     property real _glowPhase: 0.0
 
+    // ─── Auto Theme Overlay (user_config.auto.json) ───────────
+    property string autoThemeMode: ""
+    property bool autoPaletteEnabled: false
+    property var autoPalette: ({})
+    property string autoSourceWallpaper: ""
+
+    function _clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v))
+    }
+
+    function _parseColorValue(raw, fallback) {
+        if (raw === undefined || raw === null) return fallback
+        if (typeof raw !== "string") return fallback
+
+        var s = raw.trim()
+        if (s.match(/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/)) {
+            return s
+        }
+
+        var m = s.match(/^rgba?\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})(?:\s*,\s*([0-9]*\.?[0-9]+))?\s*\)$/i)
+        if (!m) return fallback
+
+        var r = _clamp(parseInt(m[1]), 0, 255)
+        var g = _clamp(parseInt(m[2]), 0, 255)
+        var b = _clamp(parseInt(m[3]), 0, 255)
+        var a = (m[4] !== undefined) ? _clamp(Number(m[4]), 0.0, 1.0) : 1.0
+        return Qt.rgba(r / 255.0, g / 255.0, b / 255.0, a)
+    }
+
+    function _autoColor(key, fallback, modeName) {
+        if (!autoPaletteEnabled || autoThemeMode !== modeName || !autoPalette) return fallback
+        return _parseColorValue(autoPalette[key], fallback)
+    }
+
+    function _autoNumber(key, fallback, modeName) {
+        if (!autoPaletteEnabled || autoThemeMode !== modeName || !autoPalette) return fallback
+        var v = Number(autoPalette[key])
+        if (isNaN(v)) return fallback
+        return _clamp(v, 0.0, 1.0)
+    }
+
+    function clearAutoPalette() {
+        autoPaletteEnabled = false
+        autoPalette = ({})
+        autoThemeMode = ""
+        autoSourceWallpaper = ""
+    }
+
+    function applyAutoPalette(modeName, paletteObj, sourceWallpaper) {
+        if (!paletteObj || typeof paletteObj !== "object") {
+            clearAutoPalette()
+            return
+        }
+
+        autoThemeMode = (modeName === "HoneyLight") ? "HoneyLight" : "HoneyDark"
+        autoPalette = paletteObj
+        autoSourceWallpaper = sourceWallpaper || ""
+        autoPaletteEnabled = true
+    }
+
     // ─── Palette HoneyDark ─────────────────────────────────────
     property QtObject dark: QtObject {
         id: _dark
-        readonly property color bg:            "#0D0D0D"
-        readonly property color accent:        "#FFB81C"
-        readonly property color secondary:     "#1A1A1A"
-        readonly property color textPrimary:   "#FFFFFF"
-        readonly property color textSecondary: "#AAAAAA"
-        readonly property color barBg:         Qt.rgba(0.05,  0.05,  0.05,  0.92)
-        readonly property color glassBg:       Qt.rgba(0.07,  0.07,  0.08,  0.65) // Sombre et translucide
-        readonly property color glassBorder:   Qt.rgba(1,     0.722, 0.11,  0.2)
-        readonly property color backdropBg:    Qt.rgba(0.02,  0.02,  0.04,  0.88)
-        readonly property real  auraAlpha:     0.6
-        readonly property color separator:     Qt.rgba(1, 1, 1, 0.08)
+        readonly property color bg:            root._autoColor("bg", "#0D0D0D", "HoneyDark")
+        readonly property color accent:        root._autoColor("accent", "#FFB81C", "HoneyDark")
+        readonly property color secondary:     root._autoColor("secondary", "#1A1A1A", "HoneyDark")
+        readonly property color textPrimary:   root._autoColor("textPrimary", "#FFFFFF", "HoneyDark")
+        readonly property color textSecondary: root._autoColor("textSecondary", "#AAAAAA", "HoneyDark")
+        readonly property color barBg:         root._autoColor("barBg", Qt.rgba(0.05,  0.05,  0.05,  0.92), "HoneyDark")
+        readonly property color glassBg:       root._autoColor("glassBg", Qt.rgba(0.07,  0.07,  0.08,  0.65), "HoneyDark")
+        readonly property color glassBorder:   root._autoColor("glassBorder", Qt.rgba(1,     0.722, 0.11,  0.2), "HoneyDark")
+        readonly property color backdropBg:    root._autoColor("backdropBg", Qt.rgba(0.02,  0.02,  0.04,  0.88), "HoneyDark")
+        readonly property real  auraAlpha:     root._autoNumber("auraAlpha", 0.6, "HoneyDark")
+        readonly property color separator:     root._autoColor("separator", Qt.rgba(1, 1, 1, 0.08), "HoneyDark")
         readonly property string wallpaper:    "../assets/wallpaper_dark_bee.png"
     }
 
     // ─── Palette HoneyLight ────────────────────────────────────
     property QtObject light: QtObject {
         id: _light
-        readonly property color bg:            "#F5F0E8"
-        readonly property color accent:        "#634604" // Très sombre pour contraste maximal (Brun/Miel foncé)
-        readonly property color secondary:     "#EBE2D3"
-        readonly property color textPrimary:   "#1A1A1A" // Noir charbon
-        readonly property color textSecondary: "#3D342B" // Brun très sombre pour sous-titres
-        readonly property color barBg:         Qt.rgba(0.92,  0.90,  0.85,  0.96) // Plus dense
-        readonly property color glassBg:       Qt.rgba(1,     1,     1,     0.94)
-        readonly property color glassBorder:   Qt.rgba(0.40,  0.28,  0.02,  0.5) // Bordures bien visibles
-        readonly property color backdropBg:    Qt.rgba(0.90,  0.86,  0.80,  0.92)
-        readonly property real  auraAlpha:     0.35
-        readonly property color separator:     Qt.rgba(0, 0, 0, 0.18) // Lignes bien marquées
+        readonly property color bg:            root._autoColor("bg", "#F5F0E8", "HoneyLight")
+        readonly property color accent:        root._autoColor("accent", "#634604", "HoneyLight")
+        readonly property color secondary:     root._autoColor("secondary", "#EBE2D3", "HoneyLight")
+        readonly property color textPrimary:   root._autoColor("textPrimary", "#1A1A1A", "HoneyLight")
+        readonly property color textSecondary: root._autoColor("textSecondary", "#3D342B", "HoneyLight")
+        readonly property color barBg:         root._autoColor("barBg", Qt.rgba(0.92,  0.90,  0.85,  0.96), "HoneyLight")
+        readonly property color glassBg:       root._autoColor("glassBg", Qt.rgba(1,     1,     1,     0.94), "HoneyLight")
+        readonly property color glassBorder:   root._autoColor("glassBorder", Qt.rgba(0.40,  0.28,  0.02,  0.5), "HoneyLight")
+        readonly property color backdropBg:    root._autoColor("backdropBg", Qt.rgba(0.90,  0.86,  0.80,  0.92), "HoneyLight")
+        readonly property real  auraAlpha:     root._autoNumber("auraAlpha", 0.35, "HoneyLight")
+        readonly property color separator:     root._autoColor("separator", Qt.rgba(0, 0, 0, 0.18), "HoneyLight")
         readonly property string wallpaper:    "../assets/wallpaper_light_bee.png"
     }
 

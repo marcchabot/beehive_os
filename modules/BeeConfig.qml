@@ -165,6 +165,51 @@ QtObject {
         running: false
     }
 
+    // ─── Auto Theme Runtime (user_config.auto.json) ───────────
+    property string autoThemeScriptPath: Qt.resolvedUrl("../scripts/bee_theme_auto.py").toString().replace("file://", "")
+    property string autoThemeOverlayPath: Qt.resolvedUrl("../user_config.auto.json").toString().replace("file://", "")
+    property string autoThemeStatus: "idle"
+    property string autoThemeLastWallpaper: ""
+    property string _autoThemePendingWallpaper: ""
+
+    property Process autoThemeProc: Process {
+        id: _autoThemeProc
+        running: false
+        stdout: SplitParser {
+            onRead: (line) => {
+                var msg = (line || "").trim()
+                if (msg.length > 0) console.log("BeeThemeAuto:", msg)
+            }
+        }
+        onExited: (code, status) => {
+            if (code !== 0) {
+                autoThemeStatus = "error"
+                console.warn("BeeConfig: auto-theme process failed with code", code, "status", status)
+                BeeBarState.dispatchNotification("BeeTheme Auto", "Echec generation theme", "❌")
+                return
+            }
+
+            autoThemeLastWallpaper = _autoThemePendingWallpaper
+            _loadAutoOverlay(
+                function(overlayCfg) {
+                    var applied = _applyOverlayTheme(overlayCfg, "BeeConfig:")
+                    if (applied) {
+                        autoThemeStatus = "ok"
+                        BeeBarState.dispatchNotification("BeeTheme Auto", "Theme applique depuis wallpaper", "🎨")
+                    } else {
+                        autoThemeStatus = "warn"
+                        BeeBarState.dispatchNotification("BeeTheme Auto", "Overlay genere mais palette invalide", "⚠️")
+                    }
+                },
+                function(reason) {
+                    autoThemeStatus = "error"
+                    console.warn("BeeConfig: auto overlay load failed after generation:", reason)
+                    BeeBarState.dispatchNotification("BeeTheme Auto", "Overlay indisponible apres generation", "⚠️")
+                }
+            )
+        }
+    }
+
     // ─── Load at startup ───────────────────────────────────────
     Component.onCompleted: {
         loadI18n("fr")   // Pre-load French by default
@@ -184,7 +229,19 @@ QtObject {
                         loadDefaults()
                         return
                     }
-                    applyConfig(JSON.parse(text))
+                    var baseCfg = JSON.parse(text)
+                    _loadAutoOverlay(
+                        function(overlayCfg) {
+                            var mergedCfg = _mergeThemeOverlay(baseCfg, overlayCfg)
+                            applyConfig(mergedCfg, baseCfg)
+                        },
+                        function(reason) {
+                            if (reason === "invalid") {
+                                console.warn("BeeConfig: user_config.auto.json invalide, fallback sur base.")
+                            }
+                            applyConfig(baseCfg, baseCfg)
+                        }
+                    )
                     return
                 } catch (e) {
                     console.warn("BeeConfig: Erreur JSON →", e)
@@ -195,8 +252,123 @@ QtObject {
         xhr.send()
     }
 
-    function applyConfig(cfg) {
-        _rawConfig = cfg
+    function _normalizeWallpaperPath(path) {
+        if (path === undefined || path === null) return ""
+        var p = (path + "").trim()
+        if (!p) return ""
+        if (p.startsWith("file://")) return p.replace("file://", "")
+        if (p.startsWith("..")) return Qt.resolvedUrl(p).toString().replace("file://", "")
+        return p
+    }
+
+    function _loadAutoOverlay(onDone, onFail) {
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET", Qt.resolvedUrl("../user_config.auto.json"))
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (xhr.status === 200 || xhr.status === 0) {
+                try {
+                    var text = (xhr.responseText || "").trim()
+                    if (text === "") {
+                        if (onFail) onFail("empty")
+                        return
+                    }
+                    var overlayCfg = JSON.parse(text)
+                    if (onDone) onDone(overlayCfg)
+                    return
+                } catch (e) {
+                    console.warn("BeeConfig: Erreur JSON auto overlay →", e)
+                    if (onFail) onFail("invalid")
+                    return
+                }
+            }
+            if (onFail) onFail("missing")
+        }
+        xhr.send()
+    }
+
+    function _mergeThemeOverlay(baseCfg, overlayCfg) {
+        var merged = JSON.parse(JSON.stringify(baseCfg || {}))
+        if (!overlayCfg || typeof overlayCfg !== "object") return merged
+
+        if (overlayCfg.theme === "HoneyDark" || overlayCfg.theme === "HoneyLight") {
+            merged.theme = overlayCfg.theme
+        }
+
+        if (overlayCfg.auto_theme && typeof overlayCfg.auto_theme === "object" &&
+            overlayCfg.auto_theme.palette && typeof overlayCfg.auto_theme.palette === "object") {
+            merged.auto_theme = {
+                enabled: overlayCfg.auto_theme.enabled !== false,
+                source_wallpaper: overlayCfg.auto_theme.source_wallpaper || "",
+                generated_at: overlayCfg.auto_theme.generated_at || "",
+                engine: overlayCfg.auto_theme.engine || "",
+                palette: overlayCfg.auto_theme.palette
+            }
+        } else {
+            delete merged.auto_theme
+        }
+
+        return merged
+    }
+
+    function _applyOverlayTheme(overlayCfg, logPrefix) {
+        if (!overlayCfg || typeof overlayCfg !== "object") {
+            BeeTheme.clearAutoPalette()
+            return false
+        }
+
+        var mode = (overlayCfg.theme === "HoneyLight") ? "HoneyLight" : "HoneyDark"
+        var autoTheme = overlayCfg.auto_theme
+        if (!autoTheme || autoTheme.enabled === false || !autoTheme.palette || typeof autoTheme.palette !== "object") {
+            BeeTheme.clearAutoPalette()
+            return false
+        }
+
+        BeeTheme.applyAutoPalette(mode, autoTheme.palette, autoTheme.source_wallpaper || "")
+        if (BeeTheme.mode !== mode) BeeTheme.setMode(mode)
+
+        var sourcePath = _normalizeWallpaperPath(autoTheme.source_wallpaper || "")
+        if (sourcePath) autoThemeLastWallpaper = sourcePath
+        if (logPrefix) console.log(logPrefix, "overlay auto-thème appliqué →", mode)
+        return true
+    }
+
+    function applyAutoThemeFromWallpaper(wallpaperPath, force) {
+        var normalized = _normalizeWallpaperPath(wallpaperPath)
+        if (!normalized) {
+            autoThemeStatus = "invalid"
+            console.warn("BeeConfig: wallpaper path vide, auto-theme ignoré.")
+            return false
+        }
+
+        if (_autoThemeProc.running) {
+            autoThemeStatus = "busy"
+            console.log("BeeConfig: auto-theme déjà en cours, requête ignorée.")
+            return false
+        }
+
+        if (!force && normalized === autoThemeLastWallpaper) {
+            autoThemeStatus = "dedup"
+            return true
+        }
+
+        _autoThemePendingWallpaper = normalized
+        autoThemeStatus = "running"
+        _autoThemeProc.running = false
+        _autoThemeProc.command = [
+            "python3",
+            autoThemeScriptPath,
+            "--wallpaper",
+            normalized,
+            "--output",
+            autoThemeOverlayPath
+        ]
+        _autoThemeProc.running = true
+        return true
+    }
+
+    function applyConfig(cfg, rawCfg) {
+        _rawConfig = JSON.parse(JSON.stringify(rawCfg !== undefined ? rawCfg : cfg))
         console.log("BeeConfig: Application de la configuration...")
         
         // ... (autres propriétés)
@@ -360,6 +532,15 @@ QtObject {
             } else {
                 loadDefaults()
             }
+        }
+
+        if (cfg.auto_theme !== undefined) {
+            _applyOverlayTheme({
+                theme: cfg.theme || BeeTheme.mode,
+                auto_theme: cfg.auto_theme
+            }, "BeeConfig:")
+        } else {
+            BeeTheme.clearAutoPalette()
         }
 
         if (cfg.theme && cfg.theme !== BeeTheme.mode) BeeTheme.setMode(cfg.theme)
