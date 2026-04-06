@@ -148,9 +148,16 @@ ShellRoot {
     }
 
     // Sentinelle Stealth
+    Connections {
+        target: BeeConfig
+        function onStealthModeChanged() {
+            stealthSentinel._exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+        }
+    }
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
+            id: stealthSentinel
             required property var modelData
             readonly property int barReserveHeight: 45
             screen: modelData
@@ -161,7 +168,6 @@ ShellRoot {
             exclusiveZone: _exclZone
             // Réagir aux changements
             onBarShownChanged: _exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
-            onBeeConfigStealthModeChanged: _exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
