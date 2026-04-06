@@ -141,6 +141,22 @@ ShellRoot {
 
 
 
+    // ─── Réserve d'espace pour la BeeBar ─────────────
+    Variants {
+        model: Quickshell.screens
+        delegate: PanelWindow {
+            required property var modelData
+            screen: modelData
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.namespace: "beehive-bar-reserve"
+            exclusiveZone: 45
+            focusable: false
+            anchors { top: true; left: true; right: true }
+            implicitHeight: 45
+            color: "transparent"
+        }
+    }
+
     // Widgets Background
     Variants {
         model: Quickshell.screens
