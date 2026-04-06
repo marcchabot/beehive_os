@@ -115,7 +115,12 @@ Rectangle {
         syncBarShownState()
     }
     onBarVisibleChanged: syncBarShownState()
-    Component.onCompleted: syncBarShownState()
+    Component.onCompleted: {
+        if (stealthEnabled) {
+            barVisible = false
+        }
+        syncBarShownState()
+    }
 
     MouseArea {
         anchors.fill: parent

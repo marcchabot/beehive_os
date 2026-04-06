@@ -160,10 +160,10 @@ ShellRoot {
             WlrLayershell.namespace: "beehive-stealth-trigger"
             function refreshExclusiveZone() {
                 console.log("[StealthSentinel] refreshExclusiveZone called: stealthMode=", BeeConfig.stealthMode, "barShown=", BeeBarState.barShown)
-                computedExclusiveZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
-                console.log("[StealthSentinel] computedExclusiveZone set to:", computedExclusiveZone)
+                stealthSentinel.exclusiveZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+                console.log("[StealthSentinel] stealthSentinel.exclusiveZone set to:", stealthSentinel.exclusiveZone)
             }
-            exclusiveZone: computedExclusiveZone
+            exclusiveZone: barReserveHeight
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
