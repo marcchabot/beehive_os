@@ -154,15 +154,35 @@ ShellRoot {
             id: stealthSentinel
             required property var modelData
             readonly property int barReserveHeight: 45
+            property int computedExclusiveZone: barReserveHeight
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
-            // Calcul réactif via Binding
-            exclusiveZone: (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+            function refreshExclusiveZone() {
+                computedExclusiveZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+            }
+            exclusiveZone: computedExclusiveZone
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
             color: "transparent"
+
+            Component.onCompleted: refreshExclusiveZone()
+
+            Connections {
+                target: BeeConfig
+                function onStealthModeChanged() {
+                    stealthSentinel.refreshExclusiveZone()
+                }
+            }
+
+            Connections {
+                target: BeeBarState
+                function onBarShownChanged() {
+                    stealthSentinel.refreshExclusiveZone()
+                }
+            }
+
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
