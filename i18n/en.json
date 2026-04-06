@@ -7,7 +7,7 @@
 
   "bar": {
     "tooltip_cpu": "CPU",
-    "tooltip_ram": "Memory",
+    "tooltip_ram": "RAM",
     "tooltip_net": "Network",
     "tooltip_disk": "Disk",
     "tooltip_battery": "BAT"
