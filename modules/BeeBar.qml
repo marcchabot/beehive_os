@@ -45,7 +45,10 @@ Rectangle {
     Timer { id: hideTimer; interval: 3000; onTriggered: if (beeBar.stealthEnabled) beeBar.barVisible = false }
 
     function syncBarShownState() {
-        BeeBarState.barShown = beeBar._shouldShow
+        var newShown = beeBar._shouldShow
+        console.log("[BeeBar] syncBarShownState: _shouldShow =", newShown, "stealthEnabled =", beeBar.stealthEnabled, "barVisible =", beeBar.barVisible, "forceVisible =", BeeBarState.forceVisible)
+        BeeBarState.barShown = newShown
+        console.log("[BeeBar] set BeeBarState.barShown =", newShown)
     }
 
     function dispatchModuleAction(action) {

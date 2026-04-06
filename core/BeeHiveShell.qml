@@ -159,7 +159,9 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
             function refreshExclusiveZone() {
+                console.log("[StealthSentinel] refreshExclusiveZone called: stealthMode=", BeeConfig.stealthMode, "barShown=", BeeBarState.barShown)
                 computedExclusiveZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+                console.log("[StealthSentinel] computedExclusiveZone set to:", computedExclusiveZone)
             }
             exclusiveZone: computedExclusiveZone
             focusable: false
@@ -167,11 +169,15 @@ ShellRoot {
             implicitHeight: 4
             color: "transparent"
 
-            Component.onCompleted: refreshExclusiveZone()
+            Component.onCompleted: {
+                console.log("[StealthSentinel] Component.onCompleted")
+                refreshExclusiveZone()
+            }
 
             Connections {
                 target: BeeConfig
                 function onStealthModeChanged() {
+                    console.log("[StealthSentinel] BeeConfig.stealthModeChanged")
                     stealthSentinel.refreshExclusiveZone()
                 }
             }
@@ -179,6 +185,7 @@ ShellRoot {
             Connections {
                 target: BeeBarState
                 function onBarShownChanged() {
+                    console.log("[StealthSentinel] BeeBarState.barShownChanged to", BeeBarState.barShown)
                     stealthSentinel.refreshExclusiveZone()
                 }
             }
