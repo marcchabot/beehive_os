@@ -35,7 +35,6 @@ Rectangle {
     signal cornersToggled(bool val)
     signal motionToggled(bool val)
     signal vibeToggled(bool val)
-    signal stealthToggled(bool val)
     signal focusToggled(bool val)
 
     // ─── Close button — Top Right (absolute positioning) ─────
@@ -314,13 +313,7 @@ Rectangle {
                     }
                 }
 
-                // ── Stealth Mode ──────────────────────────────
-                SettingRow {
-                    label:   settingsRoot._s.stealth_mode  || "Stealth Mode 🫥"
-                    desc:    settingsRoot._s.stealth_desc   || "BeeBar hides after 3s of inactivity."
-                    checked: BeeConfig.stealthMode
-                    onToggled: (val) => settingsRoot.stealthToggled(val)
-                }
+
 
                 // ── Effets Sonores ────────────────────────────
             }

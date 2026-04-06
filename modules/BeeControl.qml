@@ -225,6 +225,17 @@ Rectangle {
                     spacing: 25
 
                     Text { text: "📊 BeeBar Stats"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    SectionHeader { title: "FOCUS MODE" }
+
+                    SettingRow {
+                        label: controlRoot._s.focus || "Focus Mode 🎯"
+                        desc: "Hide Dashboard and background elements for maximum focus."
+                        checked: BeeConfig.focusMode
+                        onToggled: (val) => { BeeConfig.focusMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Focus " + (val ? "activé" : "désactivé"), "🎯") }
+                    }
+
+                    Item { height: 10 }
+
                     SectionHeader { title: "INDICATORS VISIBILITY" }
 
                     Flow {
@@ -415,19 +426,7 @@ Rectangle {
                         }
                     }
 
-                    SectionHeader { title: "PRIVACY & FOCUS" }
-                    SettingRow {
-                        label: controlRoot._s.stealth || "Stealth Mode 👤"
-                        desc: "Hide BeeBar until mouse enters the top sensor area."
-                        checked: BeeConfig.stealthMode
-                        onToggled: (val) => { BeeConfig.stealthMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Furtif " + (val ? "activé" : "désactivé"), "👤") }
-                    }
-                    SettingRow {
-                        label: controlRoot._s.focus || "Focus Mode 🎯"
-                        desc: "Hide Dashboard and background elements for maximum focus."
-                        checked: BeeConfig.focusMode
-                        onToggled: (val) => { BeeConfig.focusMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Focus " + (val ? "activé" : "désactivé"), "🎯") }
-                    }
+
 
                     Item { height: 20 }
                 }

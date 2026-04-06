@@ -47,10 +47,6 @@ ShellRoot {
                 proc.start()
             } else if (cmd.startsWith("toggle:")) {
                 var setting = cmd.substring(7)
-                if (setting === "stealth") {
-                    BeeConfig.stealthMode = !BeeConfig.stealthMode
-                    BeeConfig.saveConfig()
-                } else if (setting === "focus") {
                     BeeConfig.focusMode = !BeeConfig.focusMode
                     BeeConfig.saveConfig()
                 } else if (setting === "settings") {
@@ -80,11 +76,6 @@ ShellRoot {
         function toggleSearch() { root.toggleSearch() }
         function toggleTheme()  { 
             BeeTheme.toggle() 
-            BeeSound.playEvent("ui.cell.click")
-        }
-        function toggleStealth() {
-            BeeConfig.stealthMode = !BeeConfig.stealthMode
-            BeeConfig.saveConfig()
             BeeSound.playEvent("ui.cell.click")
         }
         function toggleFocus() {
@@ -147,52 +138,7 @@ ShellRoot {
         }
     }
 
-    // Sentinelle Stealth (réserve d'espace - Destruction dynamique)
-    // Au lieu de modifier exclusiveZone (qui bugge souvent sur Wayland), on détruit complètement la fenêtre !
-    Variants {
-        model: Quickshell.screens
-        delegate: Loader {
-            id: reserveLoader
-            required property var modelData
-            readonly property bool reserveActive: (!BeeConfig.stealthMode || BeeBarState.barShown)
-            active: reserveActive
 
-            sourceComponent: PanelWindow {
-                screen: reserveLoader.modelData
-                WlrLayershell.layer: WlrLayer.Top
-                WlrLayershell.namespace: "beehive-stealth-reserve"
-                exclusiveZone: 45
-                focusable: false
-                anchors { top: true; left: true; right: true }
-                implicitHeight: 45
-                color: "transparent"
-            }
-        }
-    }
-
-    // Sentinelle Stealth (trigger hover sans réserve)
-    Variants {
-        model: Quickshell.screens
-        delegate: PanelWindow {
-            id: stealthTriggerSentinel
-            required property var modelData
-            screen: modelData
-            WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "beehive-stealth-trigger"
-            // Active seulement en stealth pour réafficher la BeeBar au survol.
-            visible: BeeConfig.stealthMode
-            exclusiveZone: 0
-            focusable: false
-            anchors { top: true; left: true; right: true }
-            implicitHeight: 4
-            color: "transparent"
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: { if (BeeConfig.stealthMode) BeeBarState.forceVisible = true }
-            }
-        }
-    }
 
     // Widgets Background
     Variants {

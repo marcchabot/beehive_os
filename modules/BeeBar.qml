@@ -20,36 +20,13 @@ Rectangle {
     radius: 18
     anchors.horizontalCenter: parent.horizontalCenter
 
-    // ─── Stealth Mode ─────────────────────────────────────
-    property bool stealthEnabled: BeeConfig.stealthMode
-    property bool barVisible: true
-    readonly property bool _shouldShow: !stealthEnabled || barVisible || BeeBarState.forceVisible
-
-    y: _shouldShow ? 12 : -(height + 15)
-    opacity: _shouldShow ? 1.0 : 0.0
+    y: 12
+    opacity: 1.0
 
     Behavior on y       { NumberAnimation { duration: 400; easing.type: Easing.InOutCubic } }
     Behavior on opacity { NumberAnimation { duration: 250 } }
 
-    Connections {
-        target: BeeBarState
-        function onForceVisibleChanged() {
-            if (BeeBarState.forceVisible && beeBar.stealthEnabled) {
-                beeBar.barVisible = true
-                BeeBarState.forceVisible = false
-                hideTimer.restart()
-            }
-        }
-    }
-
-    Timer { id: hideTimer; interval: 3000; onTriggered: if (beeBar.stealthEnabled) beeBar.barVisible = false }
-
-    function syncBarShownState() {
-        var newShown = beeBar._shouldShow
-        console.log("[BeeBar] syncBarShownState: _shouldShow =", newShown, "stealthEnabled =", beeBar.stealthEnabled, "barVisible =", beeBar.barVisible, "forceVisible =", BeeBarState.forceVisible)
-        BeeBarState.barShown = newShown
-        console.log("[BeeBar] set BeeBarState.barShown =", newShown)
-    }
+    Component.onCompleted: BeeBarState.barShown = true
 
     function dispatchModuleAction(action) {
         if (!action || action === "none") return
@@ -110,25 +87,9 @@ Rectangle {
         console.warn("BeeBar: module action non reconnue →", action)
     }
 
-    onStealthEnabledChanged: {
-        if (stealthEnabled) hideTimer.restart()
-        syncBarShownState()
-    }
-    onBarVisibleChanged: syncBarShownState()
-    Component.onCompleted: {
-        if (stealthEnabled) {
-            barVisible = false
-        }
-        syncBarShownState()
-    }
 
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        propagateComposedEvents: true
-        onEntered: { beeBar.barVisible = true; if (beeBar.stealthEnabled) hideTimer.restart() }
-        onExited: { if (beeBar.stealthEnabled) hideTimer.restart() }
-    }
+
+
 
     color: BeeTheme.barBg
     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
