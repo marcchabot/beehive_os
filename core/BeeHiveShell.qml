@@ -154,15 +154,15 @@ ShellRoot {
             id: stealthReserveSentinel
             required property var modelData
             readonly property int barReserveHeight: 45
+            readonly property bool reserveActive: (!BeeConfig.stealthMode || BeeBarState.barShown)
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-reserve"
-            // Surface dédiée à la réserve: visible seulement quand il faut réserver la top zone.
-            visible: (!BeeConfig.stealthMode || BeeBarState.barShown)
+            // Keep zone fixed but collapse surface height to 0 when reservation is disabled.
             exclusiveZone: barReserveHeight
             focusable: false
             anchors { top: true; left: true; right: true }
-            implicitHeight: barReserveHeight
+            implicitHeight: reserveActive ? barReserveHeight : 0
             color: "transparent"
         }
     }
