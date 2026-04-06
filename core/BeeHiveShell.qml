@@ -154,39 +154,34 @@ ShellRoot {
             id: stealthSentinel
             required property var modelData
             readonly property int barReserveHeight: 45
-            property int computedExclusiveZone: barReserveHeight
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
-            function refreshExclusiveZone() {
-                console.log("[StealthSentinel] refreshExclusiveZone called: stealthMode=", BeeConfig.stealthMode, "barShown=", BeeBarState.barShown)
-                stealthSentinel.exclusiveZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
-                console.log("[StealthSentinel] stealthSentinel.exclusiveZone set to:", stealthSentinel.exclusiveZone)
+            function applyExclusiveZone() {
+                var zone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+                stealthSentinel.exclusiveZone = zone
+                // Keep surface height >= reserved zone so compositor reapplies geometry immediately.
+                stealthSentinel.implicitHeight = Math.max(4, zone)
             }
-            exclusiveZone: barReserveHeight
+            exclusiveZone: 0
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
             color: "transparent"
 
-            Component.onCompleted: {
-                console.log("[StealthSentinel] Component.onCompleted")
-                refreshExclusiveZone()
-            }
+            Component.onCompleted: applyExclusiveZone()
 
             Connections {
                 target: BeeConfig
                 function onStealthModeChanged() {
-                    console.log("[StealthSentinel] BeeConfig.stealthModeChanged")
-                    stealthSentinel.refreshExclusiveZone()
+                    stealthSentinel.applyExclusiveZone()
                 }
             }
 
             Connections {
                 target: BeeBarState
                 function onBarShownChanged() {
-                    console.log("[StealthSentinel] BeeBarState.barShownChanged to", BeeBarState.barShown)
-                    stealthSentinel.refreshExclusiveZone()
+                    stealthSentinel.applyExclusiveZone()
                 }
             }
 
