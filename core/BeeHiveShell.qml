@@ -47,6 +47,7 @@ ShellRoot {
                 proc.start()
             } else if (cmd.startsWith("toggle:")) {
                 var setting = cmd.substring(7)
+                if (setting === "focus") {
                     BeeConfig.focusMode = !BeeConfig.focusMode
                     BeeConfig.saveConfig()
                 } else if (setting === "settings") {
