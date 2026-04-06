@@ -374,8 +374,9 @@ Rectangle {
                 city: BeeConfig.weatherCity
                 lat: BeeConfig.weatherLat
                 lon: BeeConfig.weatherLon
+                conditionMaxWidth: 110
                 Layout.alignment: Qt.AlignVCenter
-                Layout.maximumWidth: 250
+                Layout.maximumWidth: 180
             }
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
