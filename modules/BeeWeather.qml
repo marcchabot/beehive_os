@@ -9,6 +9,7 @@ import QtQuick.Layouts
 
 Item {
     id: beeWeather
+    clip: true
     implicitWidth: mainLayout.implicitWidth
     implicitHeight: 48
 
@@ -24,6 +25,7 @@ Item {
     property string condition: (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
     property string icon: "🌡️"
     property bool loading: true
+    property int conditionMaxWidth: 170
 
     // ─── Mappage des codes WMO (depuis les traductions) ──
     function getWmoInfo(code) {
@@ -143,6 +145,9 @@ Item {
             font { pixelSize: 10; italic: true }
             visible: true
             Layout.alignment: Qt.AlignVCenter
+            Layout.maximumWidth: beeWeather.conditionMaxWidth
+            elide: Text.ElideRight
+            wrapMode: Text.NoWrap
         }
     }
 }

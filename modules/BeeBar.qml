@@ -370,7 +370,13 @@ Rectangle {
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
-            BeeWeather { city: BeeConfig.weatherCity; lat: BeeConfig.weatherLat; lon: BeeConfig.weatherLon; Layout.alignment: Qt.AlignVCenter }
+            BeeWeather {
+                city: BeeConfig.weatherCity
+                lat: BeeConfig.weatherLat
+                lon: BeeConfig.weatherLon
+                Layout.alignment: Qt.AlignVCenter
+                Layout.maximumWidth: 250
+            }
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
