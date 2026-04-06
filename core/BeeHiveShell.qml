@@ -154,6 +154,12 @@ ShellRoot {
             stealthSentinel._exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
         }
     }
+    Connections {
+        target: BeeBarState
+        function onBarShownChanged() {
+            stealthSentinel._exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
+        }
+    }
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
@@ -166,8 +172,6 @@ ShellRoot {
             // Nouvelle propriété calculée
             readonly property int _exclZone: (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
             exclusiveZone: _exclZone
-            // Réagir aux changements
-            onBarShownChanged: _exclZone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
