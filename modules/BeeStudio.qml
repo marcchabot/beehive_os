@@ -166,6 +166,8 @@ Item {
             autoThemeHint = "Generation deja en cours."
         else if (BeeConfig.autoThemeStatus === "dedup")
             autoThemeHint = "Wallpaper deja traite."
+        else if (BeeConfig.autoThemeStatus === "disabled")
+            autoThemeHint = "Nectar Sync desactive."
         else if (BeeConfig.autoThemeStatus === "invalid")
             autoThemeHint = "Wallpaper invalide."
         else

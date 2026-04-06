@@ -341,6 +341,11 @@ QtObject {
             return false
         }
 
+        if (!BeeTheme.nectarSync) {
+            autoThemeStatus = "disabled"
+            return true
+        }
+
         if (_autoThemeProc.running) {
             autoThemeStatus = "busy"
             console.log("BeeConfig: auto-theme déjà en cours, requête ignorée.")
@@ -354,12 +359,15 @@ QtObject {
 
         _autoThemePendingWallpaper = normalized
         autoThemeStatus = "running"
+        var modeArg = (BeeTheme.mode === "HoneyLight") ? "HoneyLight" : "HoneyDark"
         _autoThemeProc.running = false
         _autoThemeProc.command = [
             "python3",
             autoThemeScriptPath,
             "--wallpaper",
             normalized,
+            "--mode",
+            modeArg,
             "--output",
             autoThemeOverlayPath
         ]

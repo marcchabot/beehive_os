@@ -34,6 +34,24 @@ Rectangle {
     signal openSettings()
     signal openStudio()
 
+    function resolveCellData(slot) {
+        var _rev = BeeConfig.cellsRevision
+        if (BeeConfig.cells.count > slot) return BeeConfig.cells.get(slot)
+
+        var registered = BeeModuleRegistry.mayaDashCellAt(slot)
+        if (!registered || registered.enabled === false) return null
+
+        return {
+            icon: registered.icon || "🐝",
+            title: registered.title || ("Module " + slot),
+            subtitle: registered.subtitle || "",
+            detail: registered.detail || "",
+            action: registered.action || "none",
+            highlighted: registered.highlighted === true,
+            customizable: false
+        }
+    }
+
     // ─── Dispatcher d'actions ─────────────────────────────────
     function handleCellAction(action) {
         if (!action || action === "none") return
@@ -186,7 +204,7 @@ Rectangle {
         property int    cellIndex:     0
         // BeeConfig.cellsRevision est évalué en premier (opérateur virgule) pour
         // créer une dépendance réactive — ListModel.get() seul ne suffit pas.
-        property var    cellData:      (BeeConfig.cellsRevision, BeeConfig.cells.count > cellIndex ? BeeConfig.cells.get(cellIndex) : null)
+        property var    cellData:      mayaDash.resolveCellData(cellIndex)
 
         property string icon:          cellData ? cellData.icon          : "🐝"
         property string title:         cellData ? cellData.title         : "Module"

@@ -48,6 +48,65 @@ Rectangle {
         BeeBarState.barShown = beeBar._shouldShow
     }
 
+    function dispatchModuleAction(action) {
+        if (!action || action === "none") return
+
+        if (action === "toggle:settings") {
+            root.controlTab = 3
+            root.controlVisible = true
+            BeeSound.playEvent("dash.open")
+            return
+        }
+
+        if (action === "toggle:studio") {
+            root.controlTab = 0
+            root.controlVisible = true
+            BeeSound.playEvent("dash.open")
+            return
+        }
+
+        if (action === "toggle:dash") {
+            root.toggleDash()
+            return
+        }
+
+        if (action === "toggle:power") {
+            BeeBarState.powerVisible = !BeeBarState.powerVisible
+            BeeSound.playEvent(BeeBarState.powerVisible ? "dash.open" : "dash.close")
+            return
+        }
+
+        if (action === "toggle:theme") {
+            BeeTheme.toggle()
+            BeeSound.playEvent("ui.cell.click")
+            return
+        }
+
+        if (action.startsWith("app:")) {
+            var appName = action.substring(4).trim()
+            if (!appName) return
+            var appProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"] }', beeBar, "BeeBarModuleApp")
+            appProc.start()
+            return
+        }
+
+        if (action.startsWith("shell:")) {
+            var shellCmd = action.substring(6)
+            var shellProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"] }', beeBar, "BeeBarModuleShell")
+            shellProc.start()
+            return
+        }
+
+        if (action.startsWith("url:")) {
+            var url = action.substring(4).trim()
+            if (!url) return
+            Qt.openUrlExternally(url)
+            return
+        }
+
+        console.warn("BeeBar: module action non reconnue →", action)
+    }
+
     onStealthEnabledChanged: {
         if (stealthEnabled) hideTimer.restart()
         syncBarShownState()
@@ -345,6 +404,56 @@ Rectangle {
             BeeWeather { city: BeeConfig.weatherCity; lat: BeeConfig.weatherLat; lon: BeeConfig.weatherLon; Layout.alignment: Qt.AlignVCenter }
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
+
+            RowLayout {
+                visible: BeeModuleRegistry.beeBarModules.count > 0
+                spacing: 6
+                Layout.alignment: Qt.AlignVCenter
+
+                Repeater {
+                    model: BeeModuleRegistry.beeBarModules
+                    delegate: Rectangle {
+                        required property string moduleId
+                        required property string title
+                        required property string icon
+                        required property string action
+                        required property bool enabled
+
+                        visible: enabled
+                        radius: 6
+                        color: moduleHover.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                            : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.04)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.18)
+                        border.width: 1
+                        implicitWidth: moduleLabel.implicitWidth + 12
+                        implicitHeight: 22
+
+                        Text {
+                            id: moduleLabel
+                            anchors.centerIn: parent
+                            text: icon + " " + title
+                            color: BeeTheme.textPrimary
+                            font.pixelSize: 10
+                        }
+
+                        MouseArea {
+                            id: moduleHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: beeBar.dispatchModuleAction(action)
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                visible: BeeModuleRegistry.beeBarModules.count > 0
+                width: 1; height: 20
+                color: BeeTheme.separator
+                Layout.alignment: Qt.AlignVCenter
+            }
 
             Column {
                 Layout.alignment: Qt.AlignVCenter

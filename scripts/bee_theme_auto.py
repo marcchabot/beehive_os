@@ -188,11 +188,23 @@ def extract_palette(path: Path, max_colors: int = 24, sample_size: int = 256) ->
     return _extract_palette_imagemagick(path, max_colors=max_colors, sample_size=sample_size)
 
 
-def choose_mode(colors: list[ColorStat]) -> str:
+def choose_mode(colors: list[ColorStat], forced_mode: str | None = None) -> str:
+    if forced_mode in {"HoneyDark", "HoneyLight"}:
+        return forced_mode
+
     if not colors:
         return "HoneyDark"
+
     avg_lum = sum(rel_luminance(c.rgb) * c.ratio for c in colors)
-    return "HoneyLight" if avg_lum >= 0.38 else "HoneyDark"
+    avg_lightness = sum(c.lightness * c.ratio for c in colors)
+    blended = (avg_lum * 0.65) + (avg_lightness * 0.35)
+    dominant_lightness = pick_dominant(colors).lightness
+
+    if blended >= 0.50:
+        return "HoneyLight"
+    if blended <= 0.40:
+        return "HoneyDark"
+    return "HoneyLight" if dominant_lightness >= 0.52 else "HoneyDark"
 
 
 def pick_dominant(colors: list[ColorStat]) -> ColorStat:
@@ -246,8 +258,8 @@ def to_rgba_string(rgb: tuple[int, int, int], alpha: float) -> str:
     return f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha:.2f})"
 
 
-def build_palette(colors: list[ColorStat]) -> dict:
-    mode = choose_mode(colors)
+def build_palette(colors: list[ColorStat], forced_mode: str | None = None) -> dict:
+    mode = choose_mode(colors, forced_mode=forced_mode)
     dominant = pick_dominant(colors).rgb
     accent_source = pick_accent_source(colors)
     accent = normalize_accent(accent_source, mode)
@@ -301,7 +313,7 @@ def build_palette(colors: list[ColorStat]) -> dict:
     }
 
 
-def build_overlay(wallpaper_path: Path, palette: dict) -> dict:
+def build_overlay(wallpaper_path: Path, palette: dict, mode_arg: str) -> dict:
     mode = palette["mode"]
     now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
@@ -309,7 +321,7 @@ def build_overlay(wallpaper_path: Path, palette: dict) -> dict:
         "theme": mode,
         "auto_theme": {
             "enabled": True,
-            "engine": "bee_theme_auto.py@0.1.0",
+            "engine": "bee_theme_auto.py@0.2.0",
             "generated_at": now,
             "source_wallpaper": str(wallpaper_path),
             "palette": {
@@ -320,7 +332,11 @@ def build_overlay(wallpaper_path: Path, palette: dict) -> dict:
             "analysis": palette["analysis"],
             "mapping_notes": {
                 "honey_axis_hue": 42,
-                "mode_logic": "average luminance >= 0.38 => HoneyLight else HoneyDark",
+                "mode_logic": (
+                    "forced via --mode (HoneyDark|HoneyLight)"
+                    if mode_arg in {"HoneyDark", "HoneyLight"}
+                    else "auto mode uses blended luminance/lightness with neutral band disambiguation"
+                ),
                 "brand_constraint": "accent hue is pulled toward honey to preserve Bee-Hive identity",
             },
         },
@@ -354,6 +370,12 @@ def main() -> int:
         help="Output overlay JSON path",
     )
     parser.add_argument("--max-colors", type=int, default=24, help="Color buckets for extraction")
+    parser.add_argument(
+        "--mode",
+        choices=["auto", "HoneyDark", "HoneyLight"],
+        default="auto",
+        help="Theme mode strategy: auto-detect or force HoneyDark/HoneyLight",
+    )
     args = parser.parse_args()
 
     wallpaper = args.wallpaper.resolve() if args.wallpaper else resolve_default_wallpaper().resolve()
@@ -361,8 +383,9 @@ def main() -> int:
         raise FileNotFoundError(f"Wallpaper not found: {wallpaper}")
 
     colors = extract_palette(wallpaper, max_colors=max(6, args.max_colors))
-    palette = build_palette(colors)
-    overlay = build_overlay(wallpaper, palette)
+    forced_mode = None if args.mode == "auto" else args.mode
+    palette = build_palette(colors, forced_mode=forced_mode)
+    overlay = build_overlay(wallpaper, palette, args.mode)
 
     output = args.output.resolve() if not args.output.is_absolute() else args.output
     output.parent.mkdir(parents=True, exist_ok=True)

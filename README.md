@@ -61,11 +61,33 @@ This enables all core shortcuts:
 
 ```
 beehive_os/
-├── shell.qml                 # Main entry point ShellRoot (Global UI)
-├── theme.json                # Visual identity centralization
-├── user_config.json          # Persistent user configuration
+├── shell.qml                 # Compatibility entrypoint (loads core/BeeHiveShell.qml)
+├── core/
+│   └── BeeHiveShell.qml      # Main ShellRoot composition
+├── modules/
+│   ├── BeeModuleRegistry.qml # Stable registration API for BeeBar/MayaDash modules
+│   └── ...
+├── themes/
+│   └── theme.json            # Visual identity centralization
+├── docs/
+│   ├── ROADMAP.md
+│   ├── REFERENCES.md
+│   └── MODULE_API.md
+├── scripts/
+│   └── bee_theme_auto.py
 ├── assets/                   # 4K wallpapers and graphical assets
-└── modules/
+└── user_config.json          # Persistent user configuration
+```
+
+### Internal API
+
+- BeeBar / MayaDash module registration spec: `docs/MODULE_API.md`
+- Contributor workflow and CachyOS install path: `CONTRIBUTING.md`
+
+### Legacy Modules Map
+
+```
+modules/
     ├── BeeBar.qml            # Status bar (CPU, RAM, NET, DISK) + Stealth Mode
     ├── BeeBarState.qml       # Inter-window communication singleton
     ├── BeeApps.qml           # Application manager (Scan & Favorites)
@@ -212,6 +234,12 @@ QML_XHR_ALLOW_FILE_READ=1 quickshell -p ~/beehive_os
 
 ```bash
 python3 scripts/bee_theme_auto.py --wallpaper /absolute/path/to/wallpaper.png --output user_config.auto.json
+```
+
+Or force mode while keeping wallpaper-derived palette:
+
+```bash
+python3 scripts/bee_theme_auto.py --wallpaper /absolute/path/to/wallpaper.png --mode HoneyLight
 ```
 
 ### Runtime Behavior

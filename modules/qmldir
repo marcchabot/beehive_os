@@ -5,6 +5,7 @@ singleton BeeConfig   1.0 BeeConfig.qml
 singleton BeeBarState 1.0 BeeBarState.qml
 singleton BeeApps     1.0 BeeApps.qml
 singleton BeeSound    1.0 BeeSound.qml
+singleton BeeModuleRegistry 1.0 BeeModuleRegistry.qml
 
 # Composants visuels
 BeeBar       1.0 BeeBar.qml
