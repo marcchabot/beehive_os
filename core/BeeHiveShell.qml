@@ -147,23 +147,26 @@ ShellRoot {
         }
     }
 
-    // Sentinelle Stealth (réserve d'espace)
+    // Sentinelle Stealth (réserve d'espace - Destruction dynamique)
+    // Au lieu de modifier exclusiveZone (qui bugge souvent sur Wayland), on détruit complètement la fenêtre !
     Variants {
         model: Quickshell.screens
-        delegate: PanelWindow {
-            id: stealthReserveSentinel
+        delegate: Loader {
+            id: reserveLoader
             required property var modelData
-            readonly property int barReserveHeight: 45
             readonly property bool reserveActive: (!BeeConfig.stealthMode || BeeBarState.barShown)
-            screen: modelData
-            WlrLayershell.layer: WlrLayer.Top
-            WlrLayershell.namespace: "beehive-stealth-reserve"
-            // Keep zone fixed but collapse surface height to 0 when reservation is disabled.
-            exclusiveZone: barReserveHeight
-            focusable: false
-            anchors { top: true; left: true; right: true }
-            implicitHeight: reserveActive ? barReserveHeight : 0
-            color: "transparent"
+            active: reserveActive
+
+            sourceComponent: PanelWindow {
+                screen: reserveLoader.modelData
+                WlrLayershell.layer: WlrLayer.Top
+                WlrLayershell.namespace: "beehive-stealth-reserve"
+                exclusiveZone: 45
+                focusable: false
+                anchors { top: true; left: true; right: true }
+                implicitHeight: 45
+                color: "transparent"
+            }
         }
     }
 
