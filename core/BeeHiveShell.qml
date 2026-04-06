@@ -147,44 +147,42 @@ ShellRoot {
         }
     }
 
-    // Sentinelle Stealth
+    // Sentinelle Stealth (réserve d'espace)
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
-            id: stealthSentinel
+            id: stealthReserveSentinel
             required property var modelData
             readonly property int barReserveHeight: 45
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.namespace: "beehive-stealth-reserve"
+            // Surface dédiée à la réserve: visible seulement quand il faut réserver la top zone.
+            visible: (!BeeConfig.stealthMode || BeeBarState.barShown)
+            exclusiveZone: barReserveHeight
+            focusable: false
+            anchors { top: true; left: true; right: true }
+            implicitHeight: barReserveHeight
+            color: "transparent"
+        }
+    }
+
+    // Sentinelle Stealth (trigger hover sans réserve)
+    Variants {
+        model: Quickshell.screens
+        delegate: PanelWindow {
+            id: stealthTriggerSentinel
+            required property var modelData
+            screen: modelData
+            WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-stealth-trigger"
-            function applyExclusiveZone() {
-                var zone = (!BeeConfig.stealthMode || BeeBarState.barShown) ? barReserveHeight : 0
-                stealthSentinel.exclusiveZone = zone
-                // Keep surface height >= reserved zone so compositor reapplies geometry immediately.
-                stealthSentinel.implicitHeight = Math.max(4, zone)
-            }
+            // Active seulement en stealth pour réafficher la BeeBar au survol.
+            visible: BeeConfig.stealthMode
             exclusiveZone: 0
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 4
             color: "transparent"
-
-            Component.onCompleted: applyExclusiveZone()
-
-            Connections {
-                target: BeeConfig
-                function onStealthModeChanged() {
-                    stealthSentinel.applyExclusiveZone()
-                }
-            }
-
-            Connections {
-                target: BeeBarState
-                function onBarShownChanged() {
-                    stealthSentinel.applyExclusiveZone()
-                }
-            }
-
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
