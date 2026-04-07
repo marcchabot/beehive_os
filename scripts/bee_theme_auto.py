@@ -217,11 +217,9 @@ def pick_accent_source(colors: list[ColorStat]) -> ColorStat:
 
 
 def normalize_accent(source: ColorStat, mode: str) -> tuple[int, int, int]:
-    honey_hue = 42.0 / 360.0
+    # Preserve the original hue from the wallpaper for true fidelity.
+    # Only adjust saturation and lightness to meet Bee-Hive contrast/readability standards.
     h, l, s = source.hls
-
-    # Pull extracted hue toward Bee-Hive honey axis for brand coherence.
-    h = (h * 0.45) + (honey_hue * 0.55)
 
     if mode == "HoneyDark":
         s = clamp(max(s, 0.55), 0.55, 0.95)
