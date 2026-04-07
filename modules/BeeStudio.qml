@@ -423,17 +423,12 @@ Item {
                                 anchors { fill: parent; leftMargin: 18; rightMargin: 14 }
                                 spacing: 12
 
-                                // Attach ToolTip to the icon Text (test on first icon)
                                 Text {
                                     id: iconText
                                     text: catIcon
                                     font.pixelSize: 20
                                     opacity: isActive ? 1.0 : 0.60
                                     Behavior on opacity { NumberAnimation { duration: 150 } }
-                                    ToolTip.visible: hovered && index === 0
-                                    ToolTip.delay: 500
-                                    ToolTip.timeout: 5000
-                                    ToolTip.text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
                                 }
 
                                 ColumnLayout {
@@ -453,11 +448,48 @@ Item {
                                 }
                             }
 
+                            // Custom tooltip overlay
+                            Rectangle {
+                                id: tooltip
+                                visible: false
+                                opacity: 0
+                                width: Math.min(260, parent.width - 16)
+                                height: tooltipLabel.implicitHeight + 12
+                                anchors {
+                                    vertical: parent.vertical
+                                    right: parent.right
+                                    margins: 4
+                                }
+                                radius: 6
+                                color: Qt.rgba(0.02, 0.02, 0.02, 0.92)
+                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.6)
+                                border.width: 1
+
+                                Text {
+                                    id: tooltipLabel
+                                    anchors.centerIn: parent
+                                    width: parent.width - 16
+n                                    text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
+                                    color: BeeTheme.textPrimary
+                                    font.pixelSize: 11
+                                    wrapMode: Text.Wrap
+                                    horizontalAlignment: Text.AlignHCenter
+                                }
+
+                                Behavior on opacity { NumberAnimation { duration: 180 } }
+                            }
+
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor; hoverEnabled: true
-                                onEntered: parent.hovered = true
-                                onExited:  parent.hovered = false
+                                onEntered: {
+                                    parent.hovered = true
+                                    if (index === 0) tooltip.visible = true
+                                }
+                                onExited: {
+                                    parent.hovered = false
+                                    tooltip.visible = false
+                                }
                                 onClicked: beeStudio.activeCategory = index
                             }
                         }
