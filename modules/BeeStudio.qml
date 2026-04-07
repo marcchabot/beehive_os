@@ -399,15 +399,6 @@ Item {
                             property bool hovered: false
                             property bool isActive: beeStudio.activeCategory === index
 
-                            // Tooltip for first icon (cells) - test
-                            ToolTip {
-                                id: tip
-                                visible: hovered && index === 0
-                                text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
-                                delay: 500
-                                timeout: 5000
-                            }
-
                             // Fond
                             Rectangle {
                                 anchors.fill: parent
@@ -432,11 +423,17 @@ Item {
                                 anchors { fill: parent; leftMargin: 18; rightMargin: 14 }
                                 spacing: 12
 
+                                // Attach ToolTip to the icon Text (test on first icon)
                                 Text {
+                                    id: iconText
                                     text: catIcon
                                     font.pixelSize: 20
                                     opacity: isActive ? 1.0 : 0.60
                                     Behavior on opacity { NumberAnimation { duration: 150 } }
+                                    ToolTip.visible: hovered && index === 0
+                                    ToolTip.delay: 500
+                                    ToolTip.timeout: 5000
+                                    ToolTip.text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
                                 }
 
                                 ColumnLayout {
@@ -446,7 +443,7 @@ Item {
                                         color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
                                         font { pixelSize: 13; bold: isActive }
                                         Layout.fillWidth: true; elide: Text.ElideRight
-                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                        Behavior on color { ColorAnimation { duration: 600 } }
                                     }
                                     Text {
                                         text: tr(catSub)
