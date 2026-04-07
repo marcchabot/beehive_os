@@ -153,6 +153,7 @@ ShellRoot {
             focusable: false
             anchors { top: true; left: true; right: true }
             implicitHeight: 45
+            mask: Region {}
             color: "transparent"
         }
     }
