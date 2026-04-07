@@ -212,22 +212,8 @@ def pick_dominant(colors: list[ColorStat]) -> ColorStat:
 
 
 def pick_accent_source(colors: list[ColorStat]) -> ColorStat:
-    if not colors:
-        return ColorStat((255, 184, 28), 1.0)
-
-    honey_hue = 42.0 / 360.0
-    scored: list[tuple[float, ColorStat]] = []
-
-    for color in colors:
-        sat = color.saturation
-        light = color.lightness
-        warm = 1.0 - clamp(hue_distance(color.hue, honey_hue) / 0.5, 0.0, 1.0)
-        mid_light = 1.0 - min(abs(light - 0.52) / 0.52, 1.0)
-        score = (color.ratio * 0.35) + (sat * 0.35) + (warm * 0.25) + (mid_light * 0.05)
-        scored.append((score, color))
-
-    scored.sort(key=lambda item: item[0], reverse=True)
-    return scored[0][1]
+    # Option 1: Use the dominant color (top 1) as accent source for faithful wallpaper reflection.
+    return pick_dominant(colors)
 
 
 def normalize_accent(source: ColorStat, mode: str) -> tuple[int, int, int]:
