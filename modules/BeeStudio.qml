@@ -469,7 +469,7 @@ Item {
                                     id: tooltipLabel
                                     anchors.centerIn: parent
                                     width: parent.width - 16
-n                                    text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
+                                    text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
                                     color: BeeTheme.textPrimary
                                     font.pixelSize: 11
                                     wrapMode: Text.Wrap
