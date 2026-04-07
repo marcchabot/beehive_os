@@ -183,6 +183,18 @@ def _extract_palette_imagemagick(path: Path, max_colors: int = 24, sample_size: 
 
 
 def extract_palette(path: Path, max_colors: int = 24, sample_size: int = 256) -> list[ColorStat]:
+    # Check for signature BeeHive wallpapers first – use predefined palette
+    signature_wallpapers = {
+        "wallpaper_dark_bee.png": "HoneyDark",
+        "wallpaper_light_bee.png": "HoneyLight",
+        "wallpaper.png": "HoneyDark",
+        "wallpaper_light.png": "HoneyLight",
+    }
+
+    if path.name in signature_wallpapers:
+        # Return empty list to signal signature wallpaper – palette will be loaded separately
+        return []
+
     if HAS_PIL:
         return _extract_palette_pillow(path, max_colors=max_colors, sample_size=sample_size)
     return _extract_palette_imagemagick(path, max_colors=max_colors, sample_size=sample_size)
@@ -242,7 +254,41 @@ def to_rgba_string(rgb: tuple[int, int, int], alpha: float) -> str:
     return f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha:.2f})"
 
 
-def build_palette(colors: list[ColorStat], forced_mode: str | None = None) -> dict:
+def build_palette(colors: list[ColorStat], forced_mode: str | None = None, signature_mode: str | None = None) -> dict:
+    # If this is a signature wallpaper, use the predefined palette from theme.json
+    if signature_mode:
+        # Load predefined palette from themes/theme.json
+        theme_file = PROJECT_ROOT / "themes" / "theme.json"
+        if theme_file.exists():
+            try:
+                theme_data = json.loads(theme_file.read_text(encoding="utf-8"))
+                palettes = theme_data.get("palettes", {})
+                if signature_mode in palettes:
+                    p = palettes[signature_mode]
+                    return {
+                        "mode": signature_mode,
+                        "bg": p["background"].lstrip('#'),
+                        "accent": p["accent"].lstrip('#'),
+                        "secondary": p["secondary"].lstrip('#'),
+                        "textPrimary": p["text_primary"].lstrip('#'),
+                        "textSecondary": p["text_secondary"].lstrip('#'),
+                        "separator": mix_rgb(hex_to_rgb(p["accent"].lstrip('#')), hex_to_rgb(p["background"].lstrip('#')), 0.72 if signature_mode == "HoneyDark" else 0.78),
+                        "barBg": to_rgba_string(hex_to_rgb(p["background"].lstrip('#')), 0.92 if signature_mode == "HoneyDark" else 0.96),
+                        "glassBg": to_rgba_string(hex_to_rgb(p["secondary"].lstrip('#')), 0.66 if signature_mode == "HoneyDark" else 0.93),
+                        "glassBorder": to_rgba_string(hex_to_rgb(p["accent"].lstrip('#')), 0.28 if signature_mode == "HoneyDark" else 0.46),
+                        "backdropBg": to_rgba_string(hex_to_rgb(p["background"].lstrip('#')), 0.90 if signature_mode == "HoneyDark" else 0.92),
+                        "auraAlpha": 0.60 if signature_mode == "HoneyDark" else 0.35,
+                        "analysis": {
+                            "dominant": p["accent"].lstrip('#'),
+                            "accent_source": p["accent"].lstrip('#'),
+                            "average_luminance": 0.0,
+                            "top_colors": [],
+                            "signature": True
+                        },
+                    }
+            except Exception:
+                pass  # Fall back to auto generation if theme file unreadable
+
     mode = choose_mode(colors, forced_mode=forced_mode)
     dominant = pick_dominant(colors).rgb
     accent_source = pick_accent_source(colors)
@@ -367,8 +413,20 @@ def main() -> int:
         raise FileNotFoundError(f"Wallpaper not found: {wallpaper}")
 
     colors = extract_palette(wallpaper, max_colors=max(6, args.max_colors))
+    
+    # Detect signature wallpaper for preset palette
+    signature_mode = None
+    if not colors:
+        sig_map = {
+            "wallpaper_dark_bee.png": "HoneyDark",
+            "wallpaper_light_bee.png": "HoneyLight",
+            "wallpaper.png": "HoneyDark",
+            "wallpaper_light.png": "HoneyLight",
+        }
+        signature_mode = sig_map.get(wallpaper.name)
+    
     forced_mode = None if args.mode == "auto" else args.mode
-    palette = build_palette(colors, forced_mode=forced_mode)
+    palette = build_palette(colors, forced_mode=forced_mode, signature_mode=signature_mode)
     overlay = build_overlay(wallpaper, palette, args.mode)
 
     output = args.output.resolve() if not args.output.is_absolute() else args.output
