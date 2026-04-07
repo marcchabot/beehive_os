@@ -484,11 +484,15 @@ Item {
                                 cursorShape: Qt.PointingHandCursor; hoverEnabled: true
                                 onEntered: {
                                     parent.hovered = true
-                                    if (index === 0) tooltip.visible = true
+                                    if (index === 0) {
+                                        tooltip.visible = true
+                                        tooltip.opacity = 1
+                                    }
                                 }
                                 onExited: {
                                     parent.hovered = false
                                     tooltip.visible = false
+                                    tooltip.opacity = 0
                                 }
                                 onClicked: beeStudio.activeCategory = index
                             }
