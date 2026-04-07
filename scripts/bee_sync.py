@@ -129,7 +129,7 @@ def fetch_google_gog(cal_cfg):
     if not _check_gog_available():
         return []
 
-    cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--json", "--results-only"]
+    cmd = [GOG_CMD, "calendar", "list", cal_id, "--days", str(DAYS_AHEAD), "--max", "50", "--json", "--results-only"]
     events = []
 
     try:
@@ -364,7 +364,7 @@ def main():
             final_events.append(ev)
 
     max_ev = config.get("bee_events", {}).get("max_events", MAX_EVENTS)
-    final_events = final_events[:max_ev]
+    # final_events = final_events[:max_ev]
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w") as f:
