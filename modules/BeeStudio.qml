@@ -399,6 +399,15 @@ Item {
                             property bool hovered: false
                             property bool isActive: beeStudio.activeCategory === index
 
+                            // Tooltip for first icon (cells) - test
+                            ToolTip {
+                                id: tip
+                                visible: hovered && index === 0
+                                text: qsTr("Configurez vos cellules du dashboard : icônes, titres, actions")
+                                delay: 500
+                                timeout: 5000
+                            }
+
                             // Fond
                             Rectangle {
                                 anchors.fill: parent
