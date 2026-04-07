@@ -855,26 +855,7 @@ Item {
                                     Text { text: tr("wallpapers_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
                                     Text { text: tr("subtitle_wallpapers_hover"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
-                                Item { Layout.fillWidth: true }
-                                Rectangle {
-                                    Layout.preferredWidth: 250
-                                    height: 30
-                                    radius: 15
-                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.16)
-                                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.45)
-                                    border.width: 1
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "Appliquer theme depuis wallpaper"
-                                        color: BeeTheme.accent
-                                        font { pixelSize: 10; bold: true }
-                                    }
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: beeStudio.applyThemeFromCurrentWallpaper(true)
-                                    }
-                                }
+
                             }
                         }
 
