@@ -253,7 +253,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
+            Rectangle { visible: !BeeConfig.analogClock; width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             RowLayout {
                 spacing: 8
@@ -368,7 +368,7 @@ Rectangle {
                 Text { text: beeBar.batteryPercent + "%"; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
             }
 
-            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
+            Rectangle { visible: !BeeConfig.analogClock; width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             BeeWeather {
                 city: BeeConfig.weatherCity
@@ -379,7 +379,7 @@ Rectangle {
                 Layout.maximumWidth: 180
             }
 
-            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
+            Rectangle { visible: !BeeConfig.analogClock; width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             RowLayout {
                 visible: BeeModuleRegistry.beeBarModules.count > 0
@@ -432,6 +432,7 @@ Rectangle {
             }
 
             Column {
+                visible: !BeeConfig.analogClock
                 Layout.alignment: Qt.AlignVCenter
                 spacing: -2
                 Text {
@@ -446,7 +447,7 @@ Rectangle {
                 }
             }
 
-            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
+            Rectangle { visible: !BeeConfig.analogClock; width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
             Rectangle {
                 width: 28; height: 28; radius: 7; Layout.alignment: Qt.AlignVCenter
