@@ -456,7 +456,7 @@ Item {
                                 width: Math.min(260, parent.width - 16)
                                 height: tooltipLabel.implicitHeight + 12
                                 anchors {
-                                    vertical: parent.vertical
+                                    verticalCenter: parent.verticalCenter
                                     right: parent.right
                                     margins: 4
                                 }
