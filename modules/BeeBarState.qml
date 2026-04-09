@@ -36,7 +36,7 @@ QtObject {
     // ─── Window Tracking ──────────────────────
     property string activeWindowClass: "none"
 
-    property Process windowProc: Process {
+    property var windowProc: Process {
         id: _windowProc
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
         running: true
