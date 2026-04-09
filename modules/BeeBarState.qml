@@ -32,8 +32,23 @@ QtObject {
     // BeePower menu visibility
     property bool powerVisible: false
 
-    // ─── BeeAura History & Notifications 🔔📜 ─────────────────
-    // Centralized event bus for the whole hive
+
+    // ─── Window Tracking ──────────────────────
+    property string activeWindowClass: "none"
+
+    property Process windowProc: Process {
+        id: _windowProc
+        command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.activeWindowClass = this.text.trim()
+                windowTimer.start()
+            }
+        }
+    }
+
+    Timer { id: windowTimer; interval: 2000; onTriggered: windowProc.running = true }
     signal notificationReceived(string title, string body, string icon)
 
     property var historyModel: []
