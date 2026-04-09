@@ -227,7 +227,14 @@ Rectangle {
             
             RowLayout {
                 spacing: 10
-                Text { text: '🐝'; font.pixelSize: 18 }
+                Text { 
+                    text: {
+                        var activeClass = BeeBarState.activeWindowClass || "";
+                        var icons = BeeConfig.window_icons || {};
+                        return icons[activeClass] || icons["default"] || "🐝";
+                    }
+                    font.pixelSize: 18 
+                }
                 Text {
                     text: BeeBarState.focusActive ? (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS' : (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
                     font { bold: true; pixelSize: 13; letterSpacing: 2 }

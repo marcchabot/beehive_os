@@ -149,6 +149,16 @@
     "repo": "github.com/marcchabot/beehive_os",
     "_modularity_note": "Ce fichier est le point d'entrée unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alvéoles, le thème, la météo ou les transitions."
   },
+  "window_icons": {
+    "kitty": "🐚",
+    "firefox": "🦊",
+    "code": "💻",
+    "zeditor": "📝",
+    "discord": "💬",
+    "spotify": "🎧",
+    "obs": "🎥",
+    "default": "📄"
+  },
   "vibe_mode": false,
   "corners_mode": true,
   "motion_mode": true,
