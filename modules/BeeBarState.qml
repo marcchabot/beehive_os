@@ -57,7 +57,7 @@ QtObject {
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
     Process {
-        id: saveProc
+        id: _saveProc
         running: false
     }
 
