@@ -41,8 +41,8 @@ QtObject {
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: {
-                root.activeWindowClass = this.text.trim()
+            onStreamFinished: (text) => {
+                root.activeWindowClass = text.trim()
                 windowTimer.start()
             }
         }
