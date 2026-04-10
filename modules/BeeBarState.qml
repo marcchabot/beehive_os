@@ -58,10 +58,12 @@ QtObject {
     
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
+    /*
     Process {
         id: _saveProc
         running: false
     }
+    */
 
     function loadHistory() {
         var xhr = new XMLHttpRequest()
@@ -79,10 +81,8 @@ QtObject {
     }
 
     function saveHistory() {
-        var jsonStr = JSON.stringify(historyModel, null, 2)
-        _saveProc.running = false
-        _saveProc.command = ["bash", "-c", "mkdir -p $(dirname " + historyPath + ") && cat << 'BEEEOF' > " + historyPath + "\n" + jsonStr + "\nBEEEOF"]
-        _saveProc.running = true
+        // Temporarily disabled for debugging
+        console.log("[BeeBarState] saveHistory called but disabled")
     }
 
     Component.onCompleted: loadHistory()
