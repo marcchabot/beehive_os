@@ -120,8 +120,8 @@ Rectangle {
         command: ["bash", "-c", "find /sys/class/power_supply/ -maxdepth 1 -name \"BAT*\" | head -n 1 | xargs -I {} bash -c \"cat {}/capacity; cat {}/status\""]
         running: BeeConfig.showBattery
         stdout: StdioCollector {
-            onStreamFinished: {
-                var lines = this.text.trim().split("\n")
+            onStreamFinished: (text) => {
+                var lines = text.trim().split("\n")
                 if (lines.length >= 2) {
                     beeBar.batteryPercent = parseInt(lines[0])
                     beeBar.batteryStatus = lines[1]
@@ -136,8 +136,8 @@ Rectangle {
         command: ["bash", "-c", "LC_ALL=C df -h / | awk 'NR==2{print $3, $5}' | sed 's/%//'"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: {
-                var parts = this.text.trim().split(" ")
+            onStreamFinished: (text) => {
+                var parts = text.trim().split(" ")
                 if (parts.length >= 2) {
                     beeBar.diskUsed = parts[0]
                     beeBar.diskPercent = parseInt(parts[1])
@@ -152,8 +152,8 @@ Rectangle {
         command: ["bash", "-c", "read t1 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); sleep 1; read t2 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); bps=$((t2-t1)); if [ $bps -lt 1024 ]; then echo \"${bps}B/s\"; elif [ $bps -lt 1048576 ]; then echo \"$((bps/1024))K/s\"; else echo \"$(awk \"BEGIN {printf \\\"%.1fM/s\\\", $bps/1048576}\")\"; fi"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: {
-                beeBar.netSpeed = this.text.trim()
+            onStreamFinished: (text) => {
+                beeBar.netSpeed = text.trim()
                 netTimer.start()
             }
         }
@@ -164,8 +164,8 @@ Rectangle {
         command: ["bash", "-c", "read _ a b c d _ < /proc/stat; s1=$((a+b+c+d)); i1=$d; sleep 1; read _ a b c d _ < /proc/stat; s2=$((a+b+c+d)); i2=$d; dt=$((s2-s1)); di=$((i2-i1)); if [ $dt -gt 0 ]; then echo $(( (dt-di)*100/dt )); else echo 0; fi"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: {
-                var val = parseInt(this.text.trim())
+            onStreamFinished: (text) => {
+                var val = parseInt(text.trim())
                 if (!isNaN(val)) {
                     beeBar.cpuPercent = val
                     beeBar.cpuUsage = val + "%"
@@ -180,8 +180,8 @@ Rectangle {
         command: ["bash", "-c", "awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{u=t-a; printf \"%d %d %d\", u/1024, t/1024, u*100/t}' /proc/meminfo"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: {
-                var parts = this.text.trim().split(" ")
+            onStreamFinished: (text) => {
+                var parts = text.trim().split(" ")
                 if (parts.length >= 3) {
                     var usedMB = parseInt(parts[0])
                     var totalMB = parseInt(parts[1])
