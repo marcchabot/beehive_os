@@ -3,7 +3,6 @@ import QtQuick
 import QtCore
 import Quickshell
 import Quickshell.Io
-import Quickshell.Io.StdioCollectors
 
 // ═══════════════════════════════════════════════════════════
 // BeeBarState.qml — Shared Stealth Mode state
@@ -37,6 +36,7 @@ QtObject {
     // ─── Window Tracking ──────────────────────
     property string activeWindowClass: "none"
 
+    /*
     Process {
         id: windowProc
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
@@ -50,6 +50,7 @@ QtObject {
     }
 
     Timer { id: windowTimer; interval: 2000; onTriggered: windowProc.running = true }
+    */
     signal notificationReceived(string title, string body, string icon)
 
     property var historyModel: []
