@@ -1,6 +1,5 @@
 import Quickshell
 import Quickshell.Io
-import Quickshell.Io.StdioCollectors
 import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Layouts
