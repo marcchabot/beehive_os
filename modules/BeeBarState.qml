@@ -41,7 +41,7 @@ QtObject {
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
         running: true
         stdout: SplitParser {
-            onRead: function(line) {
+            onRead: (line) => {
                 root.activeWindowClass = line.trim()
                 windowTimer.start()
             }
@@ -60,7 +60,7 @@ QtObject {
         id: _saveProc
         running: false
         stdout: SplitParser {
-            onRead: function(line) {
+            onRead: (line) => {
                 // Ignore output, just process completion
                 console.log("[BeeBarState] History saved")
             }
