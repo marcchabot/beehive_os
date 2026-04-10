@@ -206,6 +206,34 @@ Rectangle {
     Timer { id: batteryTimer; interval: 10000; onTriggered: batteryProc.running = BeeConfig.showBattery }
     Timer { id: diskTimer; interval: 60000; onTriggered: diskProc.running = true }
 
+    // ─── History Save Helper ───────────────────────────────
+    property Process historySaveProc: Process {
+        id: _historySaveProc
+        running: false
+        stdout: SplitParser {
+            onRead: (line) => {
+                console.log("[BeeBar] History directory created")
+            }
+        }
+        stderr: SplitParser {}
+    }
+
+    // Connect to BeeBarState signal
+    Connections {
+        target: BeeBarState
+        function onHistorySaveNeeded(dirPath) {
+            _historySaveProc.running = false
+            _historySaveProc.command = ["bash", "-c", "mkdir -p " + dirPath]
+            _historySaveProc.running = true
+        }
+    }
+
+    Timer { 
+        id: _windowTrackerTimer
+        interval: 2000
+        onTriggered: _windowTracker.running = true 
+    }
+
     property string currentTime: Qt.formatDateTime(new Date(), "hh:mm")
     property string currentDate: Qt.formatDateTime(new Date(), "ddd d MMM")
     Timer {

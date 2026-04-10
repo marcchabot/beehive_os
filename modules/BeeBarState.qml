@@ -76,13 +76,43 @@ QtObject {
     */
 
     function loadHistory() {
-        // Simplified
-        historyModel = []
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET", "file://" + historyPath)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (xhr.status === 200 || xhr.status === 0) {
+                try {
+                    var data = JSON.parse(xhr.responseText)
+                    if (Array.isArray(data)) historyModel = data
+                } catch(e) {}
+            }
+        }
+        xhr.send()
     }
 
+    // Signal pour demander la création de dossier à BeeBar
+    signal historySaveNeeded(string dirPath)
+
     function saveHistory() {
-        // Simplified
-        console.log("[BeeBarState] saveHistory called")
+        var jsonStr = JSON.stringify(historyModel, null, 2)
+        
+        // Créer le dossier parent d'abord (via signal à BeeBar)
+        var dir = historyPath.substring(0, historyPath.lastIndexOf("/"))
+        historySaveNeeded(dir)
+        
+        // Sauvegarder le fichier avec XMLHttpRequest
+        var xhr = new XMLHttpRequest()
+        xhr.open("PUT", "file://" + historyPath)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 0 || xhr.status === 200) {
+                    console.log("[BeeBarState] History saved to", historyPath)
+                } else {
+                    console.warn("[BeeBarState] Failed to save history:", xhr.status)
+                }
+            }
+        }
+        xhr.send(jsonStr)
     }
 
     Component.onCompleted: loadHistory()
