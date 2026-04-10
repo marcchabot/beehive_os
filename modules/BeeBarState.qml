@@ -36,21 +36,19 @@ QtObject {
     // ─── Window Tracking ──────────────────────
     property string activeWindowClass: "none"
 
-    /*
     Process {
         id: windowProc
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
         running: true
-        stdout: StdioCollector {
-            onStreamFinished: function(text) {
-                root.activeWindowClass = text.trim()
+        stdout: SplitParser {
+            onRead: function(line) {
+                root.activeWindowClass = line.trim()
                 windowTimer.start()
             }
         }
     }
 
     Timer { id: windowTimer; interval: 2000; onTriggered: windowProc.running = true }
-    */
     signal notificationReceived(string title, string body, string icon)
 
     property var historyModel: []
@@ -58,12 +56,16 @@ QtObject {
     
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
-    /*
     Process {
         id: _saveProc
         running: false
+        stdout: SplitParser {
+            onRead: function(line) {
+                // Ignore output, just process completion
+                console.log("[BeeBarState] History saved")
+            }
+        }
     }
-    */
 
     function loadHistory() {
         var xhr = new XMLHttpRequest()
@@ -81,8 +83,10 @@ QtObject {
     }
 
     function saveHistory() {
-        // Temporarily disabled for debugging
-        console.log("[BeeBarState] saveHistory called but disabled")
+        var jsonStr = JSON.stringify(historyModel, null, 2)
+        _saveProc.running = false
+        _saveProc.command = ["bash", "-c", "mkdir -p $(dirname " + historyPath + ") && cat << 'BEEEOF' > " + historyPath + "\n" + jsonStr + "\nBEEEOF"]
+        _saveProc.running = true
     }
 
     Component.onCompleted: loadHistory()
