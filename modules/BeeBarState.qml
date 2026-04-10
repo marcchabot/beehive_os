@@ -5,8 +5,8 @@ import Quickshell
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════
-// BeeBarState.qml — Shared Stealth Mode state
-// v2.1 : Persistent History + OSD/Notify integration 🐝📜
+// BeeBarState.qml — Shared Stealth Mode state (MINIMAL TEST)
+// v2.1 : Minimal version to test Process API
 // ═══════════════════════════════════════════════════════════
 QtObject {
     id: root
@@ -32,10 +32,11 @@ QtObject {
     // BeePower menu visibility
     property bool powerVisible: false
 
-
     // ─── Window Tracking ──────────────────────
     property string activeWindowClass: "none"
 
+    // Test: Comment out EVERYTHING Process-related
+    /*
     Process {
         id: windowProc
         command: ["python3", "/home/node/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
@@ -46,9 +47,12 @@ QtObject {
                 windowTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     Timer { id: windowTimer; interval: 2000; onTriggered: windowProc.running = true }
+    */
+
     signal notificationReceived(string title, string body, string icon)
 
     property var historyModel: []
@@ -56,6 +60,8 @@ QtObject {
     
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
+    // Test: Comment out saveProc too
+    /*
     Process {
         id: _saveProc
         running: false
@@ -65,28 +71,18 @@ QtObject {
                 console.log("[BeeBarState] History saved")
             }
         }
+        stderr: SplitParser {}
     }
+    */
 
     function loadHistory() {
-        var xhr = new XMLHttpRequest()
-        xhr.open("GET", "file://" + historyPath)
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState !== XMLHttpRequest.DONE) return
-            if (xhr.status === 200 || xhr.status === 0) {
-                try {
-                    var data = JSON.parse(xhr.responseText)
-                    if (Array.isArray(data)) historyModel = data
-                } catch(e) {}
-            }
-        }
-        xhr.send()
+        // Simplified
+        historyModel = []
     }
 
     function saveHistory() {
-        var jsonStr = JSON.stringify(historyModel, null, 2)
-        _saveProc.running = false
-        _saveProc.command = ["bash", "-c", "mkdir -p $(dirname " + historyPath + ") && cat << 'BEEEOF' > " + historyPath + "\n" + jsonStr + "\nBEEEOF"]
-        _saveProc.running = true
+        // Simplified
+        console.log("[BeeBarState] saveHistory called")
     }
 
     Component.onCompleted: loadHistory()
