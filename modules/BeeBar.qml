@@ -129,6 +129,7 @@ Rectangle {
                 batteryTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     property Process diskProc: Process {
@@ -145,6 +146,7 @@ Rectangle {
                 diskTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     property Process netProc: Process {
@@ -157,6 +159,7 @@ Rectangle {
                 netTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     property Process cpuProc: Process {
@@ -173,6 +176,7 @@ Rectangle {
                 cpuTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     property Process ramProc: Process {
@@ -193,6 +197,7 @@ Rectangle {
                 ramTimer.start()
             }
         }
+        stderr: SplitParser {}
     }
 
     Timer { id: cpuTimer; interval: 3000; onTriggered: cpuProc.running = true }
