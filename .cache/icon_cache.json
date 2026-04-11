@@ -1,0 +1,16 @@
+{
+  "timestamp": 1775914466.390323,
+  "mappings": {
+    "kitty": "\ud83d\udc1a",
+    "firefox": "\ud83e\udd8a",
+    "code": "\ud83d\udcbb",
+    "zeditor": "\ud83d\udcdd",
+    "discord": "\ud83d\udcac",
+    "spotify": "\ud83c\udfa7",
+    "obs": "\ud83c\udfa5",
+    "zen": "/usr/share/pixmaps/zen.xpm",
+    "default": "\ud83d\udcc4",
+    "python3.11": "/usr/share/pixmaps/python3.11.xpm",
+    "display-im6.q16": "/usr/share/icons/hicolor/48x48/apps/display-im6.q16.png"
+  }
+}

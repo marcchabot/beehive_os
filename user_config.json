@@ -167,7 +167,7 @@
     "zen": "/usr/share/pixmaps/zen.xpm",
     "default": "\ud83d\udcc4",
     "python3.11": "/usr/share/pixmaps/python3.11.xpm",
-    "display-im6.q16": "display-im6.q16"
+    "display-im6.q16": "/usr/share/icons/hicolor/48x48/apps/display-im6.q16.png"
   },
   "vibe_mode": false,
   "corners_mode": true,
