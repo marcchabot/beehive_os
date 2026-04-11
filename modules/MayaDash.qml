@@ -584,10 +584,7 @@ Rectangle {
         z: 100
         
         layer.enabled: true
-        layer.effect: Effect {
-            property real blurRadius: 20
-            Blur { radius: blurRadius }
-        }
+        opacity: 0.95  // Simpler effect instead of blur
         
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
@@ -642,11 +639,11 @@ Rectangle {
             }
         }
         
-        // BeeNotes component
-        BeeNotes {
-            anchors.top: parent.top
-            anchors.topMargin: 60
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+        // BeeNotes component (temporarily disabled for debugging)
+        // BeeNotes {
+        //     anchors.top: parent.top
+        //     anchors.topMargin: 60
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        // }
     }
 }
