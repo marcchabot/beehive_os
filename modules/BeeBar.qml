@@ -125,9 +125,6 @@ Rectangle {
                 if (lines.length >= 2) {
                     beeBar.batteryPercent = parseInt(lines[0])
                     beeBar.batteryStatus = lines[1]
-                } else if (lines.length === 1 && lines[0] !== "") {
-                    // Si on ne reçoit qu'une ligne, on tente de voir si c'est la capacité
-                    beeBar.batteryPercent = parseInt(lines[0])
                 }
                 batteryTimer.start()
             }
