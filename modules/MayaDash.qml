@@ -589,16 +589,6 @@ Rectangle {
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
         
-        DropShadow {
-            anchors.fill: parent
-            horizontalOffset: 0
-            verticalOffset: 8
-            radius: 24
-            samples: 25
-            color: "#40000000"
-            source: parent
-        }
-        
         // Header
         Rectangle {
             width: parent.width
