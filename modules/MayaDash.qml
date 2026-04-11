@@ -579,12 +579,11 @@ Rectangle {
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
         border.width: 1
         visible: notesDialogVisible
-        opacity: notesDialogVisible ? 1 : 0
+        opacity: notesDialogVisible ? 0.95 : 0  // Combined opacity + blur replacement
         scale: notesDialogVisible ? 1 : 0.9
         z: 100
         
         layer.enabled: true
-        opacity: 0.95  // Simpler effect instead of blur
         
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
