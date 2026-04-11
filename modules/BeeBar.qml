@@ -263,8 +263,11 @@ Rectangle {
                 Text { 
                     text: {
                         var activeClass = BeeBarState.activeWindowClass || "";
+                        console.log("[BeeBar] Active window class:", activeClass);
                         var icons = BeeConfig.window_icons || {};
-                        return icons[activeClass] || icons["default"] || "🐝";
+                        var icon = icons[activeClass] || icons["default"] || "🐝";
+                        console.log("[BeeBar] Selected icon:", icon, "for class:", activeClass);
+                        return icon;
                     }
                     font.pixelSize: 18 
                 }
