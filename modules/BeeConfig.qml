@@ -393,7 +393,7 @@ QtObject {
             showRam = cfg.beebar_stats.ram !== false
             showNet = cfg.beebar_stats.net !== false
             showDisk = cfg.beebar_stats.disk !== false
-            showBattery = cfg.beebar_stats.battery === true
+            showBattery = cfg.beebar_stats.battery !== false
         }
 
         if (cfg.pinned_apps !== undefined && Array.isArray(cfg.pinned_apps))
