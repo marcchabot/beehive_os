@@ -1,0 +1,37 @@
+Item { Layout.fillWidth: true }
+                                
+                                // Delete button (only when a cell is selected and is customizable)
+                                Rectangle {
+                                    width: 100; height: 30; radius: 15
+                                    color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : Qt.rgba(0.5, 0.5, 0.5, 0.1)
+                                    border.color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? "#ff4444" : "#888888"
+                                    border.width: 1
+                                    opacity: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? 1 : 0.5
+                                    Text { 
+                                        text: "🗑️ Delete"; 
+                                        color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? "#ff4444" : "#888888"; 
+                                        font { pixelSize: 11; bold: true } 
+                                        anchors.centerIn: parent 
+                                    }
+                                    MouseArea { 
+                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        enabled: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable
+                                        onClicked: {
+                                            if (beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable) {
+                                                BeeConfig.cells.remove(beeStudio.selectedIndex)
+                                                beeStudio.selectedIndex = -1
+                                                BeeConfig.saveConfig()
+                                                BeeBarState.logAction("My Hive", "Alvéole supprimée", "🗑️")
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // Save button
+                                Rectangle {
+                                    width: 130; height: 30; radius: 15
+                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
+                                    Text { text: tr("save_button"); color: BeeTheme.accent; font { pixelSize: 11; bold: true } anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { BeeConfig.saveConfig(); beeStudio._saveDirty = false; BeeBarState.logAction("My Hive", "Alvéoles sauvegardées", "🍯") } }
+                                }
