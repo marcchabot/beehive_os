@@ -413,6 +413,9 @@ QtObject {
             }
         }
 
+        if (cfg.window_icons !== undefined)
+            window_icons = cfg.window_icons
+
         if (cfg.events_enabled !== undefined)
             eventsEnabled = cfg.events_enabled === true
         else if (cfg.bee_events !== undefined)
