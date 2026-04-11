@@ -252,9 +252,8 @@ Rectangle {
         id: _windowTrackerTimer
         interval: 2000  // Attendre 2 secondes entre les checks
         onTriggered: _windowTracker.running = true 
+        Component.onCompleted: start()  // Démarrer au début
     }
-
-    Component.onCompleted: _windowTrackerTimer.start()  // Démarrer au début
 
     property string currentTime: Qt.formatDateTime(new Date(), "hh:mm")
     property string currentDate: Qt.formatDateTime(new Date(), "ddd d MMM")
