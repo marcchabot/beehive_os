@@ -281,17 +281,47 @@ Rectangle {
             
             RowLayout {
                 spacing: 10
-                Text { 
-                    text: {
-                        var activeClass = BeeBarState.activeWindowClass || "";
-                        console.log("[BeeBar] Active window class:", activeClass);
-                        var icons = BeeConfig.window_icons || {};
-                        console.log("[BeeBar] Available icons:", JSON.stringify(icons));
-                        var icon = icons[activeClass] || icons["default"] || "🐝";
-                        console.log("[BeeBar] Selected icon:", icon, "for class:", activeClass);
-                        return icon;
+                
+                // Dynamic icon loader - handles both emojis and image paths
+                property string currentIcon: {
+                    var activeClass = BeeBarState.activeWindowClass || "";
+                    var icons = BeeConfig.window_icons || {};
+                    return icons[activeClass] || icons["default"] || "🐝";
+                }
+                
+                Loader {
+                    id: iconLoader
+                    sourceComponent: {
+                        // Check if currentIcon is an image path (ends with .png/.svg/.jpg etc)
+                        var icon = parent.currentIcon;
+                        if (icon && (icon.endsWith('.png') || icon.endsWith('.svg') || 
+                                     icon.endsWith('.jpg') || icon.endsWith('.jpeg') || 
+                                     icon.endsWith('.xpm'))) {
+                            return imageComponent;
+                        }
+                        // Otherwise it's an emoji or text
+                        return textComponent;
                     }
-                    font.pixelSize: 18 
+                    
+                    Component {
+                        id: imageComponent
+                        Image {
+                            source: parent.parent.currentIcon
+                            width: 18
+                            height: 18
+                            fillMode: Image.PreserveAspectFit
+                            sourceSize.width: 18
+                            sourceSize.height: 18
+                        }
+                    }
+                    
+                    Component {
+                        id: textComponent
+                        Text {
+                            text: parent.parent.currentIcon
+                            font.pixelSize: 18
+                        }
+                    }
                 }
                 Text {
                     text: BeeBarState.focusActive ? (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS' : (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
