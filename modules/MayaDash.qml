@@ -33,6 +33,19 @@ Rectangle {
     // ─── Signaux externes ─────────────────────────────────────
     signal openSettings()
     signal openStudio()
+    
+    // BeeNotes dialog
+    property bool notesDialogVisible: false
+    
+    function openNotesDialog() {
+        notesDialogVisible = true
+        BeeSound.playEvent("dash.open", {})
+    }
+    
+    function closeNotesDialog() {
+        notesDialogVisible = false
+        BeeSound.playEvent("dash.close", {})
+    }
 
     function resolveCellData(slot) {
         var _rev = BeeConfig.cellsRevision
@@ -72,6 +85,13 @@ Rectangle {
         if (action.startsWith("app:")) {
             var cmd = action.substring(4).trim()
             if (!cmd) return
+            
+            // Special case: app:notes opens BeeNotes dialog
+            if (cmd === "notes") {
+                openNotesDialog()
+                return
+            }
+            
             Qt.createQmlObject(
                 'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "' + cmd.replace(/"/g, '\\"') + ' & disown"] }',
                 mayaDash, "cellLaunch"
@@ -546,5 +566,87 @@ Rectangle {
         font { pixelSize: 10; letterSpacing: 1 }
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
+    }
+    
+    // ─── BeeNotes Dialog ──────────────────────────────────────
+    Rectangle {
+        id: notesDialog
+        width: 360
+        height: 480
+        anchors.centerIn: parent
+        radius: 16
+        color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.95)
+        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+        border.width: 1
+        visible: notesDialogVisible
+        opacity: notesDialogVisible ? 1 : 0
+        scale: notesDialogVisible ? 1 : 0.9
+        z: 100
+        
+        layer.enabled: true
+        layer.effect: Effect {
+            property real blurRadius: 20
+            Blur { radius: blurRadius }
+        }
+        
+        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+        
+        DropShadow {
+            anchors.fill: parent
+            horizontalOffset: 0
+            verticalOffset: 8
+            radius: 24
+            samples: 25
+            color: "#40000000"
+            source: parent
+        }
+        
+        // Header
+        Rectangle {
+            width: parent.width
+            height: 50
+            color: "transparent"
+            
+            Text {
+                text: "📝 Quick Notes"
+                font { bold: true; pixelSize: 18 }
+                color: BeeTheme.text
+                anchors.centerIn: parent
+            }
+            
+            // Close button
+            Rectangle {
+                width: 32
+                height: 32
+                radius: 16
+                color: Qt.rgba(1, 0.3, 0.3, 0.1)
+                border.color: "#ff4444"
+                border.width: 1
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: 16
+                
+                Text {
+                    text: "×"
+                    font { bold: true; pixelSize: 20 }
+                    color: "#ff4444"
+                    anchors.centerIn: parent
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: closeNotesDialog()
+                }
+            }
+        }
+        
+        // BeeNotes component
+        BeeNotes {
+            anchors.top: parent.top
+            anchors.topMargin: 60
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 }

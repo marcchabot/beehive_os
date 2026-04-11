@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1712798400000,
+    "text": "Welcome to Bee-Hive OS Quick Notes!",
+    "timestamp": "2026-04-10 22:40",
+    "color": "#FFC107"
+  },
+  {
+    "id": 1712798460000,
+    "text": "Type your notes here and they'll be saved automatically.",
+    "timestamp": "2026-04-10 22:41",
+    "color": "#4CAF50"
+  },
+  {
+    "id": 1712798520000,
+    "text": "Click on a note to edit it, hover to see the delete button.",
+    "timestamp": "2026-04-10 22:42",
+    "color": "#2196F3"
+  }
+]

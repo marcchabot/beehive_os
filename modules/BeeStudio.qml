@@ -19,7 +19,7 @@ Item {
     property bool embedded: false
 
     // ─── Catégorie active ────────────────────────────────────────
-    property int activeCategory: 0   // 0=Alvéoles 1=Fonds d'écran 2=Historique
+    property int activeCategory: 0   // 0=Dashboard 1=Alvéoles 2=Fonds d'écran 3=Historique
 
     // ─── Dossier fonds d'écran ───────────────────────────────────
     property string wallpaperFolder: "/home/marc/Pictures/Wallpapers"
@@ -384,6 +384,7 @@ Item {
                     // ── Catégories ────────────────────────────
                     ListModel {
                         id: categoryModel
+                        ListElement { catIcon: "📱"; catKey: "category_dashboard"; catSub: "dashboard_desc" }
                         ListElement { catIcon: "🍯"; catKey: "category_cells"; catSub: "cells_desc" }
                         ListElement { catIcon: "🖼";  catKey: "category_wallpapers"; catSub: "wallpapers_desc" }
                         ListElement { catIcon: "🔔"; catKey: "category_history"; catSub: "history_desc" }
@@ -809,7 +810,63 @@ Item {
                             RowLayout {
                                 anchors { fill: parent; leftMargin: 20; rightMargin: 16 }
                                 spacing: 10
+                                
+                                // Add new cell button
+                                Rectangle {
+                                    width: 100; height: 30; radius: 15
+                                    color: Qt.rgba(0.2, 0.7, 0.3, 0.15)
+                                    border.color: Qt.rgba(0.2, 0.7, 0.3, 0.40); border.width: 1
+                                    Text { text: "➕ Add"; color: "#4CAF50"; font { pixelSize: 11; bold: true } anchors.centerIn: parent }
+                                    MouseArea { 
+                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            // Add a new empty cell
+                                            BeeConfig.cells.append({
+                                                icon: "🐝",
+                                                title: "New Cell",
+                                                subtitle: "Click to edit",
+                                                detail: "",
+                                                action: "none",
+                                                highlighted: false,
+                                                customizable: true,
+                                                color: ""
+                                            })
+                                            BeeConfig.saveConfig()
+                                            BeeBarState.logAction("My Hive", "Nouvelle alvéole ajoutée", "➕")
+                                        }
+                                    }
+                                }
+                                
                                 Item { Layout.fillWidth: true }
+                                
+                                // Delete button (only when a cell is selected and is customizable)
+                                Rectangle {
+                                    width: 100; height: 30; radius: 15
+                                    color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : Qt.rgba(0.5, 0.5, 0.5, 0.1)
+                                    border.color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? "#ff4444" : "#888888"
+                                    border.width: 1
+                                    opacity: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? 1 : 0.5
+                                    Text { 
+                                        text: "🗑️ Delete"; 
+                                        color: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable ? "#ff4444" : "#888888"; 
+                                        font { pixelSize: 11; bold: true } 
+                                        anchors.centerIn: parent 
+                                    }
+                                    MouseArea { 
+                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        enabled: beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable
+                                        onClicked: {
+                                            if (beeStudio.selectedIndex >= 0 && beeStudio.editCustomizable) {
+                                                BeeConfig.cells.remove(beeStudio.selectedIndex)
+                                                beeStudio.selectedIndex = -1
+                                                BeeConfig.saveConfig()
+                                                BeeBarState.logAction("My Hive", "Alvéole supprimée", "🗑️")
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // Save button
                                 Rectangle {
                                     width: 130; height: 30; radius: 15
                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
