@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Effects
 import "."
 
 // ═══════════════════════════════════════════════════════════════
@@ -20,23 +21,12 @@ Rectangle {
     
     // Glassmorphism effect
     layer.enabled: true
-    layer.effect: Effect {
-        id: glassEffect
-        property real blurRadius: 12
-        property color blurColor: BeeTheme.surface
-        Blur { radius: glassEffect.blurRadius }
-        ColorOverlay { color: glassEffect.blurColor; opacity: 0.1 }
-    }
-    
-    // Drop shadow
-    DropShadow {
-        anchors.fill: parent
-        horizontalOffset: 0
-        verticalOffset: 4
-        radius: 16
-        samples: 17
-        color: "#20000000"
-        source: parent
+    layer.effect: MultiEffect {
+        blurEnabled: true
+        blur: 0.6
+        blurMax: 32
+        colorization: 0.1
+        colorizationColor: BeeTheme.surface
     }
     
     property var notesData: []
@@ -91,7 +81,7 @@ Rectangle {
                 "id": Date.now(),
                 "text": newNoteText.text,
                 "timestamp": new Date().toLocaleString(),
-                "color": BeeTheme.accent
+                "color": ""  // Will use BeeTheme.accent dynamically
             }
             
             notesModel.insert(0, newNote)
@@ -161,8 +151,8 @@ Rectangle {
             width: notesList.width
             height: noteContent.height + 32
             radius: 8
-            color: Qt.rgba(model.color.r, model.color.g, model.color.b, 0.1)
-            border.color: Qt.rgba(model.color.r, model.color.g, model.color.b, 0.3)
+            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
             border.width: 1
             
             // Hover effect
