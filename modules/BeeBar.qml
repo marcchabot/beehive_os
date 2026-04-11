@@ -235,8 +235,11 @@ Rectangle {
         running: false  // <-- Démarré par le timer
         stdout: SplitParser {
             onRead: (line) => {
-                BeeBarState.activeWindowClass = line.trim()
-                console.log("[BeeBar] Window class updated to:", line.trim())
+                var newClass = line.trim();
+                if (BeeBarState.activeWindowClass !== newClass) {
+                    BeeBarState.activeWindowClass = newClass;
+                    console.log("[BeeBar] Window class updated to:", newClass);
+                }
                 // Arrêter le processus, timer le redémarrera
                 _windowTracker.running = false
                 _windowTrackerTimer.start()
@@ -284,6 +287,7 @@ Rectangle {
                         var activeClass = BeeBarState.activeWindowClass || "";
                         console.log("[BeeBar] Active window class:", activeClass);
                         var icons = BeeConfig.window_icons || {};
+                        console.log("[BeeBar] Available icons:", JSON.stringify(icons));
                         var icon = icons[activeClass] || icons["default"] || "🐝";
                         console.log("[BeeBar] Selected icon:", icon, "for class:", activeClass);
                         return icon;
