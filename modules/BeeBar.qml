@@ -117,7 +117,7 @@ Rectangle {
 
     property Process batteryProc: Process {
         id: _batteryProc
-        command: ["bash", "-c", "battery_path=$(find /sys/class/power_supply/ -maxdepth 1 -name 'BAT*' | head -n 1); if [ -n \"$battery_path\" ]; then cat $battery_path/capacity; echo; cat $battery_path/status; fi"]
+        command: ["bash", "-c", "battery_path=$(find /sys/class/power_supply/ -maxdepth 1 -name 'BAT*' | head -n 1); if [ -n \"$battery_path\" ] && [ -r \"$battery_path/capacity\" ]; then cat $battery_path/capacity; echo; cat $battery_path/status; elif command -v acpi >/dev/null 2>&1; then acpi -b | awk -F'[,%]' '{print \$4; print \$3}' | sed 's/^ //'; else echo ''; fi"]
         running: BeeConfig.showBattery
         stdout: SplitParser {
             onRead: (line) => {
