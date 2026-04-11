@@ -232,11 +232,13 @@ Rectangle {
     property Process windowTracker: Process {
         id: _windowTracker
         command: ["python3", "/home/marc/beehive_os/scripts/get_active_window.py"]
-        running: true
+        running: false  // <-- Démarré par le timer
         stdout: SplitParser {
             onRead: (line) => {
                 BeeBarState.activeWindowClass = line.trim()
                 console.log("[BeeBar] Window class updated to:", line.trim())
+                // Arrêter le processus, timer le redémarrera
+                _windowTracker.running = false
                 _windowTrackerTimer.start()
             }
         }
@@ -245,9 +247,11 @@ Rectangle {
 
     Timer { 
         id: _windowTrackerTimer
-        interval: 2000
+        interval: 2000  // Attendre 2 secondes entre les checks
         onTriggered: _windowTracker.running = true 
     }
+
+    Component.onCompleted: _windowTrackerTimer.start()  // Démarrer au début
 
     property string currentTime: Qt.formatDateTime(new Date(), "hh:mm")
     property string currentDate: Qt.formatDateTime(new Date(), "ddd d MMM")
