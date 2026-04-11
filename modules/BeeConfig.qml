@@ -49,6 +49,9 @@ QtObject {
     property bool showDisk: true
     property bool showBattery: true
 
+    // ─── Window Icons Configuration ──────────────────────────
+    property var window_icons: ({})
+
     // ─── BeeSound: Mode Nuit ─────────────────────────────────
     property bool soundNightMode: true
     property int soundNightStartHour: 22
