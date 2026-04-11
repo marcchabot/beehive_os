@@ -109,13 +109,6 @@
       "color": "null = couleur du th\u00e8me actif | '#HEX' = couleur personnalis\u00e9e"
     }
   },
-  "beebar_stats": {
-    "cpu": true,
-    "ram": true,
-    "net": true,
-    "disk": true,
-    "battery": true
-  },
   "nectar_sync": true,
   "stealth_mode": false,
   "sound": {
