@@ -121,14 +121,10 @@ Rectangle {
         running: BeeConfig.showBattery
         stdout: SplitParser {
             onRead: (line) => {
-                console.log("[BeeBar] Battery raw output:", line)
                 var parts = line.trim().split(" ")
                 if (parts.length >= 2 && parts[0] !== "") {
                     beeBar.batteryPercent = parseInt(parts[0])
                     beeBar.batteryStatus = parts.slice(1).join(" ")
-                    console.log("[BeeBar] Battery updated:", beeBar.batteryPercent + "%", beeBar.batteryStatus)
-                } else {
-                    console.log("[BeeBar] Battery insufficient data:", parts)
                 }
                 batteryTimer.start()
             }
