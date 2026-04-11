@@ -255,14 +255,75 @@ python3 scripts/bee_theme_auto.py --wallpaper /absolute/path/to/wallpaper.png --
 - Ensure wallpaper path is valid and readable.
 - If generation fails, check Quickshell logs for `BeeThemeAuto:` lines and retry with the BeeStudio action button.
 
-## 🛠️ Installation
+## 🛠️ Installation & Update System
 
-For an automatic installation on CachyOS:
+### 🚀 First-Time Installation
+
+For a complete installation on CachyOS + Hyprland:
 
 ```bash
-cd ~/beehive_os
+# Clone the repository
+git clone https://github.com/marcchabot/beehive_os.git
+cd beehive_os
+
+# Run the installation script
 chmod +x scripts/install_beehive_os.sh
 ./scripts/install_beehive_os.sh
+```
+
+### 🔄 Safe Update Procedure
+
+**⚠️ IMPORTANT:** Always follow this procedure after `git pull` to avoid system breakage:
+
+```bash
+# 1. Backup and update
+./scripts/update.sh
+
+# 2. Run health check
+./scripts/health-check.sh
+
+# 3. If health check passes, restart
+QML_XHR_ALLOW_FILE_READ=1 quickshell -p ~/beehive_os
+```
+
+### 📋 Available Maintenance Scripts
+
+| Script | Purpose | When to use |
+|--------|---------|-------------|
+| `install_beehive_os.sh` | Complete first-time installation | New installation |
+| `update.sh` | Safe post-update maintenance | After every `git pull` |
+| `health-check.sh` | System diagnostic | When things don't work |
+| `post-update.sh` | Automatic migrations | Internal use by update.sh |
+| `update_icons.py` | Desktop icon automation | Manual icon updates |
+
+### 🏥 Health Check
+
+Run a comprehensive system diagnostic:
+```bash
+./scripts/health-check.sh
+```
+
+This will check:
+- ✅ System dependencies
+- ✅ File structure
+- ✅ Permissions
+- ✅ Configuration validity
+- ✅ Runtime functionality
+
+### 🚨 Emergency Recovery
+
+If Bee-Hive OS breaks after an update:
+```bash
+# 1. Check system health
+./scripts/health-check.sh
+
+# 2. Review warnings/failures
+
+# 3. Restore from backup (created by update.sh)
+cp ~/.beehive_backup/latest/user_config.json .
+
+# 4. Re-run update
+./scripts/update.sh
 ```
 
 ---
