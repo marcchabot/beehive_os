@@ -164,7 +164,7 @@
     "discord": "\ud83d\udcac",
     "spotify": "\ud83c\udfa7",
     "obs": "\ud83c\udfa5",
-    "zen": "\ud83e\uddd8",
+    "zen": "/usr/share/pixmaps/zen.xpm",
     "default": "\ud83d\udcc4",
     "python3.11": "/usr/share/pixmaps/python3.11.xpm",
     "display-im6.q16": "display-im6.q16"
