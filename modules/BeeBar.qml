@@ -228,6 +228,21 @@ Rectangle {
         }
     }
 
+    // ─── Window Tracker (moved from BeeBarState singleton) ──────────
+    property Process windowTracker: Process {
+        id: _windowTracker
+        command: ["python3", "/home/marc/beehive_os/scripts/get_active_window.py"]
+        running: true
+        stdout: SplitParser {
+            onRead: (line) => {
+                BeeBarState.activeWindowClass = line.trim()
+                console.log("[BeeBar] Window class updated to:", line.trim())
+                _windowTrackerTimer.start()
+            }
+        }
+        stderr: SplitParser {}
+    }
+
     Timer { 
         id: _windowTrackerTimer
         interval: 2000
