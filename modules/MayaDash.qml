@@ -591,10 +591,9 @@ Rectangle {
         // Event shield: stop all clicks from leaking through the dialog
         MouseArea {
             anchors.fill: parent
-            propagateComposedEvents: true
+            propagateComposedEvents: false
             onPressed: (mouse) => {
-                // This captures the event and prevents it from passing to the dashboard
-                // but lets it bubble up to children if they handle it.
+                mouse.accepted = true
             }
         }
         
