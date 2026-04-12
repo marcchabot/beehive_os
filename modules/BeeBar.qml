@@ -301,34 +301,22 @@ Rectangle {
                     Layout.alignment: Qt.AlignVCenter
 
                     Image {
-                        id: iconImage
                         anchors.fill: parent
                         source: parent.parent.currentIcon
                         fillMode: Image.PreserveAspectFit
                         sourceSize.width: 18
                         sourceSize.height: 18
-                        
-                        // Simpler visibility: if it's a path, try to show it
                         visible: parent.parent.currentIcon.indexOf('.') !== -1
-                        
-                        onStatusChanged: {
-                            if (status === Image.Error) {
-                                console.warn("[BeeBar] Icon load failed for path:", source);
-                                iconImage.visible = false;
-                            }
-                        }
                         Behavior on source { NumberAnimation { duration: 200 } }
                     }
                     
                     Text {
-                        id: iconText
                         anchors.fill: parent
                         text: parent.parent.currentIcon
                         font.pixelSize: 18
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        // Show if the image is not visible (either it's an emoji or the image failed to load)
-                        visible: !iconImage.visible
+                        visible: parent.parent.currentIcon.indexOf('.') === -1
                         Behavior on text { NumberAnimation { duration: 200 } }
                     }
                 }
