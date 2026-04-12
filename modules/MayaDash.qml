@@ -587,6 +587,16 @@ Rectangle {
         
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
+
+        // Event shield: stop all clicks from leaking through the dialog
+        MouseArea {
+            anchors.fill: parent
+            propagateComposedEvents: true
+            onPressed: (mouse) => {
+                // This captures the event and prevents it from passing to the dashboard
+                // but lets it bubble up to children if they handle it.
+            }
+        }
         
         // Header
         Rectangle {
