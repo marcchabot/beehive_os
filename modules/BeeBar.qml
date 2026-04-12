@@ -232,28 +232,28 @@ Rectangle {
     property Process windowTracker: Process {
         id: _windowTracker
         command: ["python3", Qt.resolvedUrl("../scripts/get_active_window.py").toString().replace("file://", "")]
-        running: false  // <-- Démarré par le timer
+        running: true  // Now running permanently
         stdout: SplitParser {
             onRead: (line) => {
                 var newClass = line.trim();
-                if (BeeBarState.activeWindowClass !== newClass) {
+                if (newClass && BeeBarState.activeWindowClass !== newClass) {
                     BeeBarState.activeWindowClass = newClass;
                     console.log("[BeeBar] Window class updated to:", newClass);
                 }
-                // Arrêter le processus, timer le redémarrera
-                _windowTracker.running = false
-                _windowTrackerTimer.start()
             }
         }
         stderr: SplitParser {}
     }
 
+    // Timer removed as tracker is now a permanent loop
+    /*
     Timer { 
         id: _windowTrackerTimer
-        interval: 2000  // Attendre 2 secondes entre les checks
+        interval: 2000 
         onTriggered: _windowTracker.running = true 
-        Component.onCompleted: start()  // Démarrer au début
+        Component.onCompleted: start() 
     }
+    */
 
     property string currentTime: Qt.formatDateTime(new Date(), "hh:mm")
     property string currentDate: Qt.formatDateTime(new Date(), "ddd d MMM")
@@ -285,7 +285,7 @@ Rectangle {
                 // Dynamic icon loader - handles both emojis and image paths
                 property string currentIcon: {
                     var activeClass = BeeBarState.activeWindowClass || "";
-                    if (activeClass === "none" || activeClass === "") {
+                    if (activeClass === "none" || activeClass === "" || activeClass === "unknown") {
                         return "🐝";
                     }
                     var icons = BeeConfig.window_icons || {};

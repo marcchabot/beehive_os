@@ -90,6 +90,7 @@ Item {
                         var name = parent.parent.parent.label || parent.parent.parent.src.split("/").pop()
                         BeeBarState.logAction("Design", "Wallpaper : " + name, "🖼")
                         BeeConfig.applyAutoThemeFromWallpaper(parent.parent.parent.src, false)
+                        BeeConfig.saveConfig() // Force persistence on disk
                     }
                 }
                 Rectangle {

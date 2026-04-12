@@ -614,6 +614,11 @@ QtObject {
         cfg.events_enabled = eventsEnabled
         cfg.events_live_path = eventsLivePath
         
+        // PERSISTENCE FIX: Save window icons and wallpaper
+        cfg.window_icons = window_icons
+        if (!cfg.wallpaper) cfg.wallpaper = ""
+        cfg.wallpaper = BeeTheme.wallpaperOverride !== "" ? BeeTheme.wallpaperOverride : BeeTheme.wallpaper
+        
         // Save calendars array
         var calArray = []
         for (var k = 0; k < _calendars.count; k++) {
