@@ -295,14 +295,12 @@ Rectangle {
                 Loader {
                     id: iconLoader
                     sourceComponent: {
-                        // Check if currentIcon is an image path (ends with .png/.svg/.jpg etc)
                         var icon = parent.currentIcon;
                         if (icon && (icon.endsWith('.png') || icon.endsWith('.svg') || 
                                      icon.endsWith('.jpg') || icon.endsWith('.jpeg') || 
                                      icon.endsWith('.xpm'))) {
                             return imageComponent;
                         }
-                        // Otherwise it's an emoji or text
                         return textComponent;
                     }
                     
@@ -315,6 +313,10 @@ Rectangle {
                             fillMode: Image.PreserveAspectFit
                             sourceSize.width: 18
                             sourceSize.height: 18
+                            
+                            Behavior on source {
+                                NumberAnimation { duration: 200 }
+                            }
                         }
                     }
                     
@@ -323,6 +325,10 @@ Rectangle {
                         Text {
                             text: parent.parent.currentIcon
                             font.pixelSize: 18
+                            
+                            Behavior on text {
+                                NumberAnimation { duration: 200 }
+                            }
                         }
                     }
                 }
