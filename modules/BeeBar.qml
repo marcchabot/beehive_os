@@ -301,32 +301,34 @@ Rectangle {
                     Layout.alignment: Qt.AlignVCenter
 
                     Image {
+                        id: iconImage
                         anchors.fill: parent
                         source: parent.parent.currentIcon
                         fillMode: Image.PreserveAspectFit
                         sourceSize.width: 18
                         sourceSize.height: 18
-                        visible: parent.parent.currentIcon.includes('.') && 
-                                 (parent.parent.currentIcon.endsWith('.png') || 
-                                  parent.parent.currentIcon.endsWith('.svg') || 
-                                  parent.parent.currentIcon.endsWith('.jpg') || 
-                                  parent.parent.currentIcon.endsWith('.jpeg') || 
-                                  parent.parent.currentIcon.endsWith('.xpm'))
+                        
+                        // Simpler visibility: if it's a path, try to show it
+                        visible: parent.parent.currentIcon.indexOf('.') !== -1
+                        
+                        onStatusChanged: {
+                            if (status === Image.Error) {
+                                console.warn("[BeeBar] Icon load failed for path:", source);
+                                iconImage.visible = false;
+                            }
+                        }
                         Behavior on source { NumberAnimation { duration: 200 } }
                     }
                     
                     Text {
+                        id: iconText
                         anchors.fill: parent
                         text: parent.parent.currentIcon
                         font.pixelSize: 18
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        visible: !parent.parent.currentIcon.includes('.') || 
-                                 !(parent.parent.currentIcon.endsWith('.png') || 
-                                   parent.parent.currentIcon.endsWith('.svg') || 
-                                   parent.parent.currentIcon.endsWith('.jpg') || 
-                                   parent.parent.currentIcon.endsWith('.jpeg') || 
-                                   parent.parent.currentIcon.endsWith('.xpm'))
+                        // Show if the image is not visible (either it's an emoji or the image failed to load)
+                        visible: !iconImage.visible
                         Behavior on text { NumberAnimation { duration: 200 } }
                     }
                 }
