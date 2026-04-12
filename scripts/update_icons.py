@@ -146,7 +146,8 @@ def find_icon_path(icon_name):
             if os.path.exists(path):
                 return path
     
-    return icon_name  # Return the name as fallback
+    return ""  # Return empty string if no real file was found instead of the name
+
 
 def scan_desktop_files():
     """
