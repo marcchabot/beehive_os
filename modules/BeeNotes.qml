@@ -285,6 +285,7 @@ Rectangle {
                 placeholderText: "Type your note here..."
                 font.pixelSize: 13
                 color: BeeTheme.textPrimary
+                focus: true
                 background: Rectangle {
                     radius: 6
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.7)
