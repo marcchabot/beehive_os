@@ -583,7 +583,7 @@ Rectangle {
         scale: notesDialogVisible ? 1 : 0.9
         z: 100
         
-        layer.enabled: true
+        // layer.enabled: true // Disabled to prevent click-through issues
         
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
@@ -633,6 +633,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.topMargin: 60
             anchors.horizontalCenter: parent.horizontalCenter
+            z: 101 // Ensure notes are above the dialog background
         }
     }
 }
