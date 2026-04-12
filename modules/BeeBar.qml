@@ -289,7 +289,13 @@ Rectangle {
                         return "🐝";
                     }
                     var icons = BeeConfig.window_icons || {};
-                    return icons[activeClass] || icons["default"] || "🐝";
+                    var icon = icons[activeClass] || icons["default"] || "🐝";
+                    
+                    // Ensure absolute paths are formatted as URLs for Qt Image
+                    if (icon.startsWith("/") && !icon.startsWith("file://")) {
+                        return "file://" + icon;
+                    }
+                    return icon;
                 }
                 
                 // Unified icon container - no Loader, just direct visibility
