@@ -5,7 +5,7 @@
   "_comment": "Bee-Hive OS \u2014 Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
   "transitions": {
     "theme_duration_ms": 600,
-    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs recommand\u00e9es : 300 (rapide) \u00e0 1200 (cin\u00e9matique)."
+    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs\u00e9cu\u00e9es : 300 (rapide) \u00e0 1200 (cin\u00e9matique)."
   },
   "weather": {
     "city": "Blainville",
@@ -27,11 +27,11 @@
         "color": ""
       },
       {
-        "icon": "\ud83d\udc8a",
-        "title": "Pharmacie",
-        "subtitle": "Alertes & Commandes",
-        "detail": "3 alertes actives\n1 commande en attente",
-        "action": "url:https://oap.oacp.ca",
+        "icon": "\ud83d\udcbe",
+        "title": "BeeNotes",
+        "subtitle": "Notes Rapides",
+        "detail": "Saisie rapide\nd'id\u00e9es 🐝",
+        "action": "app:notes",
         "highlighted": true,
         "customizable": true,
         "color": ""
@@ -100,8 +100,8 @@
     "_cell_schema": {
       "_comment": "Sch\u00e9ma de r\u00e9f\u00e9rence pour une alv\u00e9ole \u2014 copiez-collez pour ajouter les v\u00f4tres.",
       "icon": "Emoji ou chemin vers une image (ex: '\ud83d\udc1d' ou 'assets/myicon.png')",
-      "title": "Nom principal affich\u00e9 (max ~18 chars recommand\u00e9)",
-      "subtitle": "Sous-titre (cat\u00e9gorie, statut, etc.)",
+      "title": "Nom principal aff\u00e9 (max ~18 chars recommand\u00e9)",
+      "subtitle": "Sous-titre (\u00e9t\u00e1t, cat\u00e9gorie, etc.)",
       "detail": "Texte secondaire, multi-ligne avec \\n",
       "action": "Valeurs: 'none' | 'app:<cmd>' | 'toggle:settings' | 'url:<https://...>'",
       "highlighted": "true = bordure et titre dor\u00e9s (accentu\u00e9s)",
@@ -154,7 +154,7 @@
     "author": "Maya & Marc Chabot",
     "license": "MIT",
     "repo": "github.com/marcchabot/beehive_os",
-    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9t\u00e9o ou les transitions."
+    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9t\u00e1o ou les transitions."
   },
   "window_icons": {
     "kitty": "\ud83d\udc1a",
@@ -167,7 +167,7 @@
     "zen": "/usr/share/pixmaps/zen.xpm",
     "default": "\ud83d\udcc4",
     "python3.11": "/usr/share/pixmaps/python3.11.xpm",
-    "display-im6.q16": "/usr/share/icons/hicolor/48x48/apps/display-im6.q16.png"
+    "display.im6.q16": "/usr/share/icons/hicolor/48x48/apps/display-im6.q16.png"
   },
   "vibe_mode": false,
   "corners_mode": true,
