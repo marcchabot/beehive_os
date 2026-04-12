@@ -24,7 +24,9 @@ Rectangle {
     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
     border.width: 1
 
-    // Glassmorphism effect
+    // Glassmorphism effect removed to avoid stacking with MayaDash blur
+    // and to prevent interaction blocking.
+    /*
     layer.enabled: true
     layer.effect: MultiEffect {
         blurEnabled: true
@@ -33,6 +35,7 @@ Rectangle {
         colorization: 0.1
         colorizationColor: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 1.0)
     }
+    */
 
     // ─── Data ─────────────────────────────────────────────────
     property var notesData: []
