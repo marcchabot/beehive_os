@@ -231,7 +231,7 @@ Rectangle {
     // ─── Window Tracker (moved from BeeBarState singleton) ──────────
     property Process windowTracker: Process {
         id: _windowTracker
-        command: ["python3", "/home/marc/beehive_os/scripts/get_active_window.py"]
+        command: ["python3", Qt.resolvedUrl("../scripts/get_active_window.py").toString().replace("file://", "")]
         running: false  // <-- Démarré par le timer
         stdout: SplitParser {
             onRead: (line) => {

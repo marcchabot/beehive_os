@@ -1167,7 +1167,7 @@ Item {
                                                     anchors.fill: parent; anchors.margins: -6; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
                                                     onEntered: delBtn.color = Qt.rgba(1.0, 0.4, 0.4, 0.8)
                                                     onExited:  delBtn.color = Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.25)
-                                                    onClicked: BeeBarState.removeNotification(index)
+                                                    onClicked: BeeBarState.removeHistoryEntry(index)
                                                 }
                                             }
                                         }
@@ -1192,7 +1192,7 @@ Item {
                                     color: Qt.rgba(1.0, 0.3, 0.3, 0.12)
                                     border.color: Qt.rgba(1.0, 0.3, 0.3, 0.40); border.width: 1
                                     Text { id: clearHistLbl; anchors.centerIn: parent; text: tr("clear_history_button"); color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font { pixelSize: 11; bold: true } }
-                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.clearNotificationHistory() }
+                                    MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.clearHistory() }
                                 }
                             }
                         }
