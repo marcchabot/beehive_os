@@ -292,12 +292,14 @@ Rectangle {
                     return icons[activeClass] || icons["default"] || "🐝";
                 }
                 
+                // Unified icon container - no Loader, just direct visibility
                 Item {
-                    width: 18
-                    height: 18
+                    width: 20
+                    height: 20
+                    Layout.preferredWidth: 20
+                    Layout.preferredHeight: 20
                     Layout.alignment: Qt.AlignVCenter
 
-                    // Image version
                     Image {
                         anchors.fill: parent
                         source: parent.parent.currentIcon
@@ -310,11 +312,9 @@ Rectangle {
                                   parent.parent.currentIcon.endsWith('.jpg') || 
                                   parent.parent.currentIcon.endsWith('.jpeg') || 
                                   parent.parent.currentIcon.endsWith('.xpm'))
-                        
                         Behavior on source { NumberAnimation { duration: 200 } }
                     }
                     
-                    // Text/Emoji version
                     Text {
                         anchors.fill: parent
                         text: parent.parent.currentIcon
@@ -327,7 +327,6 @@ Rectangle {
                                    parent.parent.currentIcon.endsWith('.jpg') || 
                                    parent.parent.currentIcon.endsWith('.jpeg') || 
                                    parent.parent.currentIcon.endsWith('.xpm'))
-                        
                         Behavior on text { NumberAnimation { duration: 200 } }
                     }
                 }
