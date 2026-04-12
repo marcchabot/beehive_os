@@ -292,48 +292,43 @@ Rectangle {
                     return icons[activeClass] || icons["default"] || "🐝";
                 }
                 
-                Loader {
-                    id: iconLoader
-                    // Force reload whenever the active window class changes
-                    property var trigger: BeeBarState.activeWindowClass
-                    
-                    sourceComponent: {
-                        var icon = parent.currentIcon;
-                        if (icon && (icon.endsWith('.png') || icon.endsWith('.svg') || 
-                                     icon.endsWith('.jpg') || icon.endsWith('.jpeg') || 
-                                     icon.endsWith('.xpm'))) {
-                            return imageComponent;
-                        }
-                        return textComponent;
+                Item {
+                    width: 18
+                    height: 18
+                    Layout.alignment: Qt.AlignVCenter
+
+                    // Image version
+                    Image {
+                        anchors.fill: parent
+                        source: parent.parent.currentIcon
+                        fillMode: Image.PreserveAspectFit
+                        sourceSize.width: 18
+                        sourceSize.height: 18
+                        visible: parent.parent.currentIcon.includes('.') && 
+                                 (parent.parent.currentIcon.endsWith('.png') || 
+                                  parent.parent.currentIcon.endsWith('.svg') || 
+                                  parent.parent.currentIcon.endsWith('.jpg') || 
+                                  parent.parent.currentIcon.endsWith('.jpeg') || 
+                                  parent.parent.currentIcon.endsWith('.xpm'))
+                        
+                        Behavior on source { NumberAnimation { duration: 200 } }
                     }
                     
-                    Component {
-                        id: imageComponent
-                        Image {
-                            // Use the currentIcon property directly to ensure binding
-                            source: parent.parent.currentIcon
-                            width: 18
-                            height: 18
-                            fillMode: Image.PreserveAspectFit
-                            sourceSize.width: 18
-                            sourceSize.height: 18
-                            
-                            Behavior on source {
-                                NumberAnimation { duration: 200 }
-                            }
-                        }
-                    }
-                    
-                    Component {
-                        id: textComponent
-                        Text {
-                            text: parent.parent.currentIcon
-                            font.pixelSize: 18
-                            
-                            Behavior on text {
-                                NumberAnimation { duration: 200 }
-                            }
-                        }
+                    // Text/Emoji version
+                    Text {
+                        anchors.fill: parent
+                        text: parent.parent.currentIcon
+                        font.pixelSize: 18
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        visible: !parent.parent.currentIcon.includes('.') || 
+                                 !(parent.parent.currentIcon.endsWith('.png') || 
+                                   parent.parent.currentIcon.endsWith('.svg') || 
+                                   parent.parent.currentIcon.endsWith('.jpg') || 
+                                   parent.parent.currentIcon.endsWith('.jpeg') || 
+                                   parent.parent.currentIcon.endsWith('.xpm'))
+                        
+                        Behavior on text { NumberAnimation { duration: 200 } }
                     }
                 }
                 Text {
