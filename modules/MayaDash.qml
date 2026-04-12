@@ -628,10 +628,11 @@ Rectangle {
             }
         }
         
-        BeeNotes {
-            anchors.top: parent.top
-            anchors.topMargin: 60
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+        // BeeNotes component (temporarily disabled - requires major rewrite)
+        // BeeNotes {
+        //     anchors.top: parent.top
+        //     anchors.topMargin: 60
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        // }
     }
 }
