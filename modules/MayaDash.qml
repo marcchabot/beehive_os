@@ -575,7 +575,7 @@ Rectangle {
         height: 480
         anchors.centerIn: parent
         radius: 16
-        color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.95)
+        color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
         border.width: 1
         visible: notesDialogVisible
@@ -597,7 +597,7 @@ Rectangle {
             Text {
                 text: "📝 Quick Notes"
                 font { bold: true; pixelSize: 18 }
-                color: BeeTheme.text
+                color: BeeTheme.textPrimary
                 anchors.centerIn: parent
             }
             
@@ -628,11 +628,11 @@ Rectangle {
             }
         }
         
-        // BeeNotes component (temporarily disabled - requires major rewrite)
-        // BeeNotes {
-        //     anchors.top: parent.top
-        //     anchors.topMargin: 60
-        //     anchors.horizontalCenter: parent.horizontalCenter
-        // }
+        // BeeNotes component (v2.0 — rewritten with correct BeeTheme API)
+        BeeNotes {
+            anchors.top: parent.top
+            anchors.topMargin: 60
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 }
