@@ -26,10 +26,23 @@ Rectangle {
         blur: 0.6
         blurMax: 32
         colorization: 0.1
-        colorizationColor: BeeTheme.surface
+        colorizationColor: safeColor(BeeTheme.surface, 1.0)
     }
     
-    property var notesData: []
+    // Helper function to safely get color components
+    function safeColor(colorObj, alpha) {
+        if (!colorObj) return Qt.rgba(1, 0.72, 0.11, alpha || 1.0); // Fallback gold
+        if (typeof colorObj === 'string') {
+            // Parse hex color
+            var hex = colorObj.replace('#', '');
+            var r = parseInt(hex.substring(0, 2), 16) / 255;
+            var g = parseInt(hex.substring(2, 4), 16) / 255;
+            var b = parseInt(hex.substring(4, 6), 16) / 255;
+            return Qt.rgba(r, g, b, alpha || 1.0);
+        }
+        // Assume it's a QML color object
+        return Qt.rgba(colorObj.r || 1, colorObj.g || 0.72, colorObj.b || 0.11, alpha || 1.0);
+    }
     property string notesFile: "file://" + Qt.resolvedUrl("../data/quick_notes.json")
     
     Component.onCompleted: {
