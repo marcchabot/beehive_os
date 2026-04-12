@@ -284,7 +284,7 @@ Rectangle {
                 
                 // Dynamic icon loader - handles both emojis and image paths
                 property string currentIcon: {
-                    var activeClass = BeeBarState.activeWindowClass || "";
+                    var activeClass = (BeeBarState.activeWindowClass || "").trim();
                     if (activeClass === "none" || activeClass === "" || activeClass === "unknown") {
                         return "🐝";
                     }
@@ -294,6 +294,9 @@ Rectangle {
                 
                 Loader {
                     id: iconLoader
+                    // Force reload whenever the active window class changes
+                    property var trigger: BeeBarState.activeWindowClass
+                    
                     sourceComponent: {
                         var icon = parent.currentIcon;
                         if (icon && (icon.endsWith('.png') || icon.endsWith('.svg') || 
@@ -307,6 +310,7 @@ Rectangle {
                     Component {
                         id: imageComponent
                         Image {
+                            // Use the currentIcon property directly to ensure binding
                             source: parent.parent.currentIcon
                             width: 18
                             height: 18
