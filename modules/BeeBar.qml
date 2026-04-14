@@ -106,8 +106,21 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        command: ["python3", "/home/marc/beehive_os/scripts/update_icons.py"]
-        running: true // Run once on load
+        // Using bash -c to ensure environment and paths are handled correctly
+        command: ["bash", "-c", "python3 ~/beehive_os/scripts/update_icons.py"]
+        running: false // Triggered by bootTimer
+        stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
+        stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
+    }
+
+    Timer {
+        id: bootTimer
+        interval: 2000 // Wait 2s for system stability before scanning
+        running: true
+        onTriggered: {
+            console.log("[BeeBar] Triggering automatic icon scan...");
+            _bootScanProc.running = true;
+        }
     }
 
     // ─── System properties ─────────────────────────────────
