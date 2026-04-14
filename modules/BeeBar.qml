@@ -293,10 +293,13 @@ Rectangle {
                 property string currentIcon: {
                     var activeClass = BeeBarState.activeWindowClass || "";
                     var icons = BeeConfig.window_icons || {};
-                    var icon = icons[activeClass] || icons["default"];
+                    var icon = icons[activeClass] || icons["default"] || "";
                     
-                    // Fallback to Bee if it's still empty or looks like a broken path
-                    if (!icon || icon === "page blanche") return "🐝";
+                    // If icon is empty or doesn't start with '/' (not a system path), 
+                    // and it's not a known emoji, fallback to Bee.
+                    if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
+                    if (typeof icon === 'string' && !icon.startsWith("/") && icon.length < 3 && icon !== "🐝") return "🐝";
+                    
                     return icon;
                 }
                 
