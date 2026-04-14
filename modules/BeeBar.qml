@@ -106,11 +106,11 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        // Use absolute path and pipe to log file for debugging boot failures
-        command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py > /home/marc/beehive_os/boot_scan.log 2>&1"]
-        running: false // Triggered by bootTimer
-        stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
-        stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
+        // Run via bash to ensure environment. Logs are now handled internally by the script.
+        command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py"]
+        running: false
+        stdout: SplitParser {}
+        stderr: SplitParser {}
     }
 
     Timer {
