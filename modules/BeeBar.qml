@@ -106,11 +106,14 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        // Run via bash to ensure environment. Logs are now handled internally by the script.
         command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py"]
         running: false
-        stdout: SplitParser {}
-        stderr: SplitParser {}
+        stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
+        stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
+        onExited: {
+            console.log("[BeeBar] Icon scan finished. Refreshing config...");
+            BeeConfig.reload(); // Force reload of user_config.json
+        }
     }
 
     Timer {
