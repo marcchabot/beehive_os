@@ -103,6 +103,13 @@ Rectangle {
         shadowVerticalOffset: 3
     }
 
+    // ─── Autostart Scripts ─────────────────────────────────
+    property Process bootScanProc: Process {
+        id: _bootScanProc
+        command: ["python3", "/home/marc/beehive_os/scripts/update_icons.py"]
+        running: true // Run once on load
+    }
+
     // ─── System properties ─────────────────────────────────
     property string cpuUsage: "—"
     property string ramUsed: "—"
@@ -286,7 +293,11 @@ Rectangle {
                 property string currentIcon: {
                     var activeClass = BeeBarState.activeWindowClass || "";
                     var icons = BeeConfig.window_icons || {};
-                    return icons[activeClass] || icons["default"] || "🐝";
+                    var icon = icons[activeClass] || icons["default"];
+                    
+                    // Fallback to Bee if it's still empty or looks like a broken path
+                    if (!icon || icon === "page blanche") return "🐝";
+                    return icon;
                 }
                 
                 Loader {
