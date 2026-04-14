@@ -267,11 +267,7 @@ def update_user_config(desktop_entries, dry_run=False):
         for window_class, entry in desktop_entries.items():
             icon_path = entry["icon"]
             
-            # Skip if it's an emoji or custom mapping (starts with :)
-            if window_class in existing_mappings and existing_mappings[window_class].startswith(":"):
-                continue
-            
-            # Add or update mapping
+            # Add or update mapping (Allow overriding emojis with system paths)
             if window_class not in existing_mappings:
                 if not dry_run:
                     config["window_icons"][window_class] = icon_path
