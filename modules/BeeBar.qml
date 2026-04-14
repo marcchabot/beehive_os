@@ -294,13 +294,13 @@ Rectangle {
                     var activeClass = BeeBarState.activeWindowClass || "";
                     var icons = BeeConfig.window_icons || {};
                     
-                    // 1. If no window is focused, use the bee
-                    if (!activeClass) return "🐝";
+                    // If no window is focused, or it's explicitly 'unknown', use the bee
+                    if (!activeClass || activeClass.toLowerCase() === "unknown") return "🐝";
                     
-                    // 2. Get the icon for the current class, or the default icon
+                    // Get the icon for the current class, or the default icon
                     var icon = icons[activeClass] || icons["default"];
                     
-                    // 3. If the result is empty or whitespace, use the bee
+                    // If the result is empty or whitespace, use the bee
                     if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
                     
                     return icon;
