@@ -293,12 +293,15 @@ Rectangle {
                 property string currentIcon: {
                     var activeClass = BeeBarState.activeWindowClass || "";
                     var icons = BeeConfig.window_icons || {};
-                    var icon = icons[activeClass] || icons["default"] || "";
                     
-                    // If icon is empty or doesn't start with '/' (not a system path), 
-                    // and it's not a known emoji, fallback to Bee.
+                    // 1. If no window is focused, use the bee
+                    if (!activeClass) return "🐝";
+                    
+                    // 2. Get the icon for the current class, or the default icon
+                    var icon = icons[activeClass] || icons["default"];
+                    
+                    // 3. If the result is empty or whitespace, use the bee
                     if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
-                    if (typeof icon === 'string' && !icon.startsWith("/") && icon.length < 3 && icon !== "🐝") return "🐝";
                     
                     return icon;
                 }
