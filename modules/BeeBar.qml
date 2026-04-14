@@ -307,54 +307,47 @@ Rectangle {
                 
                 // Dynamic icon loader - handles both emojis and image paths
                 property string currentIcon: {
-                    var activeClass = BeeBarState.activeWindowClass || "";
+                    var activeClass = (BeeBarState.activeWindowClass || "").toLowerCase();
                     var icons = BeeConfig.window_icons || {};
                     
-                    // If no window is focused, or it's explicitly 'unknown', use the bee
-                    if (!activeClass || activeClass.toLowerCase() === "unknown") return "🐝";
+                    // Create a case-insensitive map for lookup
+                    var caseInsensitiveIcons = {};
+                    for (var key in icons) {
+                        caseInsensitiveIcons[key.toLowerCase()] = icons[key];
+                    }
+
+                    // 1. If no window is focused or it's explicitly 'unknown', use the bee
+                    if (!activeClass || activeClass === "unknown") return "🐝";
                     
-                    // Get the icon for the current class, or the default icon
-                    var icon = icons[activeClass] || icons["default"];
+                    // 2. Get the icon for the current class, or the default icon
+                    var icon = caseInsensitiveIcons[activeClass] || caseInsensitiveIcons["default"];
                     
-                    // If the result is empty or whitespace, use the bee
+                    // 3. If the result is empty or whitespace, use the bee
                     if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
                     
                     return icon;
                 }
                 
-                Loader {
-                    id: iconLoader
-                    sourceComponent: {
-                        // Check if currentIcon is an image path (ends with .png/.svg/.jpg etc)
-                        var icon = parent.currentIcon;
-                        if (icon && (icon.endsWith('.png') || icon.endsWith('.svg') || 
-                                     icon.endsWith('.jpg') || icon.endsWith('.jpeg') || 
-                                     icon.endsWith('.xpm'))) {
-                            return imageComponent;
-                        }
-                        // Otherwise it's an emoji or text
-                        return textComponent;
-                    }
-                    
-                    Component {
-                        id: imageComponent
-                        Image {
-                            source: parent.parent.currentIcon
-                            width: 18
-                            height: 18
-                            fillMode: Image.PreserveAspectFit
-                            sourceSize.width: 18
-                            sourceSize.height: 18
-                        }
-                    }
-                    
-                    Component {
-                        id: textComponent
-                        Text {
-                            text: parent.parent.currentIcon
-                            font.pixelSize: 18
-                        }
-                    }
+                // Determine if current icon is an image file
+                property bool isImageIcon: {
+                    var icon = currentIcon;
+                    return icon && icon.startsWith("/");
+                }
+
+                Image {
+                    visible: parent.isImageIcon
+                    source: parent.isImageIcon ? "file://" + parent.currentIcon : ""
+                    width: 18
+                    height: 18
+                    fillMode: Image.PreserveAspectFit
+                    sourceSize.width: 18
+                    sourceSize.height: 18
+                }
+
+                Text {
+                    visible: !parent.isImageIcon
+                    text: parent.currentIcon
+                    font.pixelSize: 18
                 }
                 Text {
                     text: BeeBarState.focusActive ? (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS' : (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
