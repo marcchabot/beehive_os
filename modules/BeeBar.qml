@@ -117,14 +117,14 @@ Rectangle {
 
     property Process batteryProc: Process {
         id: _batteryProc
-        command: ["bash", "-c", "cat /sys/class/power_supply/BAT*/capacity; cat /sys/class/power_supply/BAT*/status"]
+        command: ["bash", "-c", "echo \"$(cat /sys/class/power_supply/BAT*/capacity) $(cat /sys/class/power_supply/BAT*/status)\""]
         running: BeeConfig.showBattery
         stdout: SplitParser {
             onRead: (line) => {
-                var lines = line.trim().split("\n")
-                if (lines.length >= 2) {
-                    beeBar.batteryPercent = parseInt(lines[0])
-                    beeBar.batteryStatus = lines[1]
+                var parts = line.trim().split(" ")
+                if (parts.length >= 2) {
+                    beeBar.batteryPercent = parseInt(parts[0])
+                    beeBar.batteryStatus = parts[1]
                 }
                 batteryTimer.start()
             }
