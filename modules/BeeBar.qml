@@ -106,8 +106,8 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        // Using bash -c to ensure environment and paths are handled correctly
-        command: ["bash", "-c", "python3 ~/beehive_os/scripts/update_icons.py"]
+        // Use absolute path and pipe to log file for debugging boot failures
+        command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py > /home/marc/beehive_os/boot_scan.log 2>&1"]
         running: false // Triggered by bootTimer
         stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
         stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
@@ -115,7 +115,7 @@ Rectangle {
 
     Timer {
         id: bootTimer
-        interval: 2000 // Wait 2s for system stability before scanning
+        interval: 10000 // Increased to 10s to ensure system stability after boot
         running: true
         onTriggered: {
             console.log("[BeeBar] Triggering automatic icon scan...");
