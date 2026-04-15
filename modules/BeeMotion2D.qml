@@ -32,9 +32,6 @@ Item {
     Behavior on _motionY { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
     // ─── Calcul des angles de tilt (exposé pour compatibilité) ─
-    onMotionEnabledChanged: _updateTilt()
-    onDashShownChanged:     _updateTilt()
-
     function _updateTilt() {
         if (motionEnabled && dashShown) {
             tiltX = _motionX * 7.0
@@ -184,6 +181,7 @@ Item {
 
     // ─── Gestion de l'activation/désactivation ─────────────────
     onMotionEnabledChanged: {
+        _updateTilt()
         if (motionEnabled && dashShown) {
             particleAnimationTimer.start()
         } else {
@@ -193,6 +191,7 @@ Item {
     }
 
     onDashShownChanged: {
+        _updateTilt()
         if (motionEnabled && dashShown) {
             particleAnimationTimer.start()
         } else {
