@@ -5,21 +5,21 @@
   "active_palette": "HoneyDark",
   "palettes": {
     "HoneyDark": {
-      "background":    "#0D0D0D",
+      "background":    "#0A0A0A",
       "accent":        "#FFB81C",
       "secondary":     "#1A1A1A",
       "text_primary":  "#FFFFFF",
-      "text_secondary":"#666666",
+      "text_secondary":"#B0B0B0",
       "aura_glow":     "rgba(255, 184, 28, 0.6)",
       "wallpaper":     "wallpaper_dark_bee.png"
     },
     "HoneyLight": {
-      "background":    "#F5F0E8",
-      "accent":        "#D4960A",
+      "background":    "#FCFBF7",
+      "accent":        "#FFB81C",
       "secondary":     "#EDE6D8",
-      "text_primary":  "#1A1A1A",
-      "text_secondary":"#887766",
-      "aura_glow":     "rgba(212, 150, 10, 0.5)",
+      "text_primary":  "#000000",
+      "text_secondary":"#666666",
+      "aura_glow":     "rgba(255, 184, 28, 0.5)",
       "wallpaper":     "wallpaper_light_bee.png"
     }
   },

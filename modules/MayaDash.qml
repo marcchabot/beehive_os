@@ -254,7 +254,7 @@ Rectangle {
 
                 // Glassmorphism fill — Opaque et distinct selon le mode
                 if (hexCell.isHighlighted) {
-                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.85)
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
                         ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
@@ -324,7 +324,7 @@ Rectangle {
 
             Text {
                 text: hexCell.title
-                color: hexCell.isHighlighted ? BeeTheme.accent : BeeTheme.textPrimary
+                color: hexCell.isHighlighted ? "#000000" : BeeTheme.textPrimary
                 font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
                 anchors.horizontalCenter: parent.horizontalCenter
                 Behavior on color { ColorAnimation { duration: 600 } }
@@ -332,7 +332,7 @@ Rectangle {
 
             Text {
                 text: hexCell.subtitle
-                color: BeeTheme.textSecondary
+                color: hexCell.isHighlighted ? "#333333" : BeeTheme.textSecondary
                 font.pixelSize: 11
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -342,7 +342,7 @@ Rectangle {
 
             Text {
                 text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
-                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                color: hexCell.isHighlighted ? "#555555" : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
@@ -490,6 +490,18 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
     }
     
+    // ─── BeeNotes Dialog Overlay (Shield) ────────────────────
+    Item {
+        anchors.fill: parent
+        visible: notesDialogVisible
+        z: 99
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: closeNotesDialog()
+        }
+    }
+
     // ─── BeeNotes Dialog ──────────────────────────────────────
     Rectangle {
         id: notesDialog
@@ -497,11 +509,11 @@ Rectangle {
         height: 480
         anchors.centerIn: parent
         radius: 16
-        color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.95)
+        color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.95)
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
         border.width: 1
         visible: notesDialogVisible
-        opacity: notesDialogVisible ? 0.95 : 0  // Combined opacity + blur replacement
+        opacity: notesDialogVisible ? 0.95 : 0
         scale: notesDialogVisible ? 1 : 0.9
         z: 100
         
@@ -519,7 +531,7 @@ Rectangle {
             Text {
                 text: "📝 Quick Notes"
                 font { bold: true; pixelSize: 18 }
-                color: BeeTheme.text
+                color: BeeTheme.textPrimary
                 anchors.centerIn: parent
             }
             
@@ -550,11 +562,11 @@ Rectangle {
             }
         }
         
-        // BeeNotes component (temporarily disabled for debugging)
-        // BeeNotes {
-        //     anchors.top: parent.top
-        //     anchors.topMargin: 60
-        //     anchors.horizontalCenter: parent.horizontalCenter
-        // }
+        // BeeNotes component
+        BeeNotes {
+            anchors.top: parent.top
+            anchors.topMargin: 60
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 }
