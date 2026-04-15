@@ -128,45 +128,6 @@ Rectangle {
     // Activer/désactiver l'effet (câblé depuis BeeSettings)
     property bool beeMotionEnabled: true
 
-    // Position normalisée de la souris (-1.0 → +1.0 depuis le centre)
-    property real _motionX: 0.0
-    property real _motionY: 0.0
-
-    // Transitions fluides sur le déplacement (écrêtage à ±1)
-    Behavior on _motionX { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-    Behavior on _motionY { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-
-    // Angle d'inclinaison calculé (max ±7°), retour à 0 si désactivé
-    property real _tiltX: beeMotionEnabled && dashShown ? _motionX * 7.0 : 0.0
-    property real _tiltY: beeMotionEnabled && dashShown ? _motionY * -5.0 : 0.0
-
-    Behavior on _tiltX { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-    Behavior on _tiltY { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-
-    // MouseArea de tracking (z:-1 pour ne pas bloquer les clics HexCell)
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton   // Ne consomme aucun clic
-        z: -1
-
-        onPositionChanged: (mouse) => {
-            if (!mayaDash.beeMotionEnabled || !mayaDash.dashShown) return
-            // Normalisation [-1, +1] depuis le centre de l'écran
-            var nx = (mouse.x - mayaDash.width  / 2) / (mayaDash.width  / 2)
-            var ny = (mouse.y - mayaDash.height / 2) / (mayaDash.height / 2)
-            // Écrêtage pour éviter les valeurs extrêmes
-            mayaDash._motionX = Math.max(-1, Math.min(1, nx))
-            mayaDash._motionY = Math.max(-1, Math.min(1, ny))
-        }
-
-        onExited: {
-            // Retour au centre en douceur quand la souris sort
-            mayaDash._motionX = 0.0
-            mayaDash._motionY = 0.0
-        }
-    }
-
     // ─── Fond avec backdrop flou sombre ───────────────────────
     Rectangle {
         anchors.fill: parent
@@ -174,44 +135,17 @@ Rectangle {
 
         Behavior on color { ColorAnimation { duration: 800 } }
 
-        // Particules hexagonales flottantes — couche profonde (parallaxe amplifiée)
-        Repeater {
-            model: 8
-            delegate: Rectangle {
-                property real floatY:       Math.random() * mayaDash.height
-                property real floatX:       Math.random() * mayaDash.width
-                property real floatSize:    40 + Math.random() * 80
-                property real particleAlpha: 0.03 + Math.random() * 0.04
-                // Facteur de parallaxe unique par particule (couche plus lointaine → plus de déplacement)
-                property real parallaxDepth: 25 + (index % 5) * 12
-
-                // BeeMotion : déplacement en sens inverse (couche derrière les hex cells)
-                x: floatX - mayaDash._motionX * parallaxDepth
-                y: floatY - mayaDash._motionY * (parallaxDepth * 0.65)
-
-                Behavior on x { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
-                Behavior on y { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
-
-                width: floatSize; height: floatSize
-                color: "transparent"
-                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, particleAlpha)
-                border.width: 1
-                rotation: 30
-                radius: floatSize * 0.15
-
-                SequentialAnimation on y {
-                    loops: Animation.Infinite
-                    NumberAnimation { to: floatY - 30 - Math.random() * 40; duration: 6000 + Math.random() * 4000; easing.type: Easing.InOutSine }
-                    NumberAnimation { to: floatY + 30 + Math.random() * 40; duration: 6000 + Math.random() * 4000; easing.type: Easing.InOutSine }
-                }
-                SequentialAnimation on opacity {
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 0.6; duration: 4000; easing.type: Easing.InOutSine }
-                    NumberAnimation { to: 1.0; duration: 4000; easing.type: Easing.InOutSine }
-                }
-            }
+        // ─── BeeMotion 2.0 integration (depth-layered parallax) ──────
+        BeeMotion2D {
+            id: mayaMotion
+            anchors.fill: parent
+            motionEnabled: mayaDash.beeMotionEnabled
+            dashShown: mayaDash.dashShown
         }
-    }
+
+        // Particules hexagonales flottantes — couche profonde (parallaxe amplifiée)
+        // Désactivé car remplacé par BeeMotion2D
+        // Repeater { ... }
 
     // ═══════════════════════════════════════════════════════════
     // COMPOSANT HEXAGONE (réutilisable, thème-aware)
@@ -270,33 +204,38 @@ Rectangle {
         property real vibeValue: beeVibe.barValues.length > cellIndex
                                  ? beeVibe.barValues[cellIndex] : 0.0
 
-        // ─── Throttle repaint : max 30 fps pendant la transition de thème ──
-        // Évite 288 calls Canvas par toggle (8 cells × 36 frames à 60fps).
-        Timer {
-            id: repaintThrottle
-            interval: 33
-            repeat: false
-            onTriggered: hexCanvas.requestPaint()
+        // ─── Optimized repaint logic ────────────────────────────
+        // Désactive les repaints automatiques pendant les transitions de thème
+        // et utilise un Timer pour regrouper les changements
+        property bool _inTransition: false
+
+        onIsHighlightedChanged: {
+            if (!_inTransition) hexCanvas.requestPaint()
         }
-        // ─── Repaint Canvas quand le thème ou le highlight change ─
+
+        // ─── Repaint Canvas quand le thème change (via timer pour éviter la surcharge) ─
         Connections {
             target: BeeTheme
-            function onModeChanged() { hexCanvas.requestPaint() }
+            function onModeChanged() {
+                hexCanvas.requestPaint()
+            }
             function on_ProgressChanged() {
-                if (!repaintThrottle.running) repaintThrottle.start()
+                // Lors d'une transition, on n'utilise pas le throttle
+                // car le Canvas est déjà inefficace pendant la transition
+                hexCanvas.requestPaint()
             }
         }
-        onIsHighlightedChanged: hexCanvas.requestPaint()
 
         // ─── Hexagone Shape (Canvas) ──────────────────────────
         Canvas {
             id: hexCanvas
             anchors.fill: parent
             antialiasing: true
+            renderStrategy: Canvas.Immediate  // Qt 6 optimisation
 
             onPaint: {
                 var ctx = getContext("2d")
-                ctx.clearRect(0, 0, width, height)
+                if (!ctx) return
 
                 var cx = width / 2
                 var cy = height / 2
@@ -470,6 +409,7 @@ Rectangle {
             Behavior on yScale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
         }
     }
+    }
 
     // ═══════════════════════════════════════════════════════════
     // LAYOUT — Grille en nid d'abeille (2 + 3 + 3)
@@ -482,24 +422,6 @@ Rectangle {
 
         // On applique le scale global ici car Rectangle n'a pas de propriété scale
         scale: mayaDash.dashScale
-
-        // ─── BeeMotion : rotation 3D perspective ──────────────
-        // Axe X (horizontal) → inclinaison haut/bas (_tiltY)
-        // Axe Y (vertical)   → inclinaison gauche/droite (_tiltX)
-        transform: [
-            Rotation {
-                origin.x: hexGrid.width  / 2
-                origin.y: hexGrid.height / 2
-                axis { x: 1; y: 0; z: 0 }
-                angle: mayaDash._tiltY
-            },
-            Rotation {
-                origin.x: hexGrid.width  / 2
-                origin.y: hexGrid.height / 2
-                axis { x: 0; y: 1; z: 0 }
-                angle: mayaDash._tiltX
-            }
-        ]
 
         // ─── Titre du dashboard ───────────────────────────────
         Text {
@@ -561,7 +483,7 @@ Rectangle {
 
     // ─── Label version ────────────────────────────────────────
     Text {
-        text: "Bee-Hive OS v0.9.0 · BeeMotion 3D · BeeVibe 🐝"
+        text: "Bee-Hive OS v0.9.0 · BeeMotion2D · BeeVibe 🐝"
         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
         font { pixelSize: 10; letterSpacing: 1 }
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15

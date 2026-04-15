@@ -1,0 +1,16 @@
+{
+  "timestamp": 1776183355.3500977,
+  "mappings": {
+    "kitty": "/usr/share/icons/hicolor/scalable/apps/kitty.svg",
+    "firefox": "/usr/share/icons/hicolor/48x48/apps/firefox.png",
+    "code": "\ud83d\udcbb",
+    "zeditor": "\ud83d\udcdd",
+    "discord": "\ud83d\udcac",
+    "spotify": "/usr/share/pixmaps/spotify-client.png",
+    "obs": "\ud83c\udfa5",
+    "zen": "/usr/share/icons/hicolor/48x48/apps/zen-browser.png",
+    "default": "\ud83d\udcc4",
+    "python3.11": "/usr/share/pixmaps/python3.11.xpm",
+    "display-im6.q16": "display-im6.q16"
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.2",
+  "version": "1.3.6",
+  "theme": "HoneyDark",
+  "_comment": "Bee-Hive OS \u2014 Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
+  "transitions": {
+    "theme_duration_ms": 600,
+    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs recommand\u00e9es : 300 (rapide) \u00e0 1200 (cin\u00e9matique)."
+  },
+  "weather": {
+    "city": "Blainville",
+    "unit": "metric",
+    "lang": "fr",
+    "_comment": "unit: 'metric' (\u00b0C) | 'imperial' (\u00b0F) | 'standard' (K). lang: code ISO 2 lettres."
+  },
+  "dashboard": {
+    "title": "\ud83c\udf6f Maya Dashboard",
+    "cells": [
+      {
+        "icon": "\ud83d\udcc5",
+        "title": "Famille Chabot",
+        "subtitle": "Calendrier",
+        "detail": "Ski \u00e0 Tremblant\nNoah \u2014 Soccer 14h",
+        "action": "url:https://calendar.google.com/calendar/u/0/r",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\ud83d\udc8a",
+        "title": "Pharmacie",
+        "subtitle": "Alertes & Commandes",
+        "detail": "3 alertes actives\n1 commande en attente",
+        "action": "url:https://oap.oacp.ca",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\ud83d\udc1d",
+        "title": "Maya Status",
+        "subtitle": "En ligne",
+        "detail": "Bee-Hive OS\nCollaboration Maya/Marc",
+        "action": "url:http://192.168.13.100:18789/",
+        "highlighted": true,
+        "customizable": false,
+        "color": ""
+      },
+      {
+        "icon": "\ud83c\udfd4\ufe0f",
+        "title": "Tremblant",
+        "subtitle": "Chalet",
+        "detail": "Construction\nEn cours\u2026",
+        "action": "url:https://www.tremblant.ca/montagne/conditions-ski",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\ud83d\udda5\ufe0f",
+        "title": "Syst\u00e8me",
+        "subtitle": "CachyOS",
+        "detail": "Hyprland\nQuickshell",
+        "action": "app:kitty",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\ud83d\udcb0",
+        "title": "Powerland",
+        "subtitle": "Finances",
+        "detail": "Groupe Powerland\nFiducie 2019",
+        "action": "url:https://drive.google.com",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\ud83c\udfae",
+        "title": "GeForce Now",
+        "subtitle": "Cloud Gaming",
+        "detail": "Pr\u00eat pour\nune partie ?",
+        "action": "app:flatpak run com.nvidia.geforcenow",
+        "highlighted": true,
+        "customizable": true,
+        "color": ""
+      },
+      {
+        "icon": "\u2699\ufe0f",
+        "title": "Settings",
+        "subtitle": "Bee-Hive OS",
+        "detail": "Configuration\n& Pr\u00e9f\u00e9rences",
+        "action": "toggle:settings",
+        "highlighted": true,
+        "customizable": false,
+        "color": ""
+      }
+    ],
+    "_cell_schema": {
+      "_comment": "Sch\u00e9ma de r\u00e9f\u00e9rence pour une alv\u00e9ole \u2014 copiez-collez pour ajouter les v\u00f4tres.",
+      "icon": "Emoji ou chemin vers une image (ex: '\ud83d\udc1d' ou 'assets/myicon.png')",
+      "title": "Nom principal affich\u00e9 (max ~18 chars recommand\u00e9)",
+      "subtitle": "Sous-titre (cat\u00e9gorie, statut, etc.)",
+      "detail": "Texte secondaire, multi-ligne avec \\n",
+      "action": "Valeurs: 'none' | 'app:<cmd>' | 'toggle:settings' | 'url:<https://...>'",
+      "highlighted": "true = bordure et titre dor\u00e9s (accentu\u00e9s)",
+      "customizable": "true = l'utilisateur peut modifier cette cellule via BeeSettings",
+      "color": "null = couleur du th\u00e8me actif | '#HEX' = couleur personnalis\u00e9e"
+    }
+  },
+  "nectar_sync": true,
+  "stealth_mode": false,
+  "sound": {
+    "night_mode": true,
+    "night_start_hour": 22,
+    "night_end_hour": 7,
+    "day_gain": 0.35,
+    "night_gain": 0.18
+  },
+  "events_enabled": true,
+  "bee_events": {
+    "enabled": true,
+    "_comment": "Module BeeEvents \u2014 Prochains \u00e9v\u00e9nements du calendrier. true = widget visible, false = masqu\u00e9.",
+    "max_events": 6,
+    "_max_events_comment": "Nombre maximum d'\u00e9v\u00e9nements affich\u00e9s (1\u20135 recommand\u00e9)."
+  },
+  "calendars": [
+    {
+      "id": "famille",
+      "type": "google_api",
+      "calendar_id": "family01761025763253819175@group.calendar.google.com",
+      "label": "Famille",
+      "color": "#FFB81C"
+    },
+    {
+      "id": "pharmacie",
+      "type": "ics",
+      "url": "https://outlook.office365.com/owa/calendar/6f5d92f21da74f34b231535c59720427@pharmaciechabot.com/fdb0b4bef82f42049d4ed21138dcdb326116550443663087075/S-1-8-3645858165-128246543-3786118207-2508868002/reachcalendar.ics",
+      "label": "Pharmacie",
+      "color": "#4CAF50"
+    }
+  ],
+  "framework": {
+    "name": "Bee-Hive OS",
+    "version": "1.3.6",
+    "author": "Maya & Marc Chabot",
+    "license": "MIT",
+    "repo": "github.com/marcchabot/beehive_os",
+    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9t\u00e9o ou les transitions."
+  },
+  "window_icons": {
+    "kitty": "\ud83d\udc1a",
+    "firefox": "\ud83e\udd8a",
+    "code": "\ud83d\udcbb",
+    "zeditor": "\ud83d\udcdd",
+    "discord": "\ud83d\udcac",
+    "spotify": "\ud83c\udfa7",
+    "obs": "\ud83c\udfa5",
+    "zen": "\ud83e\uddd8",
+    "default": "\ud83d\udcc4",
+    "python3.11": "/usr/share/pixmaps/python3.11.xpm",
+    "display-im6.q16": "display-im6.q16"
+  },
+  "vibe_mode": false,
+  "corners_mode": true,
+  "motion_mode": true,
+  "pinned_apps": [
+    "__studio__",
+    "zeditor",
+    "/opt/enpass/Enpass"
+  ],
+  "analog_clock": true,
+  "focus_mode": false,
+  "_focus_mode_comment": "true = Mode Focus : masque le dashboard, les \u00e9v\u00e9nements et l'horloge. Seul le wallpaper + BeeBar restent visibles. Raccourci IPC : 'qs ipc call root toggleFocus'."
+}
