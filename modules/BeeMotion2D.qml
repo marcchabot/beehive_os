@@ -69,9 +69,6 @@ Item {
         }
 
         // Optimisation : ne redessiner que si le mouvement a changé
-        on_QuaChanged: {
-            // Rien à faire ici, requestPaint() est appelé ailleurs
-        }
 
         // ─── Rendu Canvas Painter (Qt 6) ───────────────────────
         onPaint: {
