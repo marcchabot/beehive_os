@@ -21,7 +21,7 @@ Item {
         width: 320
         height: 400
         radius: 12
-        color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.85)
+        color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.85)
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
         border.width: 1
     }
@@ -242,7 +242,7 @@ Item {
             id: inputArea
             width: parent.width
             height: 80
-            color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.5)
+            color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.5)
             anchors.bottom: parent.bottom
             
             Rectangle {
@@ -265,7 +265,7 @@ Item {
                     color: BeeTheme.textPrimary
                     background: Rectangle {
                         radius: 6
-                        color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.7)
+                        color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.7)
                         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
                         border.width: 1
                     }

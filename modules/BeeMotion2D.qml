@@ -45,19 +45,22 @@ Item {
     // ═══════════════════════════════════════════════════════════
     // PARTICULES — Depth-layered background (Canvas Painter)
     // ═══════════════════════════════════════════════════════════
+    // ─── Particules stockées sur le root Item (pas le Canvas) ──
+    property var particles: []
+
     Canvas {
         id: parallaxCanvas
         anchors.fill: parent
         visible: false   // utilisé pour le rendu, pas visible par l'utilisateur
 
-        property var particles: []
         property real _lastMotionX: -2.0
         property real _lastMotionY: -2.0
 
         Component.onCompleted: {
-            // Initialisation des particules
+            // Initialisation des particules sur root
+            var initParticles = []
             for (var i = 0; i < root.particleCount; i++) {
-                root.particles.push({
+                initParticles.push({
                     floatX:       Math.random() * parent.width,
                     floatY:       Math.random() * parent.height,
                     floatSize:    40 + Math.random() * 80,
@@ -66,6 +69,7 @@ Item {
                     yBase:        Math.random() * parent.height
                 })
             }
+            root.particles = initParticles
         }
 
         // Optimisation : ne redessiner que si le mouvement a changé
@@ -86,8 +90,10 @@ Item {
             var deltaY = root.tiltY * 15
 
             // Dessiner chaque particule avec son niveau de profondeur
-            for (var i = 0; i < root.particles.length; i++) {
-                var p = root.particles[i]
+            var _particles = root.particles
+            if (!_particles || !_particles.length) return
+            for (var i = 0; i < _particles.length; i++) {
+                var p = _particles[i]
 
                 // Parallaxe : plus la profondeur est grande, plus le déplacement est important
                 // Couche arrière (lointaine) : déplacement amplifié
