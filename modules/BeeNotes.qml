@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.6 : Absolute Zero-Semicolon Version (Surgical Clean)
+// v1.7 : Close button + Fixed persistence (color as hex string)
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -31,7 +31,31 @@ Item {
 
     // ─── Logique de données ──────────────────────────────────────
     property var notesData: []
-    property string notesFile: "file://" + Qt.resolvedUrl("../data/quick_notes.json")
+    property string notesFile: "file:///home/marc/beehive_os/data/quick_notes.json"
+
+    // Helper: convert QML color to hex string for serialization
+    function colorToHex(c) {
+        return "#" + ((1 << 24) + (Math.round(c.r * 255) << 16) + (Math.round(c.g * 255) << 8) + Math.round(c.b * 255)).toString(16).slice(1).toUpperCase()
+    }
+
+    // Helper: parse hex or named color to {r,g,b} for delegate
+    function colorToRgb(c) {
+        // If already a Qt color object with .r, use directly
+        if (typeof c === "object" && c !== null && c.r !== undefined)
+            return { r: c.r, g: c.g, b: c.b }
+        // Hex string: #RRGGBB
+        if (typeof c === "string" && c.charAt(0) === "#" && c.length === 7) {
+            var rr = parseInt(c.substring(1,3), 16) / 255
+            var gg = parseInt(c.substring(3,5), 16) / 255
+            var bb = parseInt(c.substring(5,7), 16) / 255
+            return { r: rr, g: gg, b: bb }
+        }
+        // Fallback: accent color
+        return { r: BeeTheme.accent.r, g: BeeTheme.accent.g, b: BeeTheme.accent.b }
+    }
+
+    // Predefined note colors (hex strings for JSON compatibility)
+    property var noteColors: ["#FFC107", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722"]
     
     Component.onCompleted: {
         loadNotes()
@@ -42,18 +66,25 @@ Item {
         request.open("GET", notesFile)
         request.onreadystatechange = function() {
             if (request.readyState === XMLHttpRequest.DONE) {
-                if (request.status === 200) {
+                if (request.status === 200 && request.responseText.trim() !== "") {
                     try {
                         notesData = JSON.parse(request.responseText)
                         notesModel.clear()
                         for (var i = 0; i < notesData.length; i++) {
-                            notesModel.append(notesData[i])
+                            var note = notesData[i]
+                            // Normalize color to hex string
+                            if (typeof note.color === "object" && note.color !== null) {
+                                note.color = colorToHex(note.color)
+                            }
+                            notesModel.append(note)
                         }
+                        console.log("BeeNotes: Loaded " + notesData.length + " notes")
                     } catch (e) {
-                        console.log("BeeNotes: Could not parse notes file, starting fresh")
+                        console.log("BeeNotes: Could not parse notes file, starting fresh. Error: " + e)
                         notesData = []
                     }
                 } else {
+                    console.log("BeeNotes: No saved notes found (status " + request.status + ")")
                     notesData = []
                 }
             }
@@ -62,26 +93,50 @@ Item {
     }
     
     function saveNotes() {
-        notesData = []
+        // Build a clean array of plain JS objects for JSON serialization
+        // (ListModel.get() returns QML objects that don't serialize cleanly)
+        var data = []
         for (var i = 0; i < notesModel.count; i++) {
-            notesData.push(notesModel.get(i))
+            var item = notesModel.get(i)
+            var noteColor = item.color
+            // Ensure color is a hex string for JSON
+            if (typeof noteColor === "object" && noteColor !== null) {
+                noteColor = colorToHex(noteColor)
+            }
+            data.push({
+                id: item.id,
+                text: item.text,
+                timestamp: item.timestamp,
+                color: noteColor
+            })
         }
+        notesData = data
         
-        var request = new XMLHttpRequest()
-        request.open("PUT", notesFile)
-        request.setRequestHeader("Content-Type", "application/json")
-        request.send(JSON.stringify(notesData, null, 2))
-        
-        saveAnimation.start()
+        saveTimer.start()
+    }
+    
+    // Debounced save — avoid writing on every rapid change
+    Timer {
+        id: saveTimer
+        interval: 300
+        onTriggered: {
+            var request = new XMLHttpRequest()
+            request.open("PUT", notesFile)
+            request.setRequestHeader("Content-Type", "application/json")
+            request.send(JSON.stringify(notesData, null, 2))
+            console.log("BeeNotes: Saved " + notesData.length + " notes")
+            saveAnimation.start()
+        }
     }
     
     function addNote() {
         if (newNoteText.text.trim() !== "") {
+            var colorIdx = notesModel.count % noteColors.length
             var newNote = {
                 "id": Date.now(),
                 "text": newNoteText.text,
-                "timestamp": new Date().toLocaleString(),
-                "color": BeeTheme.accent
+                "timestamp": Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"),
+                "color": noteColors[colorIdx]
             }
             
             notesModel.insert(0, newNote)
@@ -110,7 +165,7 @@ Item {
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: 16
-                anchors.rightMargin: 16
+                anchors.rightMargin: 8
                 
                 Text {
                     text: "📝 Quick Notes"
@@ -127,6 +182,41 @@ Item {
                     font.pixelSize: 12
                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.7)
                     Layout.alignment: Qt.AlignVCenter
+                }
+                
+                // ─── Close Button (✕) ────────────────────────────
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: 14
+                    color: closeBtnMA.containsMouse
+                        ? Qt.rgba(1, 0.3, 0.3, 0.9)
+                        : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
+                    border.color: closeBtnMA.containsMouse
+                        ? "#ff6666"
+                        : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                    border.width: 1
+                    Layout.alignment: Qt.AlignVCenter
+                    
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on border.color { ColorAnimation { duration: 150 } }
+                    
+                    Text {
+                        text: "✕"
+                        font.bold: true
+                        font.pixelSize: 14
+                        color: closeBtnMA.containsMouse ? "white" : BeeTheme.textPrimary
+                        anchors.centerIn: parent
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                    }
+                    
+                    MouseArea {
+                        id: closeBtnMA
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: beeNotesRoot.closeRequested()
+                    }
                 }
             }
             
@@ -155,8 +245,13 @@ Item {
                 width: notesList.width
                 height: noteContent.height + 32
                 radius: 8
-                color: Qt.rgba(model.color.r, model.color.g, model.color.b, 0.1)
-                border.color: Qt.rgba(model.color.r, model.color.g, model.color.b, 0.3)
+                // Robust color handling: accept both hex strings and color objects
+                property color noteColor: {
+                    var rgb = colorToRgb(model.color)
+                    return Qt.rgba(rgb.r, rgb.g, rgb.b, 1)
+                }
+                color: Qt.rgba(noteColor.r, noteColor.g, noteColor.b, 0.1)
+                border.color: Qt.rgba(noteColor.r, noteColor.g, noteColor.b, 0.3)
                 border.width: 1
                 
                 states: State {
