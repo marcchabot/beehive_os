@@ -39,6 +39,21 @@ Item {
         shadowHorizontalOffset: 0
     }
 
+    // ─── Bouclier Souris (Anti Click-Through) ────────────────────
+    // Capture tous les événements souris pour empêcher qu'ils ne
+    // tombent sur les alvéoles du dashboard en dessous
+    MouseArea {
+        id: mouseShield
+        anchors.fill: parent
+        z: 10
+        
+        // Ne pas bloquer les événements pour les enfants
+        // Les boutons et TextField fonctionnent normalement
+        onPressed: mouse.accepted = true
+        onReleased: mouse.accepted = true
+        onClicked: mouse.accepted = true
+    }
+
     // ─── Logique de données ──────────────────────────────────────
     property var notesData: []
     property string notesFile: "file://" + Qt.resolvedUrl("../data/quick_notes.json")
