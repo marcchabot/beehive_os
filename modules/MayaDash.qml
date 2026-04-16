@@ -204,24 +204,34 @@ Rectangle {
         property real vibeValue: beeVibe.barValues.length > cellIndex
                                  ? beeVibe.barValues[cellIndex] : 0.0
 
-        // ─── Optimized repaint logic ────────────────────────────
-        // Désactive les repaints automatiques pendant les transitions de thème
-        // et utilise un Timer pour regrouper les changements
-        property bool _inTransition: false
+        // ─── Propriétés réactives pour forcer le repaint du Canvas ──
+        // Les propriétés QML créent des dépendances automatiques.
+        // Quand elles changent, onPaint se déclenche via requestPaint().
+        property color _cellFillColor: hexCell.isHighlighted
+            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b,
+                BeeTheme.mode === "HoneyDark" ? 0.12 : 0.22)
+            : BeeTheme.mode === "HoneyDark"
+                ? Qt.rgba(0.07, 0.07, 0.08, 0.88)    // Gris anthracite (Dark)
+                : Qt.rgba(1.0, 1.0, 1.0, 0.55)       // Blanc nacré translucide (Light)
+        property color _cellBorderColor: hexCell.isHighlighted
+            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
+            : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b,
+                BeeTheme.mode === "HoneyDark" ? 0.5 : 0.35)
+        property color _innerBorderColor: BeeTheme.mode === "HoneyDark"
+            ? Qt.rgba(1, 0.84, 0, 0.15)       // Reflet doré (Dark)
+            : Qt.rgba(1, 0.78, 0.31, 0.25)    // Reflet miel (Light)
+        property real _cellBorderWidth: hexCell.isHighlighted ? 2 : 1.5
 
-        onIsHighlightedChanged: {
-            if (!_inTransition) hexCanvas.requestPaint()
-        }
+        onIsHighlightedChanged: hexCanvas.requestPaint()
+        on_CellFillColorChanged: hexCanvas.requestPaint()
+        on_CellBorderColorChanged: hexCanvas.requestPaint()
+        on_InnerBorderColorChanged: hexCanvas.requestPaint()
+        on_CellBorderWidthChanged: hexCanvas.requestPaint()
 
-        // ─── Repaint Canvas quand le thème change (via timer pour éviter la surcharge) ─
+        // Repaint pendant la transition animée du thème
         Connections {
             target: BeeTheme
-            function onModeChanged() {
-                hexCanvas.requestPaint()
-            }
             function on_ProgressChanged() {
-                // Lors d'une transition, on n'utilise pas le throttle
-                // car le Canvas est déjà inefficace pendant la transition
                 hexCanvas.requestPaint()
             }
         }
@@ -252,23 +262,13 @@ Rectangle {
                 }
                 ctx.closePath()
 
-                // Glassmorphism fill — translucide et élégant dans les deux modes
-                if (hexCell.isHighlighted) {
-                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 
-                        BeeTheme.mode === "HoneyDark" ? 0.12 : 0.22)
-                } else {
-                    ctx.fillStyle = BeeTheme.mode === "HoneyDark"
-                        ? "rgba(18, 18, 20, 0.88)"         // Gris anthracite foncé opaque
-                        : "rgba(255, 255, 255, 0.55)"      // Blanc nacré translucide (glassmorphism)
-                }
+                // Glassmorphism fill — propriétés réactives
+                ctx.fillStyle = hexCell._cellFillColor
                 ctx.fill()
 
                 // Bordure principale
-                ctx.strokeStyle = hexCell.isHighlighted
-                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
-                    : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b,
-                        BeeTheme.mode === "HoneyDark" ? 0.5 : 0.35)
-                ctx.lineWidth = hexCell.isHighlighted ? 2 : 1.5
+                ctx.strokeStyle = hexCell._cellBorderColor
+                ctx.lineWidth = hexCell._cellBorderWidth
                 ctx.stroke()
 
                 // Bordure intérieure (glassmorphism layer)
@@ -282,10 +282,7 @@ Rectangle {
                     else         ctx.lineTo(px2, py2)
                 }
                 ctx.closePath()
-                // Bordure intérieure : reflet lumineux adaptatif
-                ctx.strokeStyle = BeeTheme.mode === "HoneyDark" 
-                    ? "rgba(255, 215, 0, 0.15)"     // Reflet doré léger (Dark)
-                    : "rgba(255, 200, 80, 0.25)"    // Reflet miel chaud (Light)
+                ctx.strokeStyle = hexCell._innerBorderColor
                 ctx.lineWidth = 1.5
                 ctx.stroke()
             }
