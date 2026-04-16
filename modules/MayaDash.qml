@@ -258,7 +258,7 @@ Rectangle {
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
                         ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
-                        : "rgba(250, 250, 250, 0.90)" // Blanc pur neutre — crisp
+                        : "rgba(245, 242, 235, 0.92)" // Crème clair opaque
                 }
                 ctx.fill()
 
