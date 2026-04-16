@@ -78,6 +78,15 @@ QtObject {
     readonly property string _scanCmd:
         "python3 << 'PYEOF'\n" +
         "import os,json,glob,configparser,re\n" +
+        "def resolve_icon(name):\n" +
+        "    if not name: return None\n" +
+        "    if os.path.isabs(name): return name if os.path.exists(name) else None\n" +
+        "    dirs = ['/usr/share/icons/hicolor/48x48/apps', '/usr/share/icons/breeze/48x48/apps', '/usr/share/icons/papirus/48x48/apps']\n" +
+        "    for d in dirs:\n" +
+        "        for ext in ['.svg', '.png', '.xpm']:\n" +
+        "            p = os.path.join(d, name + ext)\n" +
+        "            if os.path.exists(p): return p\n" +
+        "    return None\n" +
         "apps=[]\n" +
         "seen=set()\n" +
         "dirs=['/usr/share/applications',os.path.expanduser('~/.local/share/applications')]\n" +
@@ -94,15 +103,14 @@ QtObject {
         "    if e.get('hidden','false').lower()=='true':continue\n" +
         "    x=e.get('exec','')\n" +
         "    if not x:continue\n" +
-        "    # Smart cleanup of %u, %U, %f, etc. parameters (including --uri= style flags)\n" +
         "    x=re.sub(r' [^ ]*=[uUfFdDnNickvm% ]+', '', x)\n" +
         "    x=re.sub(r' ?%[uUfFdDnNickvm]', '', x).strip()\n" +
-        "    # Correction Ozone pour Spotify sur Wayland\n" +
         "    if 'spotify' in p.lower():\n" +
         "        x = 'spotify --enable-features=UseOzonePlatform --ozone-platform=wayland'\n" +
         "    cat=e.get('categories','').split(';')[0]\n" +
+        "    icon=resolve_icon(e.get('icon',''))\n" +
         "    if e.get('terminal','false').lower()=='true':x='kitty -e '+x\n" +
-        "    apps.append({'name':n,'cmd':x,'cat':cat})\n" +
+        "    apps.append({'name':n,'cmd':x,'cat':cat,'icon':icon})\n" +
         "    seen.add(n.lower())\n" +
         "  except:pass\n" +
         "apps.sort(key=lambda a:a['name'].lower())\n" +
@@ -121,13 +129,16 @@ QtObject {
                 if (!s) return
                 try {
                     var o = JSON.parse(s)
-                    if (o && o.name && o.cmd)
+                    if (o && o.name && o.cmd) {
+                        // Priority: 1. .desktop icon -> 2. Emoji fallback
+                        var icon = o.icon || root._iconFor(o.cat)
                         root._scanned.push({
-                            icon: root._iconFor(o.cat),
+                            icon: icon,
                             name: o.name,
                             cmd:  o.cmd,
                             cat:  o.cat || "Application"
                         })
+                    }
                 } catch(e) {}
             }
         }

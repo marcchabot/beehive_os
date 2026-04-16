@@ -392,12 +392,27 @@ Item {
                         onClicked: beeSearch.launchApp(appCmd)
                     }
 
-                    // Icône émoji
-                    Text {
-                        id: _appIcon
+                    // Icône (Image si chemin, Text si emoji)
+                    Item {
+                        id: _iconContainer
                         anchors { left: parent.left; leftMargin: 14; verticalCenter: parent.verticalCenter }
-                        text: appIcon
-                        font.pixelSize: 22
+                        width: 22; height: 22
+
+                        Image {
+                            anchors.fill: parent
+                            source: appIcon.startsWith('/') ? appIcon : ""
+                            visible: source !== ""
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        Text {
+                            anchors.fill: parent
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            text: appIcon.startsWith('/') ? "" : appIcon
+                            font.pixelSize: 22
+                            visible: !appIcon.startsWith('/')
+                        }
                     }
 
                     // Nom + catégorie
