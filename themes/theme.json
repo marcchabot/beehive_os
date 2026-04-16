@@ -14,12 +14,12 @@
       "wallpaper":     "wallpaper_dark_bee.png"
     },
     "HoneyLight": {
-      "background":    "#FAFAFA",
-      "accent":        "#E9C46A",
-      "secondary":     "#F0F0F0",
-      "text_primary":  "#111111",
-      "text_secondary":"#555555",
-      "aura_glow":     "rgba(233, 196, 106, 0.45)",
+      "background":    "#FCFBF7",
+      "accent":        "#FFB81C",
+      "secondary":     "#EDE6D8",
+      "text_primary":  "#000000",
+      "text_secondary":"#666666",
+      "aura_glow":     "rgba(255, 184, 28, 0.5)",
       "wallpaper":     "wallpaper_light_bee.png"
     }
   },
