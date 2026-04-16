@@ -5,7 +5,7 @@
   "_comment": "Bee-Hive OS \u2014 Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
   "transitions": {
     "theme_duration_ms": 600,
-    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs recommand\u00e9es : 300 (rapide) \u00e0 1200 (cin\u00e9matique)."
+    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs recommand\u00e9es : 300 (rapide) \u00a0 \u00a0 1200 (cin\u00e9matique)."
   },
   "weather": {
     "city": "Blainville",
@@ -27,11 +27,11 @@
         "color": ""
       },
       {
-        "icon": "\ud83d\udc8a",
-        "title": "Pharmacie",
-        "subtitle": "Alertes & Commandes",
-        "detail": "3 alertes actives\n1 commande en attente",
-        "action": "url:https://oap.oacp.ca",
+        "icon": "\ud83d\udcdd",
+        "title": "BeeNotes",
+        "subtitle": "Quick Notes",
+        "detail": "Tes notes rapides\nSaisie et sauvegarde",
+        "action": "app:notes",
         "highlighted": true,
         "customizable": true,
         "color": ""
@@ -123,7 +123,7 @@
     "enabled": true,
     "_comment": "Module BeeEvents \u2014 Prochains \u00e9v\u00e9nements du calendrier. true = widget visible, false = masqu\u00e9.",
     "max_events": 6,
-    "_max_events_comment": "Nombre maximum d'\u00e9v\u00e9nements affich\u00e9s (1\u20135 recommand\u00e9)."
+    "_max_events_comment": "Nombre maximum d'évènements affichés (1\u20135 recommandé)."
   },
   "calendars": [
     {
@@ -147,7 +147,7 @@
     "author": "Maya & Marc Chabot",
     "license": "MIT",
     "repo": "github.com/marcchabot/beehive_os",
-    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9t\u00e9o ou les transitions."
+    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9to ou les transitions."
   },
   "window_icons": {
     "kitty": "\ud83d\udc1a",
@@ -160,7 +160,7 @@
     "zen": "\ud83e\uddd8",
     "default": "\ud83d\udcc4",
     "python3.11": "/usr/share/pixmaps/python3.11.xpm",
-    "display-im6.q16": "display-im6.q16"
+    "display.im6.q16": "display.im6.q16"
   },
   "vibe_mode": false,
   "corners_mode": true,
