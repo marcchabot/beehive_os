@@ -153,20 +153,20 @@ QtObject {
     }
 
     // ─── Palette HoneyLight ────────────────────────────────────
-    // v0.6.2: Nexus revamp — vibrant Honey Yellow, high-contrast, no muddy browns
+    // v0.6.3: Glassmorphism revamp — translucidité, chaleur miel, lisibilité maximale
     property QtObject light: QtObject {
         id: _light
-        readonly property color bg:            root._autoColor("bg", "#FAFAFA", "HoneyLight")
-        readonly property color accent:        root._autoColor("accent", "#FFB300", "HoneyLight")
-        readonly property color secondary:     root._autoColor("secondary", "#F0F0F0", "HoneyLight")
-        readonly property color textPrimary:   root._autoColor("textPrimary", "#111111", "HoneyLight")
-        readonly property color textSecondary: root._autoColor("textSecondary", "#555555", "HoneyLight")
-        readonly property color barBg:         root._autoColor("barBg", Qt.rgba(0.97,  0.97,  0.97,  0.96), "HoneyLight")
-        readonly property color glassBg:       root._autoColor("glassBg", Qt.rgba(1,     1,     1,     0.92), "HoneyLight")
-        readonly property color glassBorder:   root._autoColor("glassBorder", Qt.rgba(1.0,  0.70,  0.0,   0.45), "HoneyLight")
-        readonly property color backdropBg:    root._autoColor("backdropBg", Qt.rgba(0.96,  0.96,  0.96,  0.90), "HoneyLight")
-        readonly property real  auraAlpha:     root._autoNumber("auraAlpha", 0.45, "HoneyLight")
-        readonly property color separator:     root._autoColor("separator", Qt.rgba(0, 0, 0, 0.12), "HoneyLight")
+        readonly property color bg:            root._autoColor("bg", "#F5F0E8", "HoneyLight")
+        readonly property color accent:        root._autoColor("accent", "#E5A200", "HoneyLight")
+        readonly property color secondary:     root._autoColor("secondary", "#EDE8DD", "HoneyLight")
+        readonly property color textPrimary:   root._autoColor("textPrimary", "#2A1F0A", "HoneyLight")
+        readonly property color textSecondary: root._autoColor("textSecondary", "#6B5D48", "HoneyLight")
+        readonly property color barBg:         root._autoColor("barBg", Qt.rgba(0.94,  0.92,  0.88,  0.96), "HoneyLight")
+        readonly property color glassBg:       root._autoColor("glassBg", Qt.rgba(1,     1,     1,     0.72), "HoneyLight")
+        readonly property color glassBorder:   root._autoColor("glassBorder", Qt.rgba(0.90,  0.64,  0.0,   0.40), "HoneyLight")
+        readonly property color backdropBg:    root._autoColor("backdropBg", Qt.rgba(0.91,  0.89,  0.84,  0.92), "HoneyLight")
+        readonly property real  auraAlpha:     root._autoNumber("auraAlpha", 0.50, "HoneyLight")
+        readonly property color separator:     root._autoColor("separator", Qt.rgba(0.35, 0.28, 0.10, 0.18), "HoneyLight")
         readonly property string wallpaper:    "../assets/wallpaper_light_bee.png"
     }
 

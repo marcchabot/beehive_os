@@ -252,21 +252,22 @@ Rectangle {
                 }
                 ctx.closePath()
 
-                // Glassmorphism fill — Opaque et distinct selon le mode
+                // Glassmorphism fill — translucide et élégant dans les deux modes
                 if (hexCell.isHighlighted) {
                     ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 
-                        BeeTheme.mode === "HoneyDark" ? 0.12 : 0.85)
+                        BeeTheme.mode === "HoneyDark" ? 0.12 : 0.22)
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
-                        ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
-                        : "#DABD93" // Jaune doux personnalisé Marc 🐝
+                        ? "rgba(18, 18, 20, 0.88)"         // Gris anthracite foncé opaque
+                        : "rgba(255, 255, 255, 0.55)"      // Blanc nacré translucide (glassmorphism)
                 }
                 ctx.fill()
 
                 // Bordure principale
                 ctx.strokeStyle = hexCell.isHighlighted
                     ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
-                    : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b, 0.5)
+                    : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b,
+                        BeeTheme.mode === "HoneyDark" ? 0.5 : 0.35)
                 ctx.lineWidth = hexCell.isHighlighted ? 2 : 1.5
                 ctx.stroke()
 
@@ -281,10 +282,10 @@ Rectangle {
                     else         ctx.lineTo(px2, py2)
                 }
                 ctx.closePath()
-                // Bordure adaptative : reflet doré en Dark, reflet miel en Light
+                // Bordure intérieure : reflet lumineux adaptatif
                 ctx.strokeStyle = BeeTheme.mode === "HoneyDark" 
-                    ? "rgba(255, 215, 0, 0.15)" // Reflet doré léger
-                    : "rgba(255, 179, 0, 0.18)" // Reflet miel Nexus
+                    ? "rgba(255, 215, 0, 0.15)"     // Reflet doré léger (Dark)
+                    : "rgba(255, 200, 80, 0.25)"    // Reflet miel chaud (Light)
                 ctx.lineWidth = 1.5
                 ctx.stroke()
             }
@@ -326,7 +327,7 @@ Rectangle {
             Text {
                 text: hexCell.title
                 color: hexCell.isHighlighted 
-                    ? (BeeTheme.mode === "HoneyDark" ? BeeTheme.accent : "#000000") 
+                    ? BeeTheme.accent
                     : BeeTheme.textPrimary
                 font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -336,7 +337,7 @@ Rectangle {
             Text {
                 text: hexCell.subtitle
                 color: hexCell.isHighlighted 
-                    ? (BeeTheme.mode === "HoneyDark" ? BeeTheme.accent : "#333333") 
+                    ? BeeTheme.accent
                     : BeeTheme.textSecondary
                 font.pixelSize: 11
                 horizontalAlignment: Text.AlignHCenter
@@ -347,8 +348,8 @@ Rectangle {
 
             Text {
                 text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
-                color: hexCell.isHighlighted 
-                    ? (BeeTheme.mode === "HoneyDark" ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3) : "#555555") 
+                color: hexCell.isHighlighted
+                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
                     : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
