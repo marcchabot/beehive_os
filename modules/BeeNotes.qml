@@ -1,11 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import "."
+import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.0 : Simple sticky notes with persistence
+// v1.2 : Qt 6 compatible with QtQuick.Effects
 // ═══════════════════════════════════════════════════════════════
 
 Rectangle {
@@ -18,26 +18,19 @@ Rectangle {
     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
     border.width: 1
     
-    // Glassmorphism effect
-    layer.enabled: true
-    layer.effect: Effect {
-        id: glassEffect
-        property real blurRadius: 12
-        property color blurColor: BeeTheme.surface
-        Blur { radius: glassEffect.blurRadius }
-        ColorOverlay { color: glassEffect.blurColor; opacity: 0.1 }
-    }
-    
-    // Drop shadow
-    DropShadow {
+    // Drop shadow (Qt 6 compatible) - using Shadow from QtQuick.Effects
+    Shadow {
         anchors.fill: parent
         horizontalOffset: 0
         verticalOffset: 4
         radius: 16
-        samples: 17
         color: "#20000000"
         source: parent
     }
+    
+    // Simplified glassmorphism using visual properties
+    // (layer.effect with complex effects doesn't work well inside the same item)
+    // The semi-transparent background + border + radius already provides glass effect
     
     property var notesData: []
     property string notesFile: "file://" + Qt.resolvedUrl("../data/quick_notes.json")
