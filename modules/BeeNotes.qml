@@ -18,14 +18,15 @@ Rectangle {
     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
     border.width: 1
     
-    // Drop shadow (Qt 6 compatible) - using Shadow from QtQuick.Effects
-    Shadow {
+    // Drop shadow (Qt 6 compatible) - using MultiEffect from QtQuick.Effects
+    MultiEffect {
         anchors.fill: parent
-        horizontalOffset: 0
-        verticalOffset: 4
-        radius: 16
-        color: "#20000000"
         source: parent
+        shadowEnabled: true
+        shadowColor: "#20000000"
+        shadowBlur: 16
+        shadowVerticalOffset: 4
+        shadowHorizontalOffset: 0
     }
     
     // Simplified glassmorphism using visual properties
