@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.7 : Close button + Fixed persistence (color as hex string)
+// v1.8 : Fix persistence — flush save on close/destruction
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -57,8 +57,17 @@ Item {
     // Predefined note colors (hex strings for JSON compatibility)
     property var noteColors: ["#FFC107", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722"]
     
+    property bool hasPendingSave: false
+
     Component.onCompleted: {
         loadNotes()
+    }
+
+    Component.onDestruction: {
+        if (hasPendingSave || saveTimer.running) {
+            saveTimer.stop()
+            flushSave()
+        }
     }
     
     function loadNotes() {
@@ -112,6 +121,7 @@ Item {
         }
         notesData = data
         
+        hasPendingSave = true
         saveTimer.start()
     }
     
@@ -120,13 +130,19 @@ Item {
         id: saveTimer
         interval: 300
         onTriggered: {
-            var request = new XMLHttpRequest()
-            request.open("PUT", notesFile)
-            request.setRequestHeader("Content-Type", "application/json")
-            request.send(JSON.stringify(notesData, null, 2))
-            console.log("BeeNotes: Saved " + notesData.length + " notes")
-            saveAnimation.start()
+            flushSave()
         }
+    }
+
+    // Immediate save (no debounce) — used on close/destruction
+    function flushSave() {
+        hasPendingSave = false
+        var request = new XMLHttpRequest()
+        request.open("PUT", notesFile)
+        request.setRequestHeader("Content-Type", "application/json")
+        request.send(JSON.stringify(notesData, null, 2))
+        console.log("BeeNotes: Saved " + notesData.length + " notes")
+        saveAnimation.start()
     }
     
     function addNote() {
@@ -215,7 +231,14 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: beeNotesRoot.closeRequested()
+                        onClicked: {
+                            // Flush any pending save before closing
+                            if (hasPendingSave || saveTimer.running) {
+                                saveTimer.stop()
+                                flushSave()
+                            }
+                            beeNotesRoot.closeRequested()
+                        }
                     }
                 }
             }
