@@ -2,10 +2,11 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
+import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v2.0 : Simple text file persistence — no JSON, no timers
+// v2.1 : Process-based file persistence (Qt6 compatible)
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -30,6 +31,7 @@ Item {
     }
 
     // ─── Logique de données ──────────────────────────────────────
+    property string notesFilePath: "/home/marc/beehive_os/data/notes.txt"
     property string notesFile: "file:///home/marc/beehive_os/data/notes.txt"
 
     // Predefined note colors (hex strings)
@@ -100,8 +102,10 @@ Item {
         request.send()
     }
 
-    // ─── Save: write entire model to text file immediately ───────
+    // ─── Save: write entire model to text file via Process ───────
     // Format: timestamp|color|text  (one line per note)
+    // Uses Process (Quickshell.Io) instead of XMLHttpRequest PUT
+    // because Qt6 blocks XHR PUT on local files by default.
     function saveNotes() {
         var lines = []
         for (var i = 0; i < notesModel.count; i++) {
@@ -114,12 +118,23 @@ Item {
             lines.push(item.timestamp + "|" + noteColor + "|" + item.text)
         }
         var content = lines.join("\n")
-        var request = new XMLHttpRequest()
-        request.open("PUT", notesFile)
-        request.setRequestHeader("Content-Type", "text/plain")
-        request.send(content)
-        console.log("BeeNotes: Saved " + notesModel.count + " notes to text file")
+        // Escape single quotes and special chars for shell safety
+        var escaped = content.replace(/'/g, "'\\'").replace(/\\/g, "\\\\")
+        saveProcess.command = ["bash", "-c", "cat > '" + notesFilePath + "' <<< '" + escaped + "'"]
+        saveProcess.running = true
+        console.log("BeeNotes: Saving " + notesModel.count + " notes to text file")
         saveAnimation.start()
+    }
+
+    Process {
+        id: saveProcess
+        onExited: function(code, status) {
+            if (code === 0) {
+                console.log("BeeNotes: Saved " + notesModel.count + " notes successfully")
+            } else {
+                console.warn("BeeNotes: Save failed with exit code", code)
+            }
+        }
     }
 
     function addNote() {
