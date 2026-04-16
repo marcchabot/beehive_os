@@ -258,7 +258,7 @@ Rectangle {
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
                         ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
-                        : "rgba(245, 245, 250, 0.92)" // Blanc cassé opaque
+                        : "rgba(250, 250, 250, 0.90)" // Blanc pur neutre — crisp
                 }
                 ctx.fill()
 
@@ -280,10 +280,10 @@ Rectangle {
                     else         ctx.lineTo(px2, py2)
                 }
                 ctx.closePath()
-                // Bordure adaptative : blanc en Dark, noir en Light
+                // Bordure adaptative : reflet doré en Dark, reflet miel en Light
                 ctx.strokeStyle = BeeTheme.mode === "HoneyDark" 
                     ? "rgba(255, 215, 0, 0.15)" // Reflet doré léger
-                    : "rgba(0, 0, 0, 0.1)"
+                    : "rgba(255, 179, 0, 0.18)" // Reflet miel Nexus
                 ctx.lineWidth = 1.5
                 ctx.stroke()
             }

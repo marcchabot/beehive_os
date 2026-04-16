@@ -1,6 +1,6 @@
 {
   "name": "Bee-Hive OS",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Maya & Marc",
   "active_palette": "HoneyDark",
   "palettes": {
@@ -14,12 +14,12 @@
       "wallpaper":     "wallpaper_dark_bee.png"
     },
     "HoneyLight": {
-      "background":    "#FCFBF7",
-      "accent":        "#FFB81C",
-      "secondary":     "#EDE6D8",
-      "text_primary":  "#000000",
-      "text_secondary":"#666666",
-      "aura_glow":     "rgba(255, 184, 28, 0.5)",
+      "background":    "#FAFAFA",
+      "accent":        "#FFB300",
+      "secondary":     "#F0F0F0",
+      "text_primary":  "#111111",
+      "text_secondary":"#555555",
+      "aura_glow":     "rgba(255, 179, 0, 0.45)",
       "wallpaper":     "wallpaper_light_bee.png"
     }
   },

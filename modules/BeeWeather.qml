@@ -40,7 +40,7 @@ Item {
         var fallback = {
             0:  ["☀️", "Dégagé"],        1:  ["🌤️", "Plutôt dégagé"],
             2:  ["⛅", "Partiellement nuageux"], 3: ["☁️", "Couvert"],
-            45: ["🌫️", "Brouillard"],   48: ["🌫️", "Brouillard givrant"],
+            45: ["🌁", "Brouillard"],    48: ["🌁", "Brouillard givrant"],
             51: ["🌦️", "Bruine légère"], 53: ["🌦️", "Bruine modérée"], 55: ["🌦️", "Bruine dense"],
             61: ["🌧️", "Pluie légère"],  63: ["🌧️", "Pluie modérée"],  65: ["🌧️", "Pluie forte"],
             71: ["🌨️", "Neige légère"],  73: ["🌨️", "Neige modérée"],  75: ["🌨️", "Neige forte"],
@@ -115,7 +115,7 @@ Item {
 
         Text {
             text: beeWeather.icon
-            font.pixelSize: 18
+            font { pixelSize: 22; family: "Noto Color Emoji" }
             Layout.alignment: Qt.AlignVCenter
         }
 
