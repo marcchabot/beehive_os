@@ -13,7 +13,7 @@ Item {
     id: beeNotesRoot
     
     width: 320
-    height: 400
+    height: 420
 
     // ─── Signal pour fermer le PanelWindow parent ────────────────
     signal closeRequested()
@@ -23,7 +23,7 @@ Item {
         id: mainBkg
         anchors.centerIn: parent
         width: 320
-        height: 400
+        height: 420
         radius: 12
         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.85)
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
@@ -345,7 +345,7 @@ Item {
         Rectangle {
             id: inputArea
             width: parent.width
-            height: 80
+            height: 100
             color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.5)
             anchors.bottom: parent.bottom
             
