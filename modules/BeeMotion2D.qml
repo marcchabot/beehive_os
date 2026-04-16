@@ -53,9 +53,6 @@ Item {
         anchors.fill: parent
         visible: false   // utilisé pour le rendu, pas visible par l'utilisateur
 
-        property real _lastMotionX: -2.0
-        property real _lastMotionY: -2.0
-
         Component.onCompleted: {
             // Initialisation des particules sur root
             var initParticles = []
@@ -126,9 +123,7 @@ Item {
                 ctx.restore()
             }
 
-            // Sauvegarder l'état actuel pour la prochaine comparaison
-            root._lastMotionX = root._motionX
-            root._lastMotionY = root._motionY
+            // Fin du rendu
         }
     }
 
