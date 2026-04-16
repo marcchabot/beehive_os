@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.4 : Final Polish - Fixed BeeTheme references & Syntax
+// v1.5 : Final Polish - Strict Syntax Clean
 // ═══════════════════════════════════════════════════════════════
 
 Item {
