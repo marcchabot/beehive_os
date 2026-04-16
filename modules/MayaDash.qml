@@ -257,16 +257,16 @@ Rectangle {
                     ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.85)
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
-                        ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
-                        : "rgba(245, 242, 235, 0.92)" // Crème clair opaque
+                        ? "rgba(25, 20, 15, 0.9)"    // Ambre très sombre, chaud
+                        : "rgba(245, 242, 235, 0.92)" // Crème clair
                 }
                 ctx.fill()
 
                 // Bordure principale
                 ctx.strokeStyle = hexCell.isHighlighted
                     ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
-                    : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b, BeeTheme.glassBorder.a)
-                ctx.lineWidth = hexCell.isHighlighted ? 2 : 1
+                    : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b, 0.5)
+                ctx.lineWidth = hexCell.isHighlighted ? 2 : 1.5
                 ctx.stroke()
 
                 // Bordure intérieure (glassmorphism layer)
@@ -282,9 +282,9 @@ Rectangle {
                 ctx.closePath()
                 // Bordure adaptative : blanc en Dark, noir en Light
                 ctx.strokeStyle = BeeTheme.mode === "HoneyDark" 
-                    ? "rgba(255, 255, 255, 0.04)" 
-                    : "rgba(0, 0, 0, 0.08)"
-                ctx.lineWidth = 1
+                    ? "rgba(255, 215, 0, 0.15)" // Reflet doré léger
+                    : "rgba(0, 0, 0, 0.1)"
+                ctx.lineWidth = 1.5
                 ctx.stroke()
             }
         }
