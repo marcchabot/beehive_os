@@ -33,19 +33,7 @@ Rectangle {
     // ─── Signaux externes ─────────────────────────────────────
     signal openSettings()
     signal openStudio()
-    
-    // BeeNotes dialog
-    property bool notesDialogVisible: false
-    
-    function openNotesDialog() {
-        notesDialogVisible = true
-        BeeSound.playEvent("dash.open", {})
-    }
-    
-    function closeNotesDialog() {
-        notesDialogVisible = false
-        BeeSound.playEvent("dash.close", {})
-    }
+    signal openNotes()
 
     function resolveCellData(slot) {
         var _rev = BeeConfig.cellsRevision
@@ -86,9 +74,9 @@ Rectangle {
             var cmd = action.substring(4).trim()
             if (!cmd) return
             
-            // Special case: app:notes opens BeeNotes dialog
+            // Special case: app:notes opens BeeNotes panel
             if (cmd === "notes") {
-                openNotesDialog()
+                mayaDash.openNotes()
                 return
             }
             
@@ -521,100 +509,5 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
     }
     
-    // ─── BeeNotes Dialog Overlay (Shield) ────────────────────
-    Item {
-        id: notesOverlay
-        anchors.fill: parent
-        visible: notesDialogVisible
-        z: 99
 
-        // Fond qui ferme le dialog quand on clique DEHORS du Rectangle
-        Rectangle {
-            anchors.fill: parent
-            color: "transparent"
-            
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    // Vérifie si le clic est en dehors du dialog
-                    var dialogPos = notesDialog.mapToItem(notesOverlay, 0, 0)
-                    var inDialog = mouse.x >= dialogPos.x && mouse.x <= dialogPos.x + notesDialog.width &&
-                                   mouse.y >= dialogPos.y && mouse.y <= dialogPos.y + notesDialog.height
-                    if (!inDialog) {
-                        closeNotesDialog()
-                    }
-                }
-            }
-        }
-    }
-
-    // ─── BeeNotes Dialog ──────────────────────────────────────
-    Rectangle {
-        id: notesDialog
-        width: 360
-        height: 480
-        anchors.centerIn: parent
-        radius: 16
-        color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.95)
-        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
-        border.width: 1
-        visible: notesDialogVisible
-        opacity: notesDialogVisible ? 0.95 : 0
-        scale: notesDialogVisible ? 1 : 0.9
-        z: 100
-        
-        layer.enabled: true
-        
-        // Pas besoin de MouseArea ici - l'overlay vérifie si on clique hors du dialog
-        
-        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
-        
-        // Header
-        Rectangle {
-            width: parent.width
-            height: 50
-            color: "transparent"
-            
-            Text {
-                text: "📝 Quick Notes"
-                font { bold: true; pixelSize: 18 }
-                color: BeeTheme.textPrimary
-                anchors.centerIn: parent
-            }
-            
-            // Close button
-            Rectangle {
-                width: 32
-                height: 32
-                radius: 16
-                color: Qt.rgba(1, 0.3, 0.3, 0.1)
-                border.color: "#ff4444"
-                border.width: 1
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 16
-                
-                Text {
-                    text: "×"
-                    font { bold: true; pixelSize: 20 }
-                    color: "#ff4444"
-                    anchors.centerIn: parent
-                }
-                
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: closeNotesDialog()
-                }
-            }
-        }
-        
-        // BeeNotes component
-        BeeNotes {
-            anchors.top: parent.top
-            anchors.topMargin: 60
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
 }

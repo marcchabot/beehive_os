@@ -113,6 +113,10 @@ ShellRoot {
             root.searchVisible   = true 
             BeeSound.playEvent("dash.open")
         }
+        function showNotes()    {
+            root.notesVisible = !root.notesVisible
+            BeeSound.playEvent(root.notesVisible ? "dash.open" : "dash.close")
+        }
         function showWelcome()  { 
             root.welcomeVisible  = true 
             BeeSound.playEvent("dash.open")
@@ -182,6 +186,7 @@ ShellRoot {
                 beeVibeEnabled:   BeeBarState.vibeActive
                 onOpenSettings: { root.controlTab = 3; root.controlVisible = true }
                 onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
+                onOpenNotes:    { root.notesVisible = !root.notesVisible; BeeSound.playEvent(root.notesVisible ? "dash.open" : "dash.close") }
             }
 
             Clock {
@@ -358,6 +363,48 @@ ShellRoot {
                             root.searchVisible = false
                             BeeSound.playEvent("dash.close")
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    // ─── BeeNotes Panel (focusable, own PanelWindow) ─────────────
+    property bool notesVisible: false
+
+    Loader {
+        active: root.notesVisible
+        sourceComponent: Variants {
+            model: Quickshell.screens
+            delegate: PanelWindow {
+                required property var modelData
+                screen: modelData
+                WlrLayershell.layer: WlrLayer.Top
+                WlrLayershell.namespace: "beehive-notes"
+                focusable: true
+                anchors { top: true; bottom: true; left: true; right: true }
+                color: "transparent"
+
+                // Overlay semi-transparent (clic dehors → fermer)
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(0, 0, 0, 0.5)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.notesVisible = false
+                            BeeSound.playEvent("dash.close")
+                        }
+                    }
+                }
+
+                // BeeNotes centré dans le panel (par-dessus l'overlay)
+                BeeNotes {
+                    anchors.centerIn: parent
+                    onCloseRequested: {
+                        root.notesVisible = false
+                        BeeSound.playEvent("dash.close")
                     }
                 }
             }

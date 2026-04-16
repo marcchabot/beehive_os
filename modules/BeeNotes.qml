@@ -14,6 +14,9 @@ Item {
     width: 320
     height: 400
 
+    // ─── Signal pour fermer le PanelWindow parent ────────────────
+    signal closeRequested()
+
     // ─── Visuel principal (le "corps" des notes) ─────────────────
     Rectangle {
         id: mainBkg
