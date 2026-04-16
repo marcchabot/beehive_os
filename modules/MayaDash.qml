@@ -207,23 +207,41 @@ Rectangle {
         // ─── Propriétés réactives pour le Canvas ──────────────────
         // Utilisent BeeTheme._progress (0=Dark, 1=Light) pour interpoler
         // correctement pendant la transition animée Dark↔Light.
-        property color _cellFillColor: hexCell.isHighlighted
-            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b,
-                BeeTheme._progress < 0.5 ? 0.12 : 0.22)
-            : Qt.rgba(
-                0.07 + (1.0 - 0.07) * BeeTheme._progress,     // R: 0.07→1.0
-                0.07 + (1.0 - 0.07) * BeeTheme._progress,     // G: 0.07→1.0
-                0.08 + (1.0 - 0.08) * BeeTheme._progress,     // B: 0.08→1.0
-                0.88 + (0.55 - 0.88) * BeeTheme._progress)    // A: 0.88→0.55
+        //
+        // IMPORTANT: Les cellules highlighted utilisent un fill DIFFÉRENT
+        // en Light (blanc nacré translucide + bordure accent) car l'accent
+        // couleur avec alpha donne du jaune moutarde sur fond clair.
+        property color _cellFillColor: {
+            var p = BeeTheme._progress
+            if (hexCell.isHighlighted) {
+                // Dark: accent très translucide (0.12)
+                // Light: blanc nacré translucide (même base que normal, un peu plus opaque)
+                Qt.rgba(
+                    BeeTheme.accent.r * (1 - p) + (0.97 * p),
+                    BeeTheme.accent.g * (1 - p) + (0.95 * p),
+                    BeeTheme.accent.b * (1 - p) + (0.88 * p),
+                    0.12 * (1 - p) + 0.65 * p
+                )
+            } else {
+                // Dark: gris anthracite (0.07, 0.07, 0.08, 0.88)
+                // Light: blanc nacré (1.0, 1.0, 1.0, 0.55)
+                Qt.rgba(
+                    0.07 + (1.0 - 0.07) * p,
+                    0.07 + (1.0 - 0.07) * p,
+                    0.08 + (1.0 - 0.08) * p,
+                    0.88 + (0.55 - 0.88) * p
+                )
+            }
+        }
         property color _cellBorderColor: hexCell.isHighlighted
             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
             : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b,
-                0.5 + (0.35 - 0.5) * BeeTheme._progress)       // alpha: 0.5→0.35
+                0.5 + (0.35 - 0.5) * BeeTheme._progress)
         property color _innerBorderColor: Qt.rgba(
-            1.0,                                              // R
-            0.84 + (0.78 - 0.84) * BeeTheme._progress,       // G: 0.84→0.78
-            0.0  + (0.31 - 0.0) * BeeTheme._progress,       // B: 0→0.31
-            0.15 + (0.25 - 0.15) * BeeTheme._progress)      // A: 0.15→0.25
+            1.0,
+            0.84 + (0.78 - 0.84) * BeeTheme._progress,
+            0.0  + (0.31 - 0.0) * BeeTheme._progress,
+            0.15 + (0.25 - 0.15) * BeeTheme._progress)
         property real _cellBorderWidth: hexCell.isHighlighted ? 2 : 1.5
 
         onIsHighlightedChanged: hexCanvas.requestPaint()
@@ -330,8 +348,9 @@ Rectangle {
 
             Text {
                 text: hexCell.title
-                color: hexCell.isHighlighted 
-                    ? BeeTheme.accent
+                color: hexCell.isHighlighted
+                    ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b,
+                        BeeTheme._progress < 0.5 ? 1.0 : 1.0)  // toujours lisible
                     : BeeTheme.textPrimary
                 font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -340,8 +359,8 @@ Rectangle {
 
             Text {
                 text: hexCell.subtitle
-                color: hexCell.isHighlighted 
-                    ? BeeTheme.accent
+                color: hexCell.isHighlighted
+                    ? BeeTheme.textSecondary
                     : BeeTheme.textSecondary
                 font.pixelSize: 11
                 horizontalAlignment: Text.AlignHCenter
@@ -353,7 +372,7 @@ Rectangle {
             Text {
                 text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
                 color: hexCell.isHighlighted
-                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
+                    ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
                     : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
