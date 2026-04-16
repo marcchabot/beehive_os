@@ -254,11 +254,11 @@ Rectangle {
 
                 // Glassmorphism fill — Opaque et distinct selon le mode
                 if (hexCell.isHighlighted) {
-                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.85)
+                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
-                        ? "rgba(25, 20, 15, 0.9)"    // Ambre très sombre, chaud
-                        : "rgba(245, 242, 235, 0.92)" // Crème clair
+                        ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
+                        : "rgba(245, 245, 250, 0.92)" // Blanc cassé opaque
                 }
                 ctx.fill()
 
@@ -324,7 +324,7 @@ Rectangle {
 
             Text {
                 text: hexCell.title
-                color: hexCell.isHighlighted ? "#000000" : BeeTheme.textPrimary
+                color: hexCell.isHighlighted ? BeeTheme.accent : BeeTheme.textPrimary
                 font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
                 anchors.horizontalCenter: parent.horizontalCenter
                 Behavior on color { ColorAnimation { duration: 600 } }
@@ -332,7 +332,7 @@ Rectangle {
 
             Text {
                 text: hexCell.subtitle
-                color: hexCell.isHighlighted ? "#333333" : BeeTheme.textSecondary
+                color: BeeTheme.textSecondary
                 font.pixelSize: 11
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -342,7 +342,7 @@ Rectangle {
 
             Text {
                 text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
-                color: hexCell.isHighlighted ? "#555555" : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
