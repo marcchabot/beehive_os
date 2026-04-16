@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.3 : Final Qt 6 fix using MultiEffect for shadows
+// v1.4 : Final Polish - Fixed BeeTheme references & Syntax
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -24,8 +24,6 @@ Item {
         color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.85)
         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
         border.width: 1
-        
-        // On laisse le MultiEffect gérer l'ombre et le flou en externe
     }
 
     // ─── Ombre et Effets (Qt 6 Modern Approach) ──────────────────
@@ -34,14 +32,11 @@ Item {
         anchors.fill: mainBkg
         source: mainBkg
         
-        // Shadow configuration
         shadowEnabled: true
         shadowColor: "#40000000"
-        shadowBlur: 1.0  // Normalised blur
+        shadowBlur: 1.0
         shadowVerticalOffset: 4
         shadowHorizontalOffset: 0
-        
-        // On peut ajouter un léger flou si besoin, mais l'ombre suffit pour le relief
     }
 
     // ─── Logique de données ──────────────────────────────────────
@@ -111,11 +106,10 @@ Item {
         saveNotes()
     }
     
-    // ─── Contenu UI (superposé au rectangle mainBkg) ──────────────
+    // ─── Contenu UI ──────────────────────────────────────────────
     Item {
         anchors.fill: mainBkg
 
-        // Header
         Rectangle {
             id: header
             width: parent.width
@@ -130,7 +124,7 @@ Item {
                 Text {
                     text: "📝 Quick Notes"
                     font { bold: true; pixelSize: 16 }
-                    color: BeeTheme.text
+                    color: BeeTheme.textPrimary
                     Layout.alignment: Qt.AlignVCenter
                 }
                 
@@ -139,7 +133,7 @@ Item {
                 Text {
                     text: notesModel.count + " note" + (notesModel.count !== 1 ? "s" : "")
                     font.pixelSize: 12
-                    color: Qt.rgba(BeeTheme.text.r, BeeTheme.text.g, BeeTheme.text.b, 0.7)
+                    color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.7)
                     Layout.alignment: Qt.AlignVCenter
                 }
             }
@@ -152,7 +146,6 @@ Item {
             }
         }
         
-        // Notes list
         ListView {
             id: notesList
             anchors.top: header.bottom
@@ -195,14 +188,14 @@ Item {
                         text: model.text
                         wrapMode: Text.Wrap
                         font.pixelSize: 13
-                        color: BeeTheme.text
+                        color: BeeTheme.textPrimary
                     }
                     
                     Text {
                         width: parent.width
                         text: model.timestamp
                         font.pixelSize: 10
-                        color: Qt.rgba(BeeTheme.text.r, BeeTheme.text.g, BeeTheme.text.b, 0.5)
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
                         horizontalAlignment: Text.AlignRight
                     }
                 }
@@ -243,7 +236,7 @@ Item {
                 visible: notesModel.count === 0
                 text: "No notes yet\nType below to add your first note!"
                 font.pixelSize: 14
-                color: Qt.rgba(BeeTheme.text.r, BeeTheme.text.g, BeeTheme.text.b, 0.5)
+                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 anchors.centerIn: parent
@@ -252,7 +245,6 @@ Item {
             }
         }
         
-        // Input area
         Rectangle {
             id: inputArea
             width: parent.width
@@ -275,7 +267,7 @@ Item {
                     width: parent.width; height: 36
                     placeholderText: "Type your note here..."
                     font.pixelSize: 13
-                    color: BeeTheme.text
+                    color: BeeTheme.textPrimary
                     background: Rectangle {
                         radius: 6
                         color: Qt.rgba(BeeTheme.surface.r, BeeTheme.surface.g, BeeTheme.surface.b, 0.7)
