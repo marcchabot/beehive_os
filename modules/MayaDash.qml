@@ -519,6 +519,15 @@ Rectangle {
         
         layer.enabled: true
         
+        // ⛔ BLOQUE la propagation des clics vers l'overlay
+        // Sans ça, les clics dans BeeNotes ferment le dialog !
+        MouseArea {
+            anchors.fill: parent
+            onPressed: mouse.accepted = true
+            onReleased: mouse.accepted = true
+            onClicked: mouse.accepted = true
+        }
+        
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
         
