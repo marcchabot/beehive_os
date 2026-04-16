@@ -106,7 +106,7 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py"]
+        command: ["bash", "-c", "python3 /opt/maya/.openclaw/workspace/projects/beehive_os/scripts/update_icons.py"]
         running: false
         stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
         stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
@@ -254,7 +254,7 @@ Rectangle {
     // ─── Window Tracker (moved from BeeBarState singleton) ──────────
     property Process windowTracker: Process {
         id: _windowTracker
-        command: ["python3", "/home/marc/beehive_os/scripts/get_active_window.py"]
+        command: ["python3", "/opt/maya/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
         running: false  // <-- Démarré par le timer
         stdout: SplitParser {
             onRead: (line) => {
