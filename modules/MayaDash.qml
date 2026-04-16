@@ -204,22 +204,26 @@ Rectangle {
         property real vibeValue: beeVibe.barValues.length > cellIndex
                                  ? beeVibe.barValues[cellIndex] : 0.0
 
-        // ─── Propriétés réactives pour forcer le repaint du Canvas ──
-        // Les propriétés QML créent des dépendances automatiques.
-        // Quand elles changent, onPaint se déclenche via requestPaint().
+        // ─── Propriétés réactives pour le Canvas ──────────────────
+        // Utilisent BeeTheme._progress (0=Dark, 1=Light) pour interpoler
+        // correctement pendant la transition animée Dark↔Light.
         property color _cellFillColor: hexCell.isHighlighted
             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b,
-                BeeTheme.mode === "HoneyDark" ? 0.12 : 0.22)
-            : BeeTheme.mode === "HoneyDark"
-                ? Qt.rgba(0.07, 0.07, 0.08, 0.88)    // Gris anthracite (Dark)
-                : Qt.rgba(1.0, 1.0, 1.0, 0.55)       // Blanc nacré translucide (Light)
+                BeeTheme._progress < 0.5 ? 0.12 : 0.22)
+            : Qt.rgba(
+                0.07 + (1.0 - 0.07) * BeeTheme._progress,     // R: 0.07→1.0
+                0.07 + (1.0 - 0.07) * BeeTheme._progress,     // G: 0.07→1.0
+                0.08 + (1.0 - 0.08) * BeeTheme._progress,     // B: 0.08→1.0
+                0.88 + (0.55 - 0.88) * BeeTheme._progress)    // A: 0.88→0.55
         property color _cellBorderColor: hexCell.isHighlighted
             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7)
             : Qt.rgba(BeeTheme.glassBorder.r, BeeTheme.glassBorder.g, BeeTheme.glassBorder.b,
-                BeeTheme.mode === "HoneyDark" ? 0.5 : 0.35)
-        property color _innerBorderColor: BeeTheme.mode === "HoneyDark"
-            ? Qt.rgba(1, 0.84, 0, 0.15)       // Reflet doré (Dark)
-            : Qt.rgba(1, 0.78, 0.31, 0.25)    // Reflet miel (Light)
+                0.5 + (0.35 - 0.5) * BeeTheme._progress)       // alpha: 0.5→0.35
+        property color _innerBorderColor: Qt.rgba(
+            1.0,                                              // R
+            0.84 + (0.78 - 0.84) * BeeTheme._progress,       // G: 0.84→0.78
+            0.0  + (0.31 - 0.0) * BeeTheme._progress,       // B: 0→0.31
+            0.15 + (0.25 - 0.15) * BeeTheme._progress)      // A: 0.15→0.25
         property real _cellBorderWidth: hexCell.isHighlighted ? 2 : 1.5
 
         onIsHighlightedChanged: hexCanvas.requestPaint()
@@ -247,6 +251,9 @@ Rectangle {
                 var ctx = getContext("2d")
                 if (!ctx) return
 
+                // VIDER le Canvas avant de redessiner (sinon l'ancien fill persiste)
+                ctx.clearRect(0, 0, width, height)
+
                 var cx = width / 2
                 var cy = height / 2
                 var r  = Math.min(width, height) / 2 - 4
@@ -262,12 +269,12 @@ Rectangle {
                 }
                 ctx.closePath()
 
-                // Glassmorphism fill — propriétés réactives
-                ctx.fillStyle = hexCell._cellFillColor
+                // Glassmorphism fill — propriétés réactives interpolées
+                ctx.fillStyle = hexCell._cellFillColor.toString()
                 ctx.fill()
 
                 // Bordure principale
-                ctx.strokeStyle = hexCell._cellBorderColor
+                ctx.strokeStyle = hexCell._cellBorderColor.toString()
                 ctx.lineWidth = hexCell._cellBorderWidth
                 ctx.stroke()
 
@@ -282,7 +289,7 @@ Rectangle {
                     else         ctx.lineTo(px2, py2)
                 }
                 ctx.closePath()
-                ctx.strokeStyle = hexCell._innerBorderColor
+                ctx.strokeStyle = hexCell._innerBorderColor.toString()
                 ctx.lineWidth = 1.5
                 ctx.stroke()
             }
