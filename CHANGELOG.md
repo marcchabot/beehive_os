@@ -1,0 +1,67 @@
+# Changelog — Bee-Hive OS 🐝
+
+All notable changes to Bee-Hive OS will be documented in this file.
+
+---
+
+## [2.1.1] — 2026-04-16
+
+### BeeNotes — Quick Notes Widget 📝
+
+- **PanelWindow Migration**: BeeNotes migrated to a dedicated `PanelWindow` with `focusable: true` and `WlrLayer.Top`, providing proper keyboard focus and overlay behavior.
+- **Close Button (✕)**: Added a close button in the header with hover animation (red highlight on hover).
+- **Click-Outside-to-Close**: Semi-transparent overlay captures clicks outside the notes panel to dismiss it.
+- **Text File Persistence**: Notes are persisted to `data/notes.txt` using a `Process`-based I/O approach (compatible with Qt6 XHR restrictions). Format: `timestamp|color|text` (one line per note).
+- **UI Fix**: Corrected "Add Note" button overflow in the input area by adjusting layout constraints.
+- **i18n**: All user-facing strings now use `BeeConfig.tr` for English/French localization.
+
+### BeeBar
+
+- **Icon Fallback Fix**: Improved `currentIcon` logic in `BeeBar.qml` to handle error states from the window tracker, ensuring the default bee icon 🐝 is shown instead of error text.
+
+---
+
+## [2.1.0] — 2026-03-25
+
+### Persistence & Stability
+
+- **Bug Fix**: Import `QtCore` to resolve `StandardPaths` reference error in `BeeConfig.qml`.
+- **History Persistence**: Notification history (`BeeBarState.historyModel`) saved to `~/.cache/beehive_os/history.json`.
+- **Framework Stability**: Improved singleton architecture and I/O error handling.
+
+---
+
+## [2.0.0] — 2026-03-21
+
+### Multilingual Support (i18n)
+
+- Full French/English localization via `i18n/fr.json` and `i18n/en.json`.
+- `BeeConfig.tr` API for QML components with fallback strings.
+- Language selector in BeeSettings.
+
+### Public Launch (v1.3.7)
+
+- Security & Privacy: `.gitignore` hardened, private data removed from tracking.
+- Public template: `user_config.example.json` for new users.
+- Nectar Sync v2: Decoupled data sync, live daemon + IPC.
+
+---
+
+## [1.0.0] — 2026-03-21
+
+### Initial Release 🚀🍯
+
+- BeeBar — CPU/RAM/NET/DISK + Stealth Mode
+- BeeNotify — Stylized notifications
+- BeeCorners — Fake Rounding engine
+- BeeWallpaper — Fluid transitions + 4K Assets
+- BeeSettings — Configuration interface
+- BeeWeather — Universal weather without API key
+- BeeEvents — Calendar connectors
+- BeeMotion — 3D Parallax
+- BeeStudio — Full visual editor
+- BeeSearch — System scan + Favorites 📌
+- BeeVibe — Cava audio visualizer
+- BeePower — Power management ⚡
+- BeeAura Notifications & OSD — 100% native Quickshell system
+- Bee-Hive SDDM — Animated login screen

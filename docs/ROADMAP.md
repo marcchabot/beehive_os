@@ -62,6 +62,9 @@ The goal was a mind-blowing launch the weekend of March 20-21, 2026.
 - [x] **Bug Fix**: Import `QtCore` to resolve `StandardPaths` reference error in `BeeConfig.qml`.
 - [x] **History Persistence**: Notification history (`BeeBarState.historyModel`) is now saved to `~/.cache/beehive_os/history.json`.
 - [x] **Framework Stability**: Improved singleton architecture and I/O error handling.
+- [x] **BeeNotes PanelWindow**: Migrated to separate PanelWindow (focusable: true, WlrLayer.Top) with ✕ close button, overlay click-outside-to-close.
+- [x] **BeeNotes Persistence**: Notes saved to `data/notes.txt` (timestamp|color|text format, Process-based I/O for Qt6 compatibility).
+- [x] **BeeNotes UI Fix**: Corrected "Add Note" button overflow in input area.
 
 ---
 ---

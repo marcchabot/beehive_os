@@ -106,6 +106,21 @@
     "hint": "↑↓/Tab naviguer  ↵ lancer  Esc fermer"
   },
 
+  "notes": {
+    "header_title": "📝 Notes rapides",
+    "note_count": "%1 note(s)",
+    "note_count_one": "1 note",
+    "note_count_other": "%1 notes",
+    "placeholder": "Écrivez votre note ici...",
+    "add_note": "Ajouter",
+    "saved": "💾 Enregistré",
+    "no_notes": "Aucune note",
+    "no_notes_hint": "Écrivez ci-dessous pour ajouter votre première note !",
+    "default_note_1": "Bienvenue dans les Notes rapides de Bee-Hive OS !",
+    "default_note_2": "Écrivez vos notes ici, elles seront sauvegardées automatiquement.",
+    "default_note_3": "Cliquez sur une note pour l'éditer, survolez pour voir le bouton supprimer."
+  },
+
   "notifications": {
     "dismiss": "Ignorer",
     "dismiss_all": "Tout effacer"

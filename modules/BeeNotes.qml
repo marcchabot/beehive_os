@@ -88,9 +88,9 @@ Item {
                     // No file yet → create default notes
                     console.log("BeeNotes: No notes file found, creating defaults")
                     var defaults = [
-                        { text: "Welcome to Bee-Hive OS Quick Notes!", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[0] },
-                        { text: "Type your notes here and they'll be saved automatically.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[1] },
-                        { text: "Click on a note to edit it, hover to see the delete button.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[2] }
+                        { text: (BeeConfig.tr.notes && BeeConfig.tr.notes.default_note_1) || "Welcome to Bee-Hive OS Quick Notes!", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[0] },
+                        { text: (BeeConfig.tr.notes && BeeConfig.tr.notes.default_note_2) || "Type your notes here and they'll be saved automatically.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[1] },
+                        { text: (BeeConfig.tr.notes && BeeConfig.tr.notes.default_note_3) || "Click on a note to edit it, hover to see the delete button.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[2] }
                     ]
                     for (var j = 0; j < defaults.length; j++) {
                         notesModel.append(defaults[j])
@@ -173,7 +173,7 @@ Item {
                 anchors.rightMargin: 8
                 
                 Text {
-                    text: "📝 Quick Notes"
+                    text: (BeeConfig.tr.notes && BeeConfig.tr.notes.header_title) || "📝 Quick Notes"
                     font.bold: true
                     font.pixelSize: 16
                     color: BeeTheme.textPrimary
@@ -183,7 +183,9 @@ Item {
                 Item { Layout.fillWidth: true }
                 
                 Text {
-                    text: notesModel.count + " note" + (notesModel.count !== 1 ? "s" : "")
+                    text: notesModel.count !== 1
+                        ? ((BeeConfig.tr.notes && BeeConfig.tr.notes.note_count_other) || "%1 notes").arg(notesModel.count)
+                        : ((BeeConfig.tr.notes && BeeConfig.tr.notes.note_count_one) || "1 note")
                     font.pixelSize: 12
                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.7)
                     Layout.alignment: Qt.AlignVCenter
@@ -331,7 +333,7 @@ Item {
             
             Text {
                 visible: notesModel.count === 0
-                text: "No notes yet\nType below to add your first note!"
+                text: ((BeeConfig.tr.notes && BeeConfig.tr.notes.no_notes) || "No notes yet") + "\n" + ((BeeConfig.tr.notes && BeeConfig.tr.notes.no_notes_hint) || "Type below to add your first note!")
                 font.pixelSize: 14
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
                 horizontalAlignment: Text.AlignHCenter
@@ -364,7 +366,7 @@ Item {
                     id: newNoteText
                     width: parent.width
                     height: 36
-                    placeholderText: "Type your note here..."
+                    placeholderText: (BeeConfig.tr.notes && BeeConfig.tr.notes.placeholder) || "Type your note here..."
                     font.pixelSize: 13
                     color: BeeTheme.textPrimary
                     background: Rectangle {
@@ -379,7 +381,7 @@ Item {
                 RowLayout {
                     width: parent.width
                     Button {
-                        text: "Add Note"
+                        text: (BeeConfig.tr.notes && BeeConfig.tr.notes.add_note) || "Add Note"
                         Layout.preferredWidth: 100
                         Layout.preferredHeight: 32
                         background: Rectangle {
@@ -399,7 +401,7 @@ Item {
                     }
                     Item { Layout.fillWidth: true }
                     Text {
-                        text: "💾 Saved"
+                        text: (BeeConfig.tr.notes && BeeConfig.tr.notes.saved) || "💾 Saved"
                         font.pixelSize: 11
                         color: Qt.rgba(0, 0.7, 0, 0.8)
                         opacity: saveAnimation.running ? 1 : 0

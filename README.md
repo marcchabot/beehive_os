@@ -103,6 +103,7 @@ modules/
     ├── BeeVibe.qml           # Discreet audio visualizer (Cava integration)
     ├── BeePower.qml          # Power management (Shutdown, Reboot, Lock, Exit)
     ├── MayaDash.qml          # Hexagonal dashboard (Honeycomb)
+    ├── BeeNotes.qml          # Quick Notes (PanelWindow + text persistence)
     └── Clock.qml             # Analog + digital clock widget
 ```
 
@@ -148,6 +149,13 @@ modules/
 ### BeeBar — Status Bar ⚡
 - CPU, RAM, NET, DISK in real-time
 - Progress bars with animations and adaptive glow
+
+### BeeNotes — Quick Notes 📝 *(v2.1)*
+- **PanelWindow**: Dedicated focusable panel (WlrLayer.Top) with semi-transparent overlay
+- **Persistence**: Notes saved to `data/notes.txt` (timestamp|color|text format)
+- **Interactive**: Add, edit, delete notes with color-coded cards
+- **Close Button**: ✕ button + click-outside-to-close
+- **i18n**: Full English/French localization via BeeConfig.tr
 
 ### BeeEvents — Events Hub 📅 *(v0.7.0)*
 - Centralizes calendar events and professional alerts
@@ -362,6 +370,7 @@ To update without losing your personal settings (cells, weather, pinned apps):
 - [x] **BeeAura Notifications & OSD** — 100% native Quickshell system (v1.0.0)
 - [x] Nectar Sync 🍯 — Automatic theme adaptation to wallpaper (v1.3.0)
 - [x] **Multilingual Support (i18n)** — Full French/English localization (v2.0.0)
+- [x] **BeeNotes — Quick Notes** — PanelWindow + Persistence + i18n (v2.1) 📝
 
 ### 🔄 In Progress / Upcoming
 

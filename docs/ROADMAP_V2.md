@@ -15,7 +15,7 @@
   - Règles configurables par l'utilisateur
 
 - **Widgets MayaDash Interactifs (v2.2)**
-  - Quick Notes (Markdown persistantes)
+  - ~~Quick Notes (Markdown persistantes)~~ → **BeeNotes v2.1** (PanelWindow + text persistence + i18n) ✅
   - System Monitor avancé (températures, ventilateurs, processus)
   - Network widget avec speed test
 

@@ -106,6 +106,21 @@
     "hint": "↑↓/Tab navigate  ↵ launch  Esc close"
   },
 
+  "notes": {
+    "header_title": "📝 Quick Notes",
+    "note_count": "%1 note(s)",
+    "note_count_one": "1 note",
+    "note_count_other": "%1 notes",
+    "placeholder": "Type your note here...",
+    "add_note": "Add Note",
+    "saved": "💾 Saved",
+    "no_notes": "No notes yet",
+    "no_notes_hint": "Type below to add your first note!",
+    "default_note_1": "Welcome to Bee-Hive OS Quick Notes!",
+    "default_note_2": "Type your notes here and they'll be saved automatically.",
+    "default_note_3": "Click on a note to edit it, hover to see the delete button."
+  },
+
   "notifications": {
     "dismiss": "Dismiss",
     "dismiss_all": "Clear all"
