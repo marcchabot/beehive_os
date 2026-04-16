@@ -9,6 +9,7 @@ singleton BeeModuleRegistry 1.0 BeeModuleRegistry.qml
 
 # Composants visuels
 BeeBar       1.0 BeeBar.qml
+BeeNotes     1.0 BeeNotes.qml
 BeeVibe      1.0 BeeVibe.qml
 BeeCorners   1.0 BeeCorners.qml
 BeeNotify    1.0 BeeNotify.qml
