@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.8 : Fix persistence — flush save on close/destruction
+// v2.0 : Simple text file persistence — no JSON, no timers
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -30,143 +30,117 @@ Item {
     }
 
     // ─── Logique de données ──────────────────────────────────────
-    property var notesData: []
-    property string notesFile: "file:///home/marc/beehive_os/data/quick_notes.json"
+    property string notesFile: "file:///home/marc/beehive_os/data/notes.txt"
 
-    // Helper: convert QML color to hex string for serialization
-    function colorToHex(c) {
-        return "#" + ((1 << 24) + (Math.round(c.r * 255) << 16) + (Math.round(c.g * 255) << 8) + Math.round(c.b * 255)).toString(16).slice(1).toUpperCase()
-    }
+    // Predefined note colors (hex strings)
+    property var noteColors: ["#FFC107", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722"]
 
-    // Helper: parse hex or named color to {r,g,b} for delegate
+    // Helper: parse hex color to {r,g,b} for delegate
     function colorToRgb(c) {
-        // If already a Qt color object with .r, use directly
         if (typeof c === "object" && c !== null && c.r !== undefined)
             return { r: c.r, g: c.g, b: c.b }
-        // Hex string: #RRGGBB
         if (typeof c === "string" && c.charAt(0) === "#" && c.length === 7) {
             var rr = parseInt(c.substring(1,3), 16) / 255
             var gg = parseInt(c.substring(3,5), 16) / 255
             var bb = parseInt(c.substring(5,7), 16) / 255
             return { r: rr, g: gg, b: bb }
         }
-        // Fallback: accent color
         return { r: BeeTheme.accent.r, g: BeeTheme.accent.g, b: BeeTheme.accent.b }
     }
-
-    // Predefined note colors (hex strings for JSON compatibility)
-    property var noteColors: ["#FFC107", "#4CAF50", "#2196F3", "#E91E63", "#9C27B0", "#FF5722"]
-    
-    property bool hasPendingSave: false
 
     Component.onCompleted: {
         loadNotes()
     }
 
-    Component.onDestruction: {
-        if (hasPendingSave || saveTimer.running) {
-            saveTimer.stop()
-            flushSave()
-        }
-    }
-    
+    // ─── Load: read text file, one note per line ─────────────────
+    // Format: timestamp|color|text
     function loadNotes() {
         var request = new XMLHttpRequest()
         request.open("GET", notesFile)
         request.onreadystatechange = function() {
             if (request.readyState === XMLHttpRequest.DONE) {
+                notesModel.clear()
                 if (request.status === 200 && request.responseText.trim() !== "") {
-                    try {
-                        notesData = JSON.parse(request.responseText)
-                        notesModel.clear()
-                        for (var i = 0; i < notesData.length; i++) {
-                            var note = notesData[i]
-                            // Normalize color to hex string
-                            if (typeof note.color === "object" && note.color !== null) {
-                                note.color = colorToHex(note.color)
-                            }
-                            notesModel.append(note)
-                        }
-                        console.log("BeeNotes: Loaded " + notesData.length + " notes")
-                    } catch (e) {
-                        console.log("BeeNotes: Could not parse notes file, starting fresh. Error: " + e)
-                        notesData = []
+                    var lines = request.responseText.split("\n")
+                    var count = 0
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i].trim()
+                        if (line === "") continue
+                        // Split on first 2 pipes: timestamp|color|text
+                        var firstPipe = line.indexOf("|")
+                        if (firstPipe === -1) continue
+                        var secondPipe = line.indexOf("|", firstPipe + 1)
+                        if (secondPipe === -1) continue
+                        var ts = line.substring(0, firstPipe)
+                        var col = line.substring(firstPipe + 1, secondPipe)
+                        var txt = line.substring(secondPipe + 1)
+                        notesModel.append({
+                            "text": txt,
+                            "timestamp": ts,
+                            "color": col
+                        })
+                        count++
                     }
+                    console.log("BeeNotes: Loaded " + count + " notes from text file")
                 } else {
-                    console.log("BeeNotes: No saved notes found (status " + request.status + ")")
-                    notesData = []
+                    // No file yet → create default notes
+                    console.log("BeeNotes: No notes file found, creating defaults")
+                    var defaults = [
+                        { text: "Welcome to Bee-Hive OS Quick Notes!", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[0] },
+                        { text: "Type your notes here and they'll be saved automatically.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[1] },
+                        { text: "Click on a note to edit it, hover to see the delete button.", timestamp: Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"), color: noteColors[2] }
+                    ]
+                    for (var j = 0; j < defaults.length; j++) {
+                        notesModel.append(defaults[j])
+                    }
+                    saveNotes()
                 }
             }
         }
         request.send()
     }
-    
+
+    // ─── Save: write entire model to text file immediately ───────
+    // Format: timestamp|color|text  (one line per note)
     function saveNotes() {
-        // Build a clean array of plain JS objects for JSON serialization
-        // (ListModel.get() returns QML objects that don't serialize cleanly)
-        var data = []
+        var lines = []
         for (var i = 0; i < notesModel.count; i++) {
             var item = notesModel.get(i)
             var noteColor = item.color
-            // Ensure color is a hex string for JSON
+            // Ensure color is a hex string
             if (typeof noteColor === "object" && noteColor !== null) {
-                noteColor = colorToHex(noteColor)
+                noteColor = "#" + ((1 << 24) + (Math.round(noteColor.r * 255) << 16) + (Math.round(noteColor.g * 255) << 8) + Math.round(noteColor.b * 255)).toString(16).slice(1).toUpperCase()
             }
-            data.push({
-                id: item.id,
-                text: item.text,
-                timestamp: item.timestamp,
-                color: noteColor
-            })
+            lines.push(item.timestamp + "|" + noteColor + "|" + item.text)
         }
-        notesData = data
-        
-        hasPendingSave = true
-        saveTimer.start()
-    }
-    
-    // Debounced save — avoid writing on every rapid change
-    Timer {
-        id: saveTimer
-        interval: 300
-        onTriggered: {
-            flushSave()
-        }
-    }
-
-    // Immediate save (no debounce) — used on close/destruction
-    function flushSave() {
-        hasPendingSave = false
+        var content = lines.join("\n")
         var request = new XMLHttpRequest()
         request.open("PUT", notesFile)
-        request.setRequestHeader("Content-Type", "application/json")
-        request.send(JSON.stringify(notesData, null, 2))
-        console.log("BeeNotes: Saved " + notesData.length + " notes")
+        request.setRequestHeader("Content-Type", "text/plain")
+        request.send(content)
+        console.log("BeeNotes: Saved " + notesModel.count + " notes to text file")
         saveAnimation.start()
     }
-    
+
     function addNote() {
         if (newNoteText.text.trim() !== "") {
             var colorIdx = notesModel.count % noteColors.length
-            var newNote = {
-                "id": Date.now(),
+            notesModel.insert(0, {
                 "text": newNoteText.text,
                 "timestamp": Qt.formatDateTime(new Date(), "yyyy-MM-dd HH:mm"),
                 "color": noteColors[colorIdx]
-            }
-            
-            notesModel.insert(0, newNote)
+            })
             newNoteText.text = ""
             newNoteText.focus = false
             saveNotes()
         }
     }
-    
+
     function deleteNote(index) {
         notesModel.remove(index)
         saveNotes()
     }
-    
+
     // ─── Contenu UI ──────────────────────────────────────────────
     Item {
         anchors.fill: mainBkg
@@ -232,11 +206,6 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            // Flush any pending save before closing
-                            if (hasPendingSave || saveTimer.running) {
-                                saveTimer.stop()
-                                flushSave()
-                            }
                             beeNotesRoot.closeRequested()
                         }
                     }
@@ -268,7 +237,6 @@ Item {
                 width: notesList.width
                 height: noteContent.height + 32
                 radius: 8
-                // Robust color handling: accept both hex strings and color objects
                 property color noteColor: {
                     var rgb = colorToRgb(model.color)
                     return Qt.rgba(rgb.r, rgb.g, rgb.b, 1)
@@ -337,7 +305,7 @@ Item {
                     id: mouseArea
                     anchors.fill: parent
                     hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                    cursorShape: Qt.PointersHandCursor
                     onClicked: {
                         newNoteText.text = model.text
                         newNoteText.focus = true
