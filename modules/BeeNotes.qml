@@ -5,7 +5,7 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeNotes.qml — Quick Notes Widget for MayaDash 🐝
-// v1.5 : Final Polish - Strict Syntax Clean
+// v1.6 : Absolute Zero-Semicolon Version (Surgical Clean)
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -123,7 +123,8 @@ Item {
                 
                 Text {
                     text: "📝 Quick Notes"
-                    font { bold: true; pixelSize: 16 }
+                    font.bold: true
+                    font.pixelSize: 16
                     color: BeeTheme.textPrimary
                     Layout.alignment: Qt.AlignVCenter
                 }
@@ -202,15 +203,19 @@ Item {
                 
                 Rectangle {
                     id: deleteButton
-                    width: 24; height: 24; radius: 12
+                    width: 24
+                    height: 24
+                    radius: 12
                     color: Qt.rgba(1, 0.3, 0.3, 0.8)
-                    border.color: "#ff4444"; border.width: 1
-                    anchors.top: parent.top; anchors.right: parent.right
+                    border.color: "#ff4444"
+                    border.width: 1
+                    anchors.top: parent.top
+                    anchors.right: parent.right
                     anchors.margins: 8
                     opacity: mouseArea.containsMouse ? 1 : 0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                     
-                    Text { text: "×"; font { bold: true; pixelSize: 16 }; color: "white"; anchors.centerIn: parent }
+                    Text { text: "×"; font.bold: true; font.pixelSize: 16; color: "white"; anchors.centerIn: parent }
                     
                     MouseArea {
                         anchors.fill: parent
@@ -253,7 +258,8 @@ Item {
             anchors.bottom: parent.bottom
             
             Rectangle {
-                width: parent.width; height: 1
+                width: parent.width
+                height: 1
                 color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
             }
             
@@ -264,7 +270,8 @@ Item {
                 
                 TextField {
                     id: newNoteText
-                    width: parent.width; height: 36
+                    width: parent.width
+                    height: 36
                     placeholderText: "Type your note here..."
                     font.pixelSize: 13
                     color: BeeTheme.textPrimary
@@ -281,7 +288,8 @@ Item {
                     width: parent.width
                     Button {
                         text: "Add Note"
-                        Layout.preferredWidth: 100; Layout.preferredHeight: 32
+                        Layout.preferredWidth: 100
+                        Layout.preferredHeight: 32
                         background: Rectangle {
                             radius: 6
                             color: parent.pressed ? Qt.darker(BeeTheme.accent, 1.2) : BeeTheme.accent
@@ -289,7 +297,8 @@ Item {
                         }
                         contentItem: Text {
                             text: parent.text
-                            font { pixelSize: 12; bold: true }
+                            font.pixelSize: 12
+                            font.bold: true
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
