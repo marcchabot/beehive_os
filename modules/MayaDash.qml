@@ -492,13 +492,28 @@ Rectangle {
     
     // ─── BeeNotes Dialog Overlay (Shield) ────────────────────
     Item {
+        id: notesOverlay
         anchors.fill: parent
         visible: notesDialogVisible
         z: 99
 
-        MouseArea {
+        // Fond qui ferme le dialog quand on clique DEHORS du Rectangle
+        Rectangle {
             anchors.fill: parent
-            onClicked: closeNotesDialog()
+            color: "transparent"
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    // Vérifie si le clic est en dehors du dialog
+                    var dialogPos = notesDialog.mapToItem(notesOverlay, 0, 0)
+                    var inDialog = mouse.x >= dialogPos.x && mouse.x <= dialogPos.x + notesDialog.width &&
+                                   mouse.y >= dialogPos.y && mouse.y <= dialogPos.y + notesDialog.height
+                    if (!inDialog) {
+                        closeNotesDialog()
+                    }
+                }
+            }
         }
     }
 
@@ -519,14 +534,7 @@ Rectangle {
         
         layer.enabled: true
         
-        // ⛔ BLOQUE la propagation des clics vers l'overlay
-        // Sans ça, les clics dans BeeNotes ferment le dialog !
-        MouseArea {
-            anchors.fill: parent
-            onPressed: mouse.accepted = true
-            onReleased: mouse.accepted = true
-            onClicked: mouse.accepted = true
-        }
+        // Pas besoin de MouseArea ici - l'overlay vérifie si on clique hors du dialog
         
         Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }

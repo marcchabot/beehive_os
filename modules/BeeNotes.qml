@@ -26,38 +26,6 @@ Item {
         border.width: 1
     }
 
-    // ─── Ombre et Effets (Qt 6 Modern Approach) ──────────────────
-    MultiEffect {
-        id: shadowEffect
-        anchors.fill: mainBkg
-        source: mainBkg
-        
-        shadowEnabled: true
-        shadowColor: "#40000000"
-        shadowBlur: 1.0
-        shadowVerticalOffset: 4
-        shadowHorizontalOffset: 0
-    }
-
-    // ─── Bouclier Souris (Anti Click-Through) ────────────────────
-    // Capture les clics sur le fond, mais les enfants (TextField, boutons) 
-    // sont au-dessus (z:1) et reçoivent les événements normalement
-    MouseArea {
-        id: mouseShield
-        anchors.fill: parent
-        z: 0
-        propagateComposedEvents: false
-        onPressed: {
-            // Capture le clic sur le fond mais permet aux enfants de recevoir
-            mouse.accepted = true
-            // Donne le focus au TextField si on clique dans la zone input
-            if (inputArea.contains(mapToItem(inputArea, mouse.x, mouse.y))) {
-                newNoteText.forceActiveFocus()
-                mouse.accepted = false
-            }
-        }
-    }
-
     // ─── Logique de données ──────────────────────────────────────
     property var notesData: []
     property string notesFile: "file://" + Qt.resolvedUrl("../data/quick_notes.json")
