@@ -40,14 +40,22 @@ Item {
     }
 
     // ─── Bouclier Souris (Anti Click-Through) ────────────────────
-    // Fond invisible qui capture les clics dans le "vide"
-    // Les éléments interactifs au-dessus (boutons, champs) passent avant
+    // Capture les clics sur le fond, mais les enfants (TextField, boutons) 
+    // sont au-dessus (z:1) et reçoivent les événements normalement
     MouseArea {
         id: mouseShield
         anchors.fill: parent
-        z: -1
-        acceptedButtons: Qt.AllButtons
-        onPressed: mouse.accepted = true
+        z: 0
+        propagateComposedEvents: false
+        onPressed: {
+            // Capture le clic sur le fond mais permet aux enfants de recevoir
+            mouse.accepted = true
+            // Donne le focus au TextField si on clique dans la zone input
+            if (inputArea.contains(mapToItem(inputArea, mouse.x, mouse.y))) {
+                newNoteText.forceActiveFocus()
+                mouse.accepted = false
+            }
+        }
     }
 
     // ─── Logique de données ──────────────────────────────────────
@@ -120,6 +128,7 @@ Item {
     // ─── Contenu UI ──────────────────────────────────────────────
     Item {
         anchors.fill: mainBkg
+        z: 1
 
         Rectangle {
             id: header
