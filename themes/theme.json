@@ -15,11 +15,11 @@
     },
     "HoneyLight": {
       "background":    "#FCFBF7",
-      "accent":        "#FFB81C",
+      "accent":        "#DABD93",
       "secondary":     "#EDE6D8",
       "text_primary":  "#000000",
       "text_secondary":"#666666",
-      "aura_glow":     "rgba(255, 184, 28, 0.5)",
+      "aura_glow":     "rgba(218, 189, 147, 0.5)",
       "wallpaper":     "wallpaper_light_bee.png"
     }
   },
