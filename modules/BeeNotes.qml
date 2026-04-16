@@ -40,18 +40,14 @@ Item {
     }
 
     // ─── Bouclier Souris (Anti Click-Through) ────────────────────
-    // Capture tous les événements souris pour empêcher qu'ils ne
-    // tombent sur les alvéoles du dashboard en dessous
+    // Fond invisible qui capture les clics dans le "vide"
+    // Les éléments interactifs au-dessus (boutons, champs) passent avant
     MouseArea {
         id: mouseShield
         anchors.fill: parent
-        z: 10
-        
-        // Ne pas bloquer les événements pour les enfants
-        // Les boutons et TextField fonctionnent normalement
+        z: -1
+        acceptedButtons: Qt.AllButtons
         onPressed: mouse.accepted = true
-        onReleased: mouse.accepted = true
-        onClicked: mouse.accepted = true
     }
 
     // ─── Logique de données ──────────────────────────────────────
