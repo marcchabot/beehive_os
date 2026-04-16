@@ -254,7 +254,7 @@ Rectangle {
 
                 // Glassmorphism fill — Opaque et distinct selon le mode
                 if (hexCell.isHighlighted) {
-                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.85)
                 } else {
                     ctx.fillStyle = BeeTheme.mode === "HoneyDark"
                         ? "rgba(18, 18, 20, 0.88)"    // Gris anthracite foncé opaque
@@ -324,7 +324,7 @@ Rectangle {
 
             Text {
                 text: hexCell.title
-                color: hexCell.isHighlighted ? BeeTheme.accent : BeeTheme.textPrimary
+                color: hexCell.isHighlighted ? "#000000" : BeeTheme.textPrimary
                 font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
                 anchors.horizontalCenter: parent.horizontalCenter
                 Behavior on color { ColorAnimation { duration: 600 } }
@@ -332,7 +332,7 @@ Rectangle {
 
             Text {
                 text: hexCell.subtitle
-                color: BeeTheme.textSecondary
+                color: hexCell.isHighlighted ? "#333333" : BeeTheme.textSecondary
                 font.pixelSize: 11
                 horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -342,7 +342,7 @@ Rectangle {
 
             Text {
                 text: hexCell.isCalendarCell ? hexCell.dynamicDetail : hexCell.detail
-                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                color: hexCell.isHighlighted ? "#555555" : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
                 font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
