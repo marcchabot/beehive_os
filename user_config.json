@@ -77,12 +77,12 @@
         "color": ""
       },
       {
-        "icon": "🌐",
-        "title": "Réseau",
-        "subtitle": "Connecté",
-        "detail": "Stats en temps réel\n& Test de débit",
-        "action": "detail:network",
-        "highlighted": true,
+        "icon": "🎮",
+        "title": "Gaming",
+        "subtitle": "Steam",
+        "detail": "Ready to play?\nLibrary: 42 games",
+        "action": "app:steam",
+        "highlighted": false,
         "customizable": true,
         "color": ""
       },
