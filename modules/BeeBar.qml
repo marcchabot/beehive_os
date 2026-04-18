@@ -112,7 +112,7 @@ Rectangle {
         stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
         onExited: {
             console.log("[BeeBar] Icon scan finished. Refreshing config...");
-            BeeConfig.reload(); // Force reload of user_config.json
+            BeeConfig.loadConfig(); // Force reload of user_config.json
         }
     }
 

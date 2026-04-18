@@ -7,8 +7,8 @@ QtObject {
     readonly property int apiVersion: 1
     readonly property int mayaDashSlots: 8
 
-    property ListModel beeBarModules: ListModel { id: _beeBarModules }
-    property ListModel mayaDashModules: ListModel { id: _mayaDashModules }
+    property ListModel beeBarModules: ListModel { id: _beeBarModules; ListElement { moduleId: ""; title: ""; icon: ""; action: ""; order: 0; enabled: false; source: "" } }
+    property ListModel mayaDashModules: ListModel { id: _mayaDashModules; ListElement { moduleId: ""; slot: 0; title: ""; subtitle: ""; icon: ""; detail: ""; action: ""; highlighted: false; order: 0; enabled: false; source: "" } }
 
     function _sanitizeText(v, fallback) {
         var s = (v === undefined || v === null) ? "" : (v + "").trim()
@@ -123,5 +123,11 @@ QtObject {
             if (row.enabled && row.slot === s) return row
         }
         return null
+    }
+
+    // Remove seed elements after roles are established
+    Component.onCompleted: {
+        if (_beeBarModules.count > 0 && _beeBarModules.get(0).moduleId === "") _beeBarModules.remove(0)
+        if (_mayaDashModules.count > 0 && _mayaDashModules.get(0).moduleId === "") _mayaDashModules.remove(0)
     }
 }
