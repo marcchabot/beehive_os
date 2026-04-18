@@ -323,14 +323,14 @@ Item {
         publicIpTimer.start()
         detailsTimer.start()
 
-        // Register in BeeModuleRegistry
+        // Register in BeeModuleRegistry (static metadata only — live data is read from BeeNetwork properties directly)
         BeeModuleRegistry.registerMayaDashModule({
             id: "network",
             slot: 6,
             title: tr("title"),
-            subtitle: ssid,
-            icon: networkIcon,
-            detail: downloadRate + " / " + uploadRate,
+            subtitle: tr("ethernet"),
+            icon: "🌐",
+            detail: "",
             action: "detail:network",
             highlighted: true,
             order: 6
