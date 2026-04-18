@@ -17,7 +17,14 @@
 - **Widgets MayaDash Interactifs (v2.2)**
   - ~~Quick Notes (Markdown persistantes)~~ → **BeeNotes v2.1** (PanelWindow + text persistence + i18n) ✅
   - System Monitor avancé (températures, ventilateurs, processus)
-  - Network widget avec speed test
+  - ~~Network widget avec speed test~~ ✅ (BeeNetwork v1.0)
+
+- **Alvéoles Presets (BeeStudio)** 🔜
+  - Onglet "Alvéoles" dans BeeStudio avec grille visuelle drag & drop
+  - Bibliothèque de modules disponibles (Network, Gaming, Weather, etc.)
+  - Presets enregistrés : "Travail", "Gaming", "Weekend"
+  - Stockage dans user_config.json → cellPresets
+  - Un clic change toute la grille MayaDash
 
 - **Animations & Transitions Polish**
   - Cross-fade wallpapers
