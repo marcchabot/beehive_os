@@ -519,7 +519,7 @@ QtObject {
                 // Remplissage si nécessaire
                 if (_cells.count < 8) {
                     var cellKeys = ["calendar", "email", "beehive", "weather", "system", "network", "analytics", "settings"]  // v0.9.1: network replaces gaming in defaults
-                    for (var k = 0; k < cellKeys.length; k++)) {
+                    for (var k = 0; k < cellKeys.length; k++) {
                         if (_cells.count >= 8) break
                         
                         var def = trCell(cellKeys[k])
