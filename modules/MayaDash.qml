@@ -491,14 +491,12 @@ Rectangle {
             }
             onReleased: (mouse) => {
                 _longPressLoop.stop()
-                if (mayaDash.dragActive && mayaDash.dragFromIndex === cellIndex) {
-                    // Drop on self = cancel drag
-                    mayaDash.dragActive = false
-                    mayaDash.dragFromIndex = -1
-                    mayaDash.dragOverIndex = -1
-                } else if (mayaDash.dragActive && mayaDash.dragOverIndex >= 0 && mayaDash.dragOverIndex !== mayaDash.dragFromIndex) {
-                    // Complete the swap
-                    BeePresets.swapCells(mayaDash.dragFromIndex, mayaDash.dragOverIndex)
+                if (mayaDash.dragActive) {
+                    if (mayaDash.dragOverIndex >= 0 && mayaDash.dragOverIndex !== mayaDash.dragFromIndex) {
+                        // Complete the swap
+                        BeePresets.swapCells(mayaDash.dragFromIndex, mayaDash.dragOverIndex)
+                    }
+                    // Cancel drag regardless (drop on self = cancel, valid drop = complete)
                     mayaDash.dragActive = false
                     mayaDash.dragFromIndex = -1
                     mayaDash.dragOverIndex = -1
