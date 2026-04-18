@@ -730,33 +730,33 @@ Rectangle {
 
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("local_ip"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.localIp; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("local_ip"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.localIp; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("public_ip"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.publicIp; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("public_ip"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.publicIp; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("gateway"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.gateway; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("gateway"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.gateway; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("dns"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.dns; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("dns"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.dns; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("mac"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.macAddress; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("mac"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.macAddress; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; elide: Text.ElideRight; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                     Row {
                         spacing: 6
-                        Text { text: beeNet.tr("latency"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } }
-                        Text { text: beeNet.latency; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" }; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.tr("latency"); color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true; Behavior on color { ColorAnimation { duration: 600 } } }
+                        Text { text: beeNet.latency; color: BeeTheme.textPrimary; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
                     }
                 }
 
@@ -838,10 +838,10 @@ Rectangle {
                             Row {
                                 anchors.centerIn: parent
                                 spacing: 10
-                                Text { text: "\u2193 " + beeNet.speedTestHistory[index].download; color: BeeTheme.accent; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: "\u2191 " + beeNet.speedTestHistory[index].upload; color: BeeTheme.textSecondary; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: beeNet.speedTestHistory[index].ping; color: BeeTheme.textSecondary; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: beeNet.speedTestHistory[index].timestamp; color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5); font.pixelSize: 9 Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: "\u2193 " + beeNet.speedTestHistory[index].download; color: BeeTheme.accent; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: "\u2191 " + beeNet.speedTestHistory[index].upload; color: BeeTheme.textSecondary; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: beeNet.speedTestHistory[index].ping; color: BeeTheme.textSecondary; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: beeNet.speedTestHistory[index].timestamp; color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5); font.pixelSize: 9; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                         }
                     }
