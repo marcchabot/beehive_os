@@ -21,9 +21,9 @@ Rectangle {
     // ─── Visibilité animée (fade + scale) ─────────────────────
     property bool dashShown: false
     visible: true
-    enabled: dashShown
     opacity: dashShown ? 1.0 : 0.0
     property real dashScale: dashShown ? 1.0 : 0.96
+    property bool interactive: dashShown  // replaces enabled to avoid QML override warning
 
     Behavior on opacity { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }
     Behavior on dashScale { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }

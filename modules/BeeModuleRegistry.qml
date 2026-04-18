@@ -7,8 +7,13 @@ QtObject {
     readonly property int apiVersion: 1
     readonly property int mayaDashSlots: 8
 
-    property ListModel beeBarModules: ListModel { id: _beeBarModules; ListElement { moduleId: ""; title: ""; icon: ""; action: ""; order: 0; enabled: false; source: "" } }
-    property ListModel mayaDashModules: ListModel { id: _mayaDashModules; ListElement { moduleId: ""; slot: 0; title: ""; subtitle: ""; icon: ""; detail: ""; action: ""; highlighted: false; order: 0; enabled: false; source: "" } }
+    // ListModels with roles pre-seeded via empty ListElements (all string/number to avoid QML6 bool issues)
+    property ListModel beeBarModules: ListModel { id: _beeBarModules }
+    property ListModel mayaDashModules: ListModel { id: _mayaDashModules }
+
+    // Track whether models have been seeded with their role template
+    property bool _barSeeded: false
+    property bool _dashSeeded: false
 
     function _sanitizeText(v, fallback) {
         var s = (v === undefined || v === null) ? "" : (v + "").trim()
@@ -21,10 +26,22 @@ QtObject {
         return Math.max(0, Math.floor(n))
     }
 
+    function _seedModel(model, template) {
+        // Append a template row to establish ListModel roles,
+        // then immediately remove it. This ensures QML knows
+        // all role names before real data is appended.
+        model.append(template)
+        model.remove(0)
+    }
+
     function _upsert(model, moduleId, payload) {
         for (var i = 0; i < model.count; ++i) {
             if (model.get(i).moduleId === moduleId) {
-                model.set(i, payload)
+                // Use set() to update in-place — preserves roles
+                var keys = Object.keys(payload)
+                for (var k = 0; k < keys.length; ++k) {
+                    model.setProperty(i, keys[k], payload[keys[k]])
+                }
                 return i
             }
         }
@@ -33,14 +50,32 @@ QtObject {
     }
 
     function _sortByOrder(model) {
-        var rows = []
-        for (var i = 0; i < model.count; ++i) rows.push(model.get(i))
-        rows.sort(function(a, b) {
-            if (a.order === b.order) return a.moduleId < b.moduleId ? -1 : (a.moduleId > b.moduleId ? 1 : 0)
-            return a.order - b.order
-        })
-        model.clear()
-        for (var j = 0; j < rows.length; ++j) model.append(rows[j])
+        // Sort in-place using swap instead of clear/append
+        // to preserve ListModel roles
+        var n = model.count
+        for (var i = 0; i < n - 1; ++i) {
+            for (var j = 0; j < n - i - 1; ++j) {
+                var a = model.get(j)
+                var b = model.get(j + 1)
+                if (a.order > b.order || (a.order === b.order && a.moduleId > b.moduleId)) {
+                    // Swap via setProperty
+                    var aKeys = ["moduleId", "title", "icon", "action", "order", "enabled", "source",
+                                 "slot", "subtitle", "detail", "highlighted"]
+                    var aVals = {}
+                    var bVals = {}
+                    for (var k = 0; k < aKeys.length; ++k) {
+                        var key = aKeys[k]
+                        try { aVals[key] = a[key] } catch(e) { aVals[key] = undefined }
+                        try { bVals[key] = b[key] } catch(e) { bVals[key] = undefined }
+                    }
+                    for (var k = 0; k < aKeys.length; ++k) {
+                        var key = aKeys[k]
+                        if (aVals[key] !== undefined) model.setProperty(j, key, bVals[key])
+                        if (bVals[key] !== undefined) model.setProperty(j + 1, key, aVals[key])
+                    }
+                }
+            }
+        }
     }
 
     function registerBeeBarModule(spec) {
@@ -49,6 +84,15 @@ QtObject {
         if (!moduleId) {
             console.warn("BeeModuleRegistry: BeeBar module id is required")
             return false
+        }
+
+        // Seed model roles on first registration
+        if (!_barSeeded) {
+            _seedModel(_beeBarModules, {
+                moduleId: "", title: "", icon: "", action: "none",
+                order: 0, enabled: true, source: "internal"
+            })
+            _barSeeded = true
         }
 
         var payload = {
@@ -78,6 +122,16 @@ QtObject {
         if (slot < 0 || slot >= mayaDashSlots) {
             console.warn("BeeModuleRegistry: MayaDash slot must be between 0 and", mayaDashSlots - 1)
             return false
+        }
+
+        // Seed model roles on first registration
+        if (!_dashSeeded) {
+            _seedModel(_mayaDashModules, {
+                moduleId: "", slot: 0, title: "", subtitle: "",
+                icon: "", detail: "", action: "none",
+                highlighted: false, order: 0, enabled: true, source: "internal"
+            })
+            _dashSeeded = true
         }
 
         var payload = {
@@ -114,6 +168,8 @@ QtObject {
     function clearAll() {
         _beeBarModules.clear()
         _mayaDashModules.clear()
+        _barSeeded = false
+        _dashSeeded = false
     }
 
     function mayaDashCellAt(slot) {
@@ -123,11 +179,5 @@ QtObject {
             if (row.enabled && row.slot === s) return row
         }
         return null
-    }
-
-    // Remove seed elements after roles are established
-    Component.onCompleted: {
-        if (_beeBarModules.count > 0 && _beeBarModules.get(0).moduleId === "") _beeBarModules.remove(0)
-        if (_mayaDashModules.count > 0 && _mayaDashModules.get(0).moduleId === "") _mayaDashModules.remove(0)
     }
 }
