@@ -10,9 +10,9 @@
 
 **Échéance:** 2-3 sprints matinaux
 
-- **BeeBar Contextuelle Intelligente**
-  - Icônes dynamiques selon l'application active
-  - Règles configurables par l'utilisateur
+- ~~**BeeBar Contextuelle Intelligente**~~ ✅
+  - ~~Icônes dynamiques selon l'application active~~ ✅
+  - ~~Règles configurables par l'utilisateur~~ ✅
 
 - **Widgets MayaDash Interactifs (v2.2)**
   - ~~Quick Notes (Markdown persistantes)~~ → **BeeNotes v2.1** (PanelWindow + text persistence + i18n) ✅

@@ -2,32 +2,32 @@
   "schema_version": "1.2",
   "version": "1.3.6",
   "theme": "HoneyDark",
-  "_comment": "Bee-Hive OS \u2014 Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
+  "_comment": "Bee-Hive OS — Fichier de configuration communautaire. Modifiez les valeurs ci-dessous pour personnaliser votre ruche.",
   "transitions": {
     "theme_duration_ms": 600,
-    "_comment": "Dur\u00e9e de la transition Dark\u2194Light en millisecondes. Valeurs recommand\u00e9es : 300 (rapide) \u00a0 \u00a0 1200 (cin\u00e9matique)."
+    "_comment": "Durée de la transition Dark↔Light en millisecondes. Valeurs recommandées : 300 (rapide)     1200 (cinématique)."
   },
   "weather": {
     "city": "Blainville",
     "unit": "metric",
     "lang": "fr",
-    "_comment": "unit: 'metric' (\u00b0C) | 'imperial' (\u00b0F) | 'standard' (K). lang: code ISO 2 lettres."
+    "_comment": "unit: 'metric' (°C) | 'imperial' (°F) | 'standard' (K). lang: code ISO 2 lettres."
   },
   "dashboard": {
-    "title": "\ud83c\udf6f Maya Dashboard",
+    "title": "🍯 Maya Dashboard",
     "cells": [
       {
-        "icon": "\ud83d\udcc5",
+        "icon": "📅",
         "title": "Famille Chabot",
         "subtitle": "Calendrier",
-        "detail": "Ski \u00e0 Tremblant\nNoah \u2014 Soccer 14h",
+        "detail": "Ski à Tremblant\nNoah — Soccer 14h",
         "action": "url:https://calendar.google.com/calendar/u/0/r",
         "highlighted": true,
         "customizable": true,
         "color": ""
       },
       {
-        "icon": "\ud83d\udcdd",
+        "icon": "📝",
         "title": "BeeNotes",
         "subtitle": "Quick Notes",
         "detail": "Tes notes rapides\nSaisie et sauvegarde",
@@ -37,7 +37,7 @@
         "color": ""
       },
       {
-        "icon": "\ud83d\udc1d",
+        "icon": "🐝",
         "title": "Maya Status",
         "subtitle": "En ligne",
         "detail": "Bee-Hive OS\nCollaboration Maya/Marc",
@@ -47,18 +47,18 @@
         "color": ""
       },
       {
-        "icon": "\ud83c\udfd4\ufe0f",
-        "title": "Tremblant",
-        "subtitle": "Chalet",
-        "detail": "Construction\nEn cours\u2026",
-        "action": "url:https://www.tremblant.ca/montagne/conditions-ski",
+        "icon": "🌐",
+        "title": "Réseau",
+        "subtitle": "Connecté",
+        "detail": "Stats en temps réel\n& Test de débit",
+        "action": "detail:network",
         "highlighted": true,
         "customizable": true,
         "color": ""
       },
       {
-        "icon": "\ud83d\udda5\ufe0f",
-        "title": "Syst\u00e8me",
+        "icon": "🖥️",
+        "title": "Système",
         "subtitle": "CachyOS",
         "detail": "Hyprland\nQuickshell",
         "action": "app:kitty",
@@ -67,7 +67,7 @@
         "color": ""
       },
       {
-        "icon": "\ud83d\udcb0",
+        "icon": "💰",
         "title": "Powerland",
         "subtitle": "Finances",
         "detail": "Groupe Powerland\nFiducie 2019",
@@ -77,20 +77,20 @@
         "color": ""
       },
       {
-        "icon": "\ud83c\udfae",
-        "title": "GeForce Now",
-        "subtitle": "Cloud Gaming",
-        "detail": "Pr\u00eat pour\nune partie ?",
-        "action": "app:flatpak run com.nvidia.geforcenow",
+        "icon": "🌐",
+        "title": "Réseau",
+        "subtitle": "Connecté",
+        "detail": "Stats en temps réel\n& Test de débit",
+        "action": "detail:network",
         "highlighted": true,
         "customizable": true,
         "color": ""
       },
       {
-        "icon": "\u2699\ufe0f",
+        "icon": "⚙️",
         "title": "Settings",
         "subtitle": "Bee-Hive OS",
-        "detail": "Configuration\n& Pr\u00e9f\u00e9rences",
+        "detail": "Configuration\n& Préférences",
         "action": "toggle:settings",
         "highlighted": true,
         "customizable": false,
@@ -98,15 +98,15 @@
       }
     ],
     "_cell_schema": {
-      "_comment": "Sch\u00e9ma de r\u00e9f\u00e9rence pour une alv\u00e9ole \u2014 copiez-collez pour ajouter les v\u00f4tres.",
-      "icon": "Emoji ou chemin vers une image (ex: '\ud83d\udc1d' ou 'assets/myicon.png')",
-      "title": "Nom principal affich\u00e9 (max ~18 chars recommand\u00e9)",
-      "subtitle": "Sous-titre (cat\u00e9gorie, statut, etc.)",
+      "_comment": "Schéma de référence pour une alvéole — copiez-collez pour ajouter les vôtres.",
+      "icon": "Emoji ou chemin vers une image (ex: '🐝' ou 'assets/myicon.png')",
+      "title": "Nom principal affiché (max ~18 chars recommandé)",
+      "subtitle": "Sous-titre (catégorie, statut, etc.)",
       "detail": "Texte secondaire, multi-ligne avec \\n",
       "action": "Valeurs: 'none' | 'app:<cmd>' | 'toggle:settings' | 'url:<https://...>'",
-      "highlighted": "true = bordure et titre dor\u00e9s (accentu\u00e9s)",
+      "highlighted": "true = bordure et titre dorés (accentués)",
       "customizable": "true = l'utilisateur peut modifier cette cellule via BeeSettings",
-      "color": "null = couleur du th\u00e8me actif | '#HEX' = couleur personnalis\u00e9e"
+      "color": "null = couleur du thème actif | '#HEX' = couleur personnalisée"
     }
   },
   "nectar_sync": true,
@@ -121,9 +121,9 @@
   "events_enabled": true,
   "bee_events": {
     "enabled": true,
-    "_comment": "Module BeeEvents \u2014 Prochains \u00e9v\u00e9nements du calendrier. true = widget visible, false = masqu\u00e9.",
+    "_comment": "Module BeeEvents — Prochains événements du calendrier. true = widget visible, false = masqué.",
     "max_events": 6,
-    "_max_events_comment": "Nombre maximum d'évènements affichés (1\u20135 recommandé)."
+    "_max_events_comment": "Nombre maximum d'évènements affichés (1–5 recommandé)."
   },
   "calendars": [
     {
@@ -147,18 +147,18 @@
     "author": "Maya & Marc Chabot",
     "license": "MIT",
     "repo": "github.com/marcchabot/beehive_os",
-    "_modularity_note": "Ce fichier est le point d'entr\u00e9e unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alv\u00e9oles, le th\u00e8me, la m\u00e9to ou les transitions."
+    "_modularity_note": "Ce fichier est le point d'entrée unique pour toute personnalisation. Aucune modification de code QML n'est requise pour changer les alvéoles, le thème, la méto ou les transitions."
   },
   "window_icons": {
-    "kitty": "\ud83d\udc1a",
-    "firefox": "\ud83e\udd8a",
-    "code": "\ud83d\udcbb",
-    "zeditor": "\ud83d\udcdd",
-    "discord": "\ud83d\udcac",
-    "spotify": "\ud83c\udfa7",
-    "obs": "\ud83c\udfa5",
-    "zen": "\ud83e\uddd8",
-    "default": "\ud83d\udcc4",
+    "kitty": "🐚",
+    "firefox": "🦊",
+    "code": "💻",
+    "zeditor": "📝",
+    "discord": "💬",
+    "spotify": "🎧",
+    "obs": "🎥",
+    "zen": "🧘",
+    "default": "📄",
     "python3.11": "/usr/share/pixmaps/python3.11.xpm",
     "display.im6.q16": "display.im6.q16"
   },
@@ -172,5 +172,5 @@
   ],
   "analog_clock": true,
   "focus_mode": false,
-  "_focus_mode_comment": "true = Mode Focus : masque le dashboard, les \u00e9v\u00e9nements et l'horloge. Seul le wallpaper + BeeBar restent visibles. Raccourci IPC : 'qs ipc call root toggleFocus'."
+  "_focus_mode_comment": "true = Mode Focus : masque le dashboard, les événements et l'horloge. Seul le wallpaper + BeeBar restent visibles. Raccourci IPC : 'qs ipc call root toggleFocus'."
 }

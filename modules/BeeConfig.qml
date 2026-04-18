@@ -518,8 +518,8 @@ QtObject {
                 
                 // Remplissage si nécessaire
                 if (_cells.count < 8) {
-                    var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
-                    for (var k = 0; k < cellKeys.length; k++) {
+                    var cellKeys = ["calendar", "email", "beehive", "weather", "system", "network", "analytics", "settings"]  // v0.9.1: network replaces gaming in defaults
+                    for (var k = 0; k < cellKeys.length; k++)) {
                         if (_cells.count >= 8) break
                         
                         var def = trCell(cellKeys[k])
@@ -660,7 +660,7 @@ QtObject {
         _cells.clear()
         // Try to load localized cells if i18n is available
         var localized = false
-        var cellKeys = ["calendar", "email", "beehive", "weather", "system", "analytics", "gaming", "settings"]
+        var cellKeys = ["calendar", "email", "beehive", "weather", "system", "network", "analytics", "settings"]
         for (var i = 0; i < cellKeys.length; i++) {
             var key = cellKeys[i]
             var cell = trCell(key)
@@ -684,7 +684,7 @@ QtObject {
             _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false, customizable: true })
             _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "Hyprland\nQuickshell",                     action: "app:terminal",    highlighted: false, customizable: true })
             _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false, customizable: true })
-            _cells.append({ icon: "🎮",  title: "Gaming",          subtitle: "Steam",                detail: "Ready to play?\nLibrary: 42 games",        action: "app:steam",       highlighted: false, customizable: true })
+            _cells.append({ icon: "🌐",  title: "Network",          subtitle: "Connected",           detail: "Real-time stats\n& Speed Test",             action: "detail:network",  highlighted: true,  customizable: true })
             _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
         }
     }

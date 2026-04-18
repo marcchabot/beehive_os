@@ -316,14 +316,14 @@ Rectangle {
                         caseInsensitiveIcons[key.toLowerCase()] = icons[key];
                     }
 
-                    // 1. If no window is focused or it's explicitly 'unknown', use the bee
-                    if (!activeClass || activeClass === "unknown") return "🐝";
+                    // 1. If no window is focused, it's unknown, or it's an error state, use the bee
+                    if (!activeClass || activeClass === "unknown" || activeClass.startsWith("error:")) return "🐝";
                     
                     // 2. Get the icon for the current class, or the default icon
                     var icon = caseInsensitiveIcons[activeClass] || caseInsensitiveIcons["default"];
                     
-                    // 3. If the result is empty or whitespace, use the bee
-                    if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
+                    // 3. If the result is empty, whitespace, or error-like, use the bee
+                    if (!icon || (typeof icon === 'string' && (icon.trim() === "" || icon.startsWith("error:")))) return "🐝";
                     
                     return icon;
                 }

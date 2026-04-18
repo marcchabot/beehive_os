@@ -250,7 +250,35 @@
       "subtitle": "Bee-Hive OS",
       "detail": "Configuration\n& Preferences",
       "action": "toggle:settings"
+    },
+    "network": {
+      "icon": "🌐",
+      "title": "Network",
+      "subtitle": "Connected",
+      "detail": "Real-time stats\n& Speed Test",
+      "action": "detail:network"
     }
+  },
+
+  "network": {
+    "title": "Network",
+    "ethernet": "Ethernet",
+    "wifi": "WiFi",
+    "download": "↓ Down",
+    "upload": "↑ Up",
+    "latency": "Latency",
+    "local_ip": "Local IP",
+    "public_ip": "Public IP",
+    "gateway": "Gateway",
+    "dns": "DNS",
+    "mac": "MAC",
+    "speed_test": "⚡ Speed Test",
+    "speed_test_running": "Testing…",
+    "speed_test_done": "Done!",
+    "speed_test_error": "Error",
+    "history": "History",
+    "no_history": "No tests yet",
+    "chart_label": "Throughput"
   },
 
   "common": {

@@ -7,6 +7,7 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // MayaDash.qml — Tableau de bord Maya (Bee-Hive OS) 🐝
+// v0.7 : BeeNetwork — Network monitor & speed test (detail:network action)
 // v0.6 : BeeVibe — Visualiseur audio intégré aux alvéoles (Phase 3)
 //        Subtle equalizer bars, reactive to system audio
 // v0.5 : BeeMotion — Effet de parallaxe 3D
@@ -34,6 +35,13 @@ Rectangle {
     signal openSettings()
     signal openStudio()
     signal openNotes()
+
+    // ─── BeeNetwork instance ────────────────────────────────
+    property bool networkDetailVisible: false
+
+    BeeNetwork {
+        id: beeNet
+    }
 
     function resolveCellData(slot) {
         var _rev = BeeConfig.cellsRevision
@@ -97,7 +105,14 @@ Rectangle {
             )
             return
         }
-        
+
+        // detail:network → BeeNetwork detail panel
+        if (action === "detail:network") {
+            mayaDash.networkDetailVisible = !mayaDash.networkDetailVisible
+            BeeSound.playEvent(mayaDash.networkDetailVisible ? "dash.open" : "dash.close")
+            return
+        }
+
         console.warn("MayaDash: Action non reconnue →", action)
     }
 
@@ -148,17 +163,20 @@ Rectangle {
         // créer une dépendance réactive — ListModel.get() seul ne suffit pas.
         property var    cellData:      mayaDash.resolveCellData(cellIndex)
 
-        property string icon:          cellData ? cellData.icon          : "🐝"
+        property string icon:          isNetworkCell ? beeNet.networkIcon : (cellData ? cellData.icon : "🐝")
         property string title:         cellData ? cellData.title         : "Module"
-        property string subtitle:      cellData ? cellData.subtitle      : ""
+        property string subtitle:      isNetworkCell ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData ? cellData.subtitle : "")) : (cellData ? cellData.subtitle : "")
         property string detail:        cellData ? cellData.detail        : ""
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
 
             // Détection de la cellule Calendar pour afficher le compteur live
             property bool isCalendarCell: cellData && (cellData.icon === "📅" || cellData.title === "Calendar" || cellData.title === "Calendrier")
-            
-            // Texte de détail dynamique pour la cellule Calendar
+
+            // Détection de la cellule Network pour afficher les stats live
+            property bool isNetworkCell: cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")
+
+            // Texte de détail dynamique pour les cellules Calendar et Network
             property string dynamicDetail: {
                 if (hexCell.isCalendarCell) {
                     var count = BeeConfig.liveSyncCount;
@@ -176,15 +194,36 @@ Rectangle {
                         return (lang === "fr") ? "Aucun événement à venir" : "No upcoming events";
                     }
                 }
+                if (hexCell.isNetworkCell) {
+                    return beeNet.downloadRate + " / " + beeNet.uploadRate;
+                }
                 return cellData ? cellData.detail : "";
             }
 
-            // Réagir aux changements de liveSyncCount pour mise à jour immédiate
+            // Réagir aux changements de liveSyncCount et network stats pour mise à jour immédiate
             Connections {
                 target: BeeConfig
                 function onLiveSyncCountChanged() {
-                    // Force la réévaluation de dynamicDetail
                     hexCell.dynamicDetail = hexCell.dynamicDetail;
+                }
+            }
+
+            // Réagir aux changements de stats réseau
+            Connections {
+                target: beeNet
+                function onDownloadRateChanged() {
+                    if (hexCell.isNetworkCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
+                }
+                function onUploadRateChanged() {
+                    if (hexCell.isNetworkCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
+                }
+                function onLatencyChanged() {
+                    // Force subtitle re-evaluation for network cell
+                    hexCell.subtitle = hexCell.subtitle;
+                }
+                function onNetworkIconChanged() {
+                    // Force icon re-evaluation for network cell
+                    hexCell.icon = hexCell.icon;
                 }
             }
 
@@ -502,12 +541,289 @@ Rectangle {
 
     // ─── Label version ────────────────────────────────────────
     Text {
-        text: "Bee-Hive OS v0.9.0 · BeeMotion2D · BeeVibe 🐝"
+        text: "Bee-Hive OS v0.9.0 · BeeMotion2D · BeeVibe · BeeNetwork 🐝"
         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
         font { pixelSize: 10; letterSpacing: 1 }
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
     }
-    
+
+    // ═══════════════════════════════════════════════════════════
+    // BeeNetwork — Détail réseau (overlay panel)
+    // ═══════════════════════════════════════════════════════════
+    Rectangle {
+        id: networkOverlay
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.5)
+        visible: mayaDash.networkDetailVisible
+        opacity: mayaDash.networkDetailVisible ? 1.0 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                mayaDash.networkDetailVisible = false
+                BeeSound.playEvent("dash.close")
+            }
+        }
+
+        Rectangle {
+            width: 420
+            height: 520
+            anchors.centerIn: parent
+            color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
+            radius: 16
+            border.color: BeeTheme.glassBorder
+            border.width: 1.5
+            Behavior on color { ColorAnimation { duration: 600 } }
+            Behavior on border.color { ColorAnimation { duration: 600 } }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: mouse.accepted = true
+            }
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 12
+
+                // ─── Header ──
+                Row {
+                    spacing: 10
+                    Text {
+                        text: beeNet.networkIcon
+                        font.pixelSize: 28
+                    }
+                    Column {
+                        spacing: 2
+                        Text {
+                            text: beeNet.ssid
+                            color: BeeTheme.textPrimary
+                            font { bold: true; pixelSize: 18 }
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                        Text {
+                            text: beeNet.localIp + " \u00b7 " + beeNet.latency
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 11
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                    }
+                }
+
+                // ─── Throughput chart ──
+                Rectangle {
+                    width: parent.width - 40
+                    height: 110
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    radius: 8
+                    color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
+                    Behavior on color { ColorAnimation { duration: 600 } }
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        spacing: 4
+
+                        Text {
+                            text: beeNet.tr("chart_label")
+                            color: BeeTheme.textSecondary
+                            font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+
+                        Canvas {
+                            id: netChartCanvas
+                            width: parent.width
+                            height: parent.height - 28
+                            antialiasing: true
+                            renderStrategy: Canvas.Immediate
+
+                            property var dlData: beeNet.dlHistory
+                            property var ulData: beeNet.ulHistory
+
+                            onDlDataChanged: requestPaint()
+                            onUlDataChanged: requestPaint()
+
+                            Connections {
+                                target: BeeTheme
+                                function on_ProgressChanged() { netChartCanvas.requestPaint() }
+                            }
+
+                            onPaint: {
+                                var ctx = getContext("2d")
+                                if (!ctx) return
+                                ctx.clearRect(0, 0, width, height)
+
+                                var maxVal = 1024
+                                for (var i = 0; i < dlData.length; i++) {
+                                    if (dlData[i] > maxVal) maxVal = dlData[i]
+                                    if (ulData[i] > maxVal) maxVal = ulData[i]
+                                }
+                                maxVal *= 1.2
+
+                                var w = width
+                                var h = height
+                                var step = w / (beeNet.chartMaxPoints - 1)
+
+                                if (dlData.length > 1) {
+                                    ctx.beginPath()
+                                    ctx.strokeStyle = BeeTheme.accent.toString()
+                                    ctx.lineWidth = 2
+                                    for (var d = 0; d < dlData.length; d++) {
+                                        var x = d * step
+                                        var y = h - (dlData[d] / maxVal) * h
+                                        if (d === 0) ctx.moveTo(x, y)
+                                        else ctx.lineTo(x, y)
+                                    }
+                                    ctx.stroke()
+                                    ctx.lineTo((dlData.length - 1) * step, h)
+                                    ctx.lineTo(0, h)
+                                    ctx.closePath()
+                                    ctx.fillStyle = Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1).toString()
+                                    ctx.fill()
+                                }
+
+                                if (ulData.length > 1) {
+                                    ctx.beginPath()
+                                    ctx.strokeStyle = Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.7).toString()
+                                    ctx.lineWidth = 1.5
+                                    ctx.setLineDash([4, 3])
+                                    for (var u = 0; u < ulData.length; u++) {
+                                        var ux = u * step
+                                        var uy = h - (ulData[u] / maxVal) * h
+                                        if (u === 0) ctx.moveTo(ux, uy)
+                                        else ctx.lineTo(ux, uy)
+                                    }
+                                    ctx.stroke()
+                                    ctx.setLineDash([])
+                                }
+                            }
+                        }
+
+                        Row {
+                            spacing: 15
+                            Text {
+                                text: "\u25cf " + beeNet.tr("download") + " " + beeNet.downloadRate
+                                color: BeeTheme.accent
+                                font.pixelSize: 9
+                                Behavior on color { ColorAnimation { duration: 600 } }
+                            }
+                            Text {
+                                text: "--- " + beeNet.tr("upload") + " " + beeNet.uploadRate
+                                color: BeeTheme.textSecondary
+                                font.pixelSize: 9
+                                Behavior on color { ColorAnimation { duration: 600 } }
+                            }
+                        }
+                    }
+                }
+
+                // ─── Network details grid ──
+                Grid {
+                    width: parent.width - 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    columns: 2
+                    columnSpacing: 20
+                    rowSpacing: 6
+
+                    Row { spacing: 6; Text { text: beeNet.tr("local_ip"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.localIp; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } elide: Text.ElideRight Behavior on color { ColorAnimation { duration: 600 } } } }
+                    Row { spacing: 6; Text { text: beeNet.tr("public_ip"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.publicIp; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } elide: Text.ElideRight Behavior on color { ColorAnimation { duration: 600 } } } }
+                    Row { spacing: 6; Text { text: beeNet.tr("gateway"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.gateway; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } elide: Text.ElideRight Behavior on color { ColorAnimation { duration: 600 } } } }
+                    Row { spacing: 6; Text { text: beeNet.tr("dns"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.dns; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } elide: Text.ElideRight Behavior on color { ColorAnimation { duration: 600 } } } }
+                    Row { spacing: 6; Text { text: beeNet.tr("mac"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.macAddress; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } elide: Text.ElideRight Behavior on color { ColorAnimation { duration: 600 } } } }
+                    Row { spacing: 6; Text { text: beeNet.tr("latency"); color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } Behavior on color { ColorAnimation { duration: 600 } } } Text { text: beeNet.latency; color: BeeTheme.textPrimary; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } } }
+                }
+
+                // ─── Speed Test button ──
+                Rectangle {
+                    width: parent.width - 40
+                    height: 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    radius: 10
+                    color: netStMouse.containsMouse
+                        ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                    border.color: BeeTheme.accent
+                    border.width: 1
+                    Behavior on color { ColorAnimation { duration: 200 } }
+                    Behavior on border.color { ColorAnimation { duration: 600 } }
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 8
+                        Text {
+                            text: beeNet.speedTestRunning ? "\u23f3" : "\u26a1"
+                            font.pixelSize: 16
+                        }
+                        Text {
+                            text: beeNet.speedTestRunning
+                                ? beeNet.speedTestStatus
+                                : beeNet.tr("speed_test")
+                            color: BeeTheme.accent
+                            font { bold: true; pixelSize: 13 }
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        height: 3
+                        width: parent.width * beeNet.speedTestProgress
+                        color: BeeTheme.accent
+                        radius: 1
+                        visible: beeNet.speedTestRunning || beeNet.speedTestProgress > 0
+                        Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 600 } }
+                    }
+
+                    MouseArea {
+                        id: netStMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: beeNet.runSpeedTest()
+                    }
+                }
+
+                // ─── Speed Test History ──
+                Column {
+                    width: parent.width - 40
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 4
+                    visible: beeNet.speedTestHistory.length > 0
+
+                    Text {
+                        text: beeNet.tr("history")
+                        color: BeeTheme.textSecondary
+                        font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                        Behavior on color { ColorAnimation { duration: 600 } }
+                    }
+
+                    Repeater {
+                        model: beeNet.speedTestHistory.length
+                        delegate: Rectangle {
+                            width: parent.width
+                            height: 22
+                            radius: 4
+                            color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.2)
+                            Behavior on color { ColorAnimation { duration: 600 } }
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 10
+                                Text { text: "\u2193 " + beeNet.speedTestHistory[index].download; color: BeeTheme.accent; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: "\u2191 " + beeNet.speedTestHistory[index].upload; color: BeeTheme.textSecondary; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: beeNet.speedTestHistory[index].ping; color: BeeTheme.textSecondary; font { pixelSize: 10; family: "monospace" } Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: beeNet.speedTestHistory[index].timestamp; color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5); font.pixelSize: 9 Behavior on color { ColorAnimation { duration: 600 } } }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

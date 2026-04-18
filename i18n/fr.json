@@ -183,6 +183,13 @@
       "subtitle": "Bee-Hive OS",
       "detail": "Configuration\n& Préférences",
       "action": "toggle:settings"
+    },
+    "network": {
+      "icon": "🌐",
+      "title": "Réseau",
+      "subtitle": "Connecté",
+      "detail": "Stats en temps réel\n& Test de débit",
+      "action": "detail:network"
     }
   },
 
@@ -251,6 +258,27 @@
     "wallpaper_example_soft_light": "Lumière Douce",
     "categories_label": "CATÉGORIES",
     "maya_status": "Statut de Maya"
+  },
+
+  "network": {
+    "title": "Réseau",
+    "ethernet": "Ethernet",
+    "wifi": "WiFi",
+    "download": "↓ Récep",
+    "upload": "↑ Envoi",
+    "latency": "Latence",
+    "local_ip": "IP locale",
+    "public_ip": "IP publique",
+    "gateway": "Passerelle",
+    "dns": "DNS",
+    "mac": "MAC",
+    "speed_test": "⚡ Test de débit",
+    "speed_test_running": "Test en cours…",
+    "speed_test_done": "Terminé !",
+    "speed_test_error": "Erreur",
+    "history": "Historique",
+    "no_history": "Aucun test",
+    "chart_label": "Débit"
   },
 
   "common": {
