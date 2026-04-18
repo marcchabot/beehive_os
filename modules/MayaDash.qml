@@ -20,7 +20,8 @@ Rectangle {
 
     // ─── Visibilité animée (fade + scale) ─────────────────────
     property bool dashShown: false
-    visible: true
+    // visible=true while animating out, then false to block mouse events through wallpaper
+    visible: dashShown || opacity > 0.01
     opacity: dashShown ? 1.0 : 0.0
     property real dashScale: dashShown ? 1.0 : 0.96
     property bool interactive: dashShown  // replaces enabled to avoid QML override warning
@@ -475,6 +476,7 @@ Rectangle {
             id: hexMouseArea
             anchors.fill: parent
             hoverEnabled: true
+            enabled: mayaDash.dashShown
             cursorShape: mayaDash.dragActive ? (mayaDash.dragFromIndex === cellIndex ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.PointingHandCursor
 
             property int longPressTimer: 0
