@@ -19,21 +19,22 @@
   - System Monitor avancé (températures, ventilateurs, processus)
   - ~~Network widget avec speed test~~ ✅ (BeeNetwork v1.0)
 
-- **Alvéoles Presets (BeeStudio)** 🔜
-  - Onglet "Alvéoles" dans BeeStudio avec grille visuelle drag & drop
-  - Bibliothèque de modules disponibles (Network, Gaming, Weather, etc.)
-  - Presets enregistrés : "Travail", "Gaming", "Weekend"
-  - Stockage dans user_config.json → cellPresets
-  - Un clic change toute la grille MayaDash
+- **Alvéoles Presets (BeeStudio)** 🔧 EN COURS
+  - Onglet "Présets" 🎯 dans BeeStudio avec grille visuelle ✅
+  - Bibliothèque de modules disponibles (Network, Gaming, Weather, etc.) ✅
+  - Presets enregistrés : "Travail", "Gaming", "Weekend" ✅
+  - Stockage dans user_config.json → cellPresets ✅
+  - Un clic change toute la grille MayaDash ✅
+  - Drag & drop pour réorganiser les alvéoles 🔜 (prochaine itération)
 
-- **Animations & Transitions Polish**
+- **Animations & Transitions Polish** 🔜
   - Cross-fade wallpapers
   - Flou dynamique BeeStudio
   - Stealth Mode ultra-lisse
 
-- **OSD BeeAura Redesign**
-  - Volume/brightness avec prévisualisation temps réel
-  - OSD confirmations actions
+- **OSD BeeAura** ✅
+  - Volume/brightness avec prévisualisation temps réel ✅
+  - OSD confirmations actions ✅
 
 ---
 
@@ -131,5 +132,5 @@
 
 ---
 
-*Document version 1.0 - 7 avril 2026*  
+*Document version 1.1 - 18 avril 2026*  
 *Par Maya & Marc*

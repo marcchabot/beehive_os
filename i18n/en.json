@@ -1,10 +1,9 @@
 {
   "_meta": {
     "lang": "en",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "English translations — Bee-Hive OS"
   },
-
   "bar": {
     "tooltip_cpu": "CPU",
     "tooltip_ram": "RAM",
@@ -12,50 +11,121 @@
     "tooltip_disk": "Disk",
     "tooltip_battery": "BAT"
   },
-
   "weather": {
     "loading": "Loading…",
     "error": "Weather unavailable",
     "feels_like": "Feels like",
     "conditions": {
-      "0":  ["☀️", "Clear"],
-      "1":  ["🌤️", "Mostly clear"],
-      "2":  ["⛅", "Partly cloudy"],
-      "3":  ["☁️", "Overcast"],
-      "45": ["🌁", "Fog"],
-      "48": ["🌁", "Icy fog"],
-      "51": ["🌦️", "Light drizzle"],
-      "53": ["🌦️", "Moderate drizzle"],
-      "55": ["🌦️", "Dense drizzle"],
-      "61": ["🌧️", "Light rain"],
-      "63": ["🌧️", "Moderate rain"],
-      "65": ["🌧️", "Heavy rain"],
-      "71": ["🌨️", "Light snow"],
-      "73": ["🌨️", "Moderate snow"],
-      "75": ["🌨️", "Heavy snow"],
-      "77": ["🌨️", "Snow grains"],
-      "80": ["🌦️", "Light showers"],
-      "81": ["🌦️", "Moderate showers"],
-      "82": ["🌦️", "Violent showers"],
-      "85": ["🌨️", "Light snow showers"],
-      "86": ["🌨️", "Heavy snow showers"],
-      "95": ["⛈️", "Thunderstorm"],
-      "96": ["⛈️", "Thunderstorm, light hail"],
-      "99": ["⛈️", "Thunderstorm, heavy hail"],
-      "unknown": ["❓", "Unknown"]
+      "0": [
+        "☀️",
+        "Clear"
+      ],
+      "1": [
+        "🌤️",
+        "Mostly clear"
+      ],
+      "2": [
+        "⛅",
+        "Partly cloudy"
+      ],
+      "3": [
+        "☁️",
+        "Overcast"
+      ],
+      "45": [
+        "🌁",
+        "Fog"
+      ],
+      "48": [
+        "🌁",
+        "Icy fog"
+      ],
+      "51": [
+        "🌦️",
+        "Light drizzle"
+      ],
+      "53": [
+        "🌦️",
+        "Moderate drizzle"
+      ],
+      "55": [
+        "🌦️",
+        "Dense drizzle"
+      ],
+      "61": [
+        "🌧️",
+        "Light rain"
+      ],
+      "63": [
+        "🌧️",
+        "Moderate rain"
+      ],
+      "65": [
+        "🌧️",
+        "Heavy rain"
+      ],
+      "71": [
+        "🌨️",
+        "Light snow"
+      ],
+      "73": [
+        "🌨️",
+        "Moderate snow"
+      ],
+      "75": [
+        "🌨️",
+        "Heavy snow"
+      ],
+      "77": [
+        "🌨️",
+        "Snow grains"
+      ],
+      "80": [
+        "🌦️",
+        "Light showers"
+      ],
+      "81": [
+        "🌦️",
+        "Moderate showers"
+      ],
+      "82": [
+        "🌦️",
+        "Violent showers"
+      ],
+      "85": [
+        "🌨️",
+        "Light snow showers"
+      ],
+      "86": [
+        "🌨️",
+        "Heavy snow showers"
+      ],
+      "95": [
+        "⛈️",
+        "Thunderstorm"
+      ],
+      "96": [
+        "⛈️",
+        "Thunderstorm, light hail"
+      ],
+      "99": [
+        "⛈️",
+        "Thunderstorm, heavy hail"
+      ],
+      "unknown": [
+        "❓",
+        "Unknown"
+      ]
     }
   },
-
   "dashboard": {
     "default_title": "My Dashboard",
     "no_events": "No upcoming events"
   },
-
   "events": {
     "upcoming": "Upcoming events",
     "see_calendar": "See calendar →"
   },
-
   "sync": {
     "last_sync": "Sync: %1 min ago",
     "syncing": "Syncing...",
@@ -63,7 +133,6 @@
     "no_sources": "No calendar configured",
     "sources_count": "%1 active calendar(s)"
   },
-
   "settings": {
     "title": "Bee-Hive Settings",
     "palette": "BeePalette 🎨",
@@ -87,7 +156,6 @@
     "save": "Save",
     "close": "Close"
   },
-
   "power": {
     "title": "BEE POWER",
     "subtitle": "What would you like to do?",
@@ -98,14 +166,12 @@
     "logout": "Log Out",
     "sleep": "Sleep"
   },
-
   "search": {
     "placeholder": "Search applications…",
     "loading": "Loading applications…",
     "no_results": "No results for",
     "hint": "↑↓/Tab navigate  ↵ launch  Esc close"
   },
-
   "notes": {
     "header_title": "📝 Quick Notes",
     "note_count": "%1 note(s)",
@@ -120,12 +186,10 @@
     "default_note_2": "Type your notes here and they'll be saved automatically.",
     "default_note_3": "Click on a note to edit it, hover to see the delete button."
   },
-
   "notifications": {
     "dismiss": "Dismiss",
     "dismiss_all": "Clear all"
   },
-
   "studio": {
     "title": "BeeStudio",
     "subtitle": "Control Center",
@@ -190,9 +254,10 @@
     "wallpaper_example_light_bee": "Light Bee",
     "wallpaper_example_soft_light": "Soft Light",
     "categories_label": "CATEGORIES",
-    "maya_status": "Maya Status"
+    "maya_status": "Maya Status",
+    "category_presets": "Presets",
+    "presets_desc": "Quick switch between layouts"
   },
-
   "cells": {
     "calendar": {
       "icon": "📅",
@@ -259,7 +324,6 @@
       "action": "detail:network"
     }
   },
-
   "network": {
     "title": "Network",
     "ethernet": "Ethernet",
@@ -280,7 +344,6 @@
     "no_history": "No tests yet",
     "chart_label": "Throughput"
   },
-
   "common": {
     "bee_power": "BEE POWER",
     "bee_hive_time": "🐝 Bee-Hive Time",
@@ -297,5 +360,21 @@
     "beehive_label": "BEE-HIVE",
     "focus_label": "FOCUS",
     "beebar_stats_title": "BeeBar Display 📊"
+  },
+  "presets": {
+    "title": "Presets",
+    "apply": "Apply",
+    "save": "Save current",
+    "delete": "Delete",
+    "applied": "Preset applied",
+    "saved": "Preset saved",
+    "deleted": "Preset deleted",
+    "confirm_delete": "Delete preset?",
+    "default_name": "My Preset",
+    "module_library": "Module Library",
+    "current_grid": "Quick switch between layouts",
+    "saved_presets": "Saved Presets",
+    "save_current": "Save Current Layout",
+    "alveoles_count": "cells"
   }
 }

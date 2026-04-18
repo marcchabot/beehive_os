@@ -19,7 +19,7 @@ Item {
     property bool embedded: false
 
     // ─── Catégorie active ────────────────────────────────────────
-    property int activeCategory: 0   // 0=Dashboard 1=Alvéoles 2=Fonds d'écran 3=Historique
+    property int activeCategory: 0   // 0=Dashboard 1=Alvéoles 2=Fonds d'écran 3=Historique 4=Presets
 
     // ─── Dossier fonds d'écran ───────────────────────────────────
     property string wallpaperFolder: "/home/marc/Pictures/Wallpapers"
@@ -36,6 +36,11 @@ Item {
     property bool   _loading:         false
     property bool   _saveDirty:       false
     property string autoThemeHint:    ""
+
+    // ─── Presets state ─────────────────────────────────────────────
+    property string presetNewName:   ""
+    property string presetNewIcon:   "🍯"
+    property int    presetToDelete:  -1
 
     // ─── Composant WallCard (Unified Wallpaper) ─────────────────
     component WallCard: Item {
@@ -388,6 +393,7 @@ Item {
                         ListElement { catIcon: "🍯"; catKey: "category_cells"; catSub: "cells_desc" }
                         ListElement { catIcon: "🖼";  catKey: "category_wallpapers"; catSub: "wallpapers_desc" }
                         ListElement { catIcon: "🔔"; catKey: "category_history"; catSub: "history_desc" }
+                        ListElement { catIcon: "🎯"; catKey: "category_presets"; catSub: "presets_desc" }
                     }
 
                     Repeater {
@@ -885,7 +891,7 @@ Item {
                 Item {
                     id: panelWallpapers
                     anchors.fill: parent
-                    visible: beeStudio.activeCategory === 1
+                    visible: beeStudio.activeCategory === 1 || beeStudio.activeCategory === 2
 
                     // Modèle de dossier
                     FolderListModel {
@@ -1046,7 +1052,7 @@ Item {
                 Item {
                     id: panelHistorique
                     anchors.fill: parent
-                    visible: beeStudio.activeCategory === 2
+                    visible: beeStudio.activeCategory === 3
 
                     ColumnLayout {
                         anchors.fill: parent; spacing: 0
@@ -1193,6 +1199,380 @@ Item {
                                     border.color: Qt.rgba(1.0, 0.3, 0.3, 0.40); border.width: 1
                                     Text { id: clearHistLbl; anchors.centerIn: parent; text: tr("clear_history_button"); color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font { pixelSize: 11; bold: true } }
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.clearNotificationHistory() }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ═══════════════════════════════════════════════════════
+                // PANNEAU 3 : PRÉSETS 🎯  (Alvéoles Presets)
+                // ═══════════════════════════════════════════════════════
+                Item {
+                    id: panelPresets
+                    anchors.fill: parent
+                    visible: beeStudio.activeCategory === 4
+
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 0
+                        spacing: 0
+
+                        // ── Header ──────────────────────────
+                        Item {
+                            Layout.fillWidth: true; height: 60
+                            RowLayout {
+                                anchors { fill: parent; leftMargin: 22; rightMargin: 20 } spacing: 12
+                                Text { text: "🎯"; font.pixelSize: 24 }
+                                ColumnLayout {
+                                    spacing: 1
+                                    Text {
+                                        text: BeePresets.tr("title")
+                                        color: BeeTheme.accent
+                                        font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
+                                        Behavior on color { ColorAnimation { duration: 600 } }
+                                    }
+                                    Text {
+                                        text: BeePresets.tr("current_grid")
+                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
+                                        font.pixelSize: 10
+                                    }
+                                }
+                                Item { Layout.fillWidth: true }
+                            }
+                        }
+
+                        Rectangle {
+                            height: 1; Layout.fillWidth: true
+                            gradient: Gradient {
+                                orientation: Gradient.Horizontal
+                                GradientStop { position: 0.0; color: "transparent" }
+                                GradientStop { position: 0.1; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.20) }
+                                GradientStop { position: 0.9; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.20) }
+                                GradientStop { position: 1.0; color: "transparent" }
+                            }
+                        }
+
+                        // ── Preset cards ──────────────────────
+                        Item {
+                            Layout.fillWidth: true; Layout.fillHeight: true
+
+                            Flickable {
+                                anchors.fill: parent
+                                contentHeight: presetsContent.implicitHeight + 40
+                                clip: true
+                                ScrollBar.vertical: ScrollBar {
+                                    width: 4; policy: ScrollBar.AsNeeded
+                                    contentItem: Rectangle { radius: 2; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2) }
+                                }
+
+                                ColumnLayout {
+                                    id: presetsContent
+                                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+                                    spacing: 16
+
+                                    // ── Saved presets ──
+                                    Text {
+                                        text: (BeeConfig.tr && BeeConfig.tr.presets) ? BeeConfig.tr.presets.saved_presets || "Saved Presets" : "Saved Presets"
+                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
+                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                    }
+
+                                    // Preset grid
+                                    Flow {
+                                        Layout.fillWidth: true
+                                        spacing: 14
+
+                                        Repeater {
+                                            model: BeePresets.presets
+
+                                            delegate: Rectangle {
+                                                width: 180; height: 200
+                                                radius: 14
+                                                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                                                border.width: 1
+                                                Behavior on color { ColorAnimation { duration: 150 } }
+                                                Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                                                property bool hovered: false
+                                                property bool isDefault: (modelData.name === "Travail" || modelData.name === "Gaming" || modelData.name === "Weekend")
+
+                                                Rectangle {
+                                                    id: presetHoverOverlay
+                                                    anchors.fill: parent
+                                                    radius: parent.radius
+                                                    color: parent.hovered ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10) : "transparent"
+                                                    Behavior on color { ColorAnimation { duration: 150 } }
+                                                }
+
+                                                ColumnLayout {
+                                                    anchors { fill: parent; margins: 14; topMargin: 16 }
+                                                    spacing: 6
+
+                                                    // Preset icon + name
+                                                    RowLayout {
+                                                        spacing: 8
+                                                        Text {
+                                                            text: modelData.icon || "🍯"
+                                                            font.pixelSize: 24
+                                                        }
+                                                        Text {
+                                                            text: modelData.name
+                                                            color: BeeTheme.accent
+                                                            font { bold: true; pixelSize: 14 }
+                                                            Behavior on color { ColorAnimation { duration: 600 } }
+                                                        }
+                                                        Item { Layout.fillWidth: true }
+                                                        // Delete button (not for defaults)
+                                                        Text {
+                                                            visible: !parent.parent.parent.isDefault
+                                                            text: "✕"
+                                                            font.pixelSize: 10
+                                                            color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
+                                                            MouseArea {
+                                                                anchors.fill: parent; anchors.margins: -6
+                                                                cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                                                onEntered: parent.color = Qt.rgba(1.0, 0.4, 0.4, 0.8)
+                                                                onExited: parent.color = Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
+                                                                onClicked: BeePresets.deletePreset(modelData.name)
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Mini cell preview (4x2 grid)
+                                                    Rectangle {
+                                                        Layout.fillWidth: true
+                                                        Layout.preferredHeight: 90
+                                                        radius: 8
+                                                        color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.4)
+
+                                                        Grid {
+                                                            anchors { fill: parent; margins: 6 }
+                                                            columns: 4
+                                                            spacing: 3
+
+                                                            Repeater {
+                                                                model: modelData.cells.slice(0, 8)
+
+                                                                delegate: Rectangle {
+                                                                    width: 36; height: 36
+                                                                    radius: 6
+                                                                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                                                                    Text {
+                                                                        text: modelData.icon || "📦"
+                                                                        font.pixelSize: 14
+                                                                        anchors.centerIn: parent
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Cell count
+                                                    Text {
+                                                        text: modelData.cells.length + " alvéoles"
+                                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.35)
+                                                        font.pixelSize: 9
+                                                    }
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                                    onEntered: parent.hovered = true
+                                                    onExited: parent.hovered = false
+                                                    onClicked: BeePresets.applyPreset(modelData.name)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // ── Save current as preset ──
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 1
+                                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                                    }
+
+                                    Text {
+                                        text: (BeeConfig.tr && BeeConfig.tr.presets) ? BeeConfig.tr.presets.save_current || "Save Current Layout" : "Save Current Layout"
+                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
+                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 10
+
+                                        TextField {
+                                            id: presetNameField
+                                            Layout.fillWidth: true
+                                            height: 36
+                                            placeholderText: BeePresets.tr("default_name")
+                                            color: BeeTheme.textPrimary
+                                            font.pixelSize: 12
+                                            leftPadding: 10; rightPadding: 10
+                                            background: Rectangle {
+                                                radius: 7
+                                                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.07)
+                                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, presetNameField.activeFocus ? 0.5 : 0.15)
+                                                border.width: 1
+                                                Behavior on border.color { ColorAnimation { duration: 150 } }
+                                            }
+                                            onTextChanged: beeStudio.presetNewName = text
+                                        }
+
+                                        // Icon picker (simple emoji selector)
+                                        Rectangle {
+                                            width: 36; height: 36; radius: 7
+                                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.07)
+                                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                                            border.width: 1
+
+                                            Text {
+                                                id: presetIconDisplay
+                                                text: beeStudio.presetNewIcon
+                                                font.pixelSize: 18
+                                                anchors.centerIn: parent
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: presetIconMenu.open()
+                                            }
+
+                                            Popup {
+                                                id: presetIconMenu
+                                                x: parent.width + 4
+                                                y: -(contentHeight / 2)
+                                                width: 200; padding: 10
+                                                modal: false; focus: true
+                                                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                                                background: Rectangle {
+                                                    color: BeeTheme.mode === "HoneyDark" ? Qt.rgba(0.08, 0.08, 0.12, 0.97) : Qt.rgba(0.97, 0.95, 0.90, 0.97)
+                                                    radius: 12
+                                                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                                                    border.width: 1
+                                                }
+                                                contentItem: Flow {
+                                                    spacing: 6
+                                                    Repeater {
+                                                        model: ["💼", "🎮", "🌿", "🍯", "🏠", "☕", "🎵", "📷", "✈️", "🏋️", "📚", "💻", "🎬", "🛒", "🔧", "🎯"]
+                                                        delegate: Text {
+                                                            text: modelData
+                                                            font.pixelSize: 20
+                                                            MouseArea {
+                                                                anchors.fill: parent; anchors.margins: -4
+                                                                cursorShape: Qt.PointingHandCursor
+                                                                onClicked: { beeStudio.presetNewIcon = modelData; presetIconMenu.close() }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: 120; height: 36; radius: 10
+                                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.16)
+                                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40)
+                                            border.width: 1
+                                            Text {
+                                                text: BeePresets.tr("save")
+                                                color: BeeTheme.accent
+                                                font { pixelSize: 12; bold: true }
+                                                anchors.centerIn: parent
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    var name = presetNameField.text.trim()
+                                                    if (name.length > 0) {
+                                                        BeePresets.saveCurrentAsPreset(name, beeStudio.presetNewIcon)
+                                                        presetNameField.text = ""
+                                                        beeStudio.presetNewIcon = "🍯"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // ── Module Library ──
+                                    Rectangle {
+                                        Layout.fillWidth: true
+                                        height: 1
+                                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                                    }
+
+                                    Text {
+                                        text: BeePresets.tr("module_library")
+                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
+                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                    }
+
+                                    // Module library grid
+                                    Flow {
+                                        Layout.fillWidth: true
+                                        spacing: 8
+
+                                        Repeater {
+                                            model: BeePresets.moduleLibrary
+
+                                            delegate: Rectangle {
+                                                width: 100; height: 56
+                                                radius: 8
+                                                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                                                border.width: 1
+
+                                                property bool libHovered: false
+
+                                                ColumnLayout {
+                                                    anchors.centerIn: parent
+                                                    spacing: 2
+                                                    Text {
+                                                        text: modelData.icon
+                                                        font.pixelSize: 18
+                                                        Layout.alignment: Qt.AlignHCenter
+                                                    }
+                                                    Text {
+                                                        text: modelData.title
+                                                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, parent.parent.libHovered ? 0.9 : 0.5)
+                                                        font.pixelSize: 9
+                                                        Layout.alignment: Qt.AlignHCenter
+                                                    }
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent; hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onEntered: parent.libHovered = true
+                                                    onExited: parent.libHovered = false
+                                                    onClicked: {
+                                                        // Add this module to the first empty slot
+                                                        if (BeeConfig.cells.count < 8) {
+                                                            BeeConfig.cells.append({
+                                                                icon: modelData.icon,
+                                                                title: modelData.title,
+                                                                subtitle: modelData.subtitle,
+                                                                detail: modelData.detail,
+                                                                action: modelData.action,
+                                                                highlighted: modelData.highlighted,
+                                                                customizable: modelData.customizable !== false,
+                                                                color: ""
+                                                            })
+                                                            BeeConfig.cellsRevision++
+                                                            BeeConfig.saveConfig()
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Item { height: 20 }  // bottom padding
                                 }
                             }
                         }

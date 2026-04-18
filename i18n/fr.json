@@ -1,10 +1,9 @@
 {
   "_meta": {
     "lang": "fr",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Traductions françaises — Bee-Hive OS"
   },
-
   "bar": {
     "tooltip_cpu": "CPU",
     "tooltip_ram": "RAM",
@@ -12,50 +11,121 @@
     "tooltip_disk": "Disque",
     "tooltip_battery": "BAT"
   },
-
   "weather": {
     "loading": "Chargement…",
     "error": "Météo indisponible",
     "feels_like": "Ressenti",
     "conditions": {
-      "0":  ["☀️", "Dégagé"],
-      "1":  ["🌤️", "Plutôt dégagé"],
-      "2":  ["⛅", "Partiellement nuageux"],
-      "3":  ["☁️", "Couvert"],
-      "45": ["🌁", "Brouillard"],
-      "48": ["🌁", "Brouillard givrant"],
-      "51": ["🌦️", "Bruine légère"],
-      "53": ["🌦️", "Bruine modérée"],
-      "55": ["🌦️", "Bruine dense"],
-      "61": ["🌧️", "Pluie légère"],
-      "63": ["🌧️", "Pluie modérée"],
-      "65": ["🌧️", "Pluie forte"],
-      "71": ["🌨️", "Neige légère"],
-      "73": ["🌨️", "Neige modérée"],
-      "75": ["🌨️", "Neige forte"],
-      "77": ["🌨️", "Grains de neige"],
-      "80": ["🌦️", "Averses légères"],
-      "81": ["🌦️", "Averses modérées"],
-      "82": ["🌦️", "Averses violentes"],
-      "85": ["🌨️", "Averses de neige légères"],
-      "86": ["🌨️", "Averses de neige fortes"],
-      "95": ["⛈️", "Orage"],
-      "96": ["⛈️", "Orage avec grêle légère"],
-      "99": ["⛈️", "Orage avec grêle forte"],
-      "unknown": ["❓", "Inconnu"]
+      "0": [
+        "☀️",
+        "Dégagé"
+      ],
+      "1": [
+        "🌤️",
+        "Plutôt dégagé"
+      ],
+      "2": [
+        "⛅",
+        "Partiellement nuageux"
+      ],
+      "3": [
+        "☁️",
+        "Couvert"
+      ],
+      "45": [
+        "🌁",
+        "Brouillard"
+      ],
+      "48": [
+        "🌁",
+        "Brouillard givrant"
+      ],
+      "51": [
+        "🌦️",
+        "Bruine légère"
+      ],
+      "53": [
+        "🌦️",
+        "Bruine modérée"
+      ],
+      "55": [
+        "🌦️",
+        "Bruine dense"
+      ],
+      "61": [
+        "🌧️",
+        "Pluie légère"
+      ],
+      "63": [
+        "🌧️",
+        "Pluie modérée"
+      ],
+      "65": [
+        "🌧️",
+        "Pluie forte"
+      ],
+      "71": [
+        "🌨️",
+        "Neige légère"
+      ],
+      "73": [
+        "🌨️",
+        "Neige modérée"
+      ],
+      "75": [
+        "🌨️",
+        "Neige forte"
+      ],
+      "77": [
+        "🌨️",
+        "Grains de neige"
+      ],
+      "80": [
+        "🌦️",
+        "Averses légères"
+      ],
+      "81": [
+        "🌦️",
+        "Averses modérées"
+      ],
+      "82": [
+        "🌦️",
+        "Averses violentes"
+      ],
+      "85": [
+        "🌨️",
+        "Averses de neige légères"
+      ],
+      "86": [
+        "🌨️",
+        "Averses de neige fortes"
+      ],
+      "95": [
+        "⛈️",
+        "Orage"
+      ],
+      "96": [
+        "⛈️",
+        "Orage avec grêle légère"
+      ],
+      "99": [
+        "⛈️",
+        "Orage avec grêle forte"
+      ],
+      "unknown": [
+        "❓",
+        "Inconnu"
+      ]
     }
   },
-
   "dashboard": {
     "default_title": "Mon Tableau de bord"
   },
-
   "events": {
     "upcoming": "Prochains événements",
     "no_events": "Aucun événement à venir 🍯",
     "see_calendar": "Voir le calendrier →"
   },
-
   "sync": {
     "last_sync": "Sync: il y a %1 min",
     "syncing": "Synchronisation...",
@@ -63,7 +133,6 @@
     "no_sources": "Aucun calendrier configuré",
     "sources_count": "%1 calendrier(s) actif(s)"
   },
-
   "settings": {
     "title": "Bee-Hive Settings",
     "palette": "BeePalette 🎨",
@@ -87,7 +156,6 @@
     "save": "Enregistrer",
     "close": "Fermer"
   },
-
   "power": {
     "title": "BEE POWER",
     "subtitle": "Que veux-tu faire ?",
@@ -98,14 +166,12 @@
     "logout": "Déconnexion",
     "sleep": "Veille"
   },
-
   "search": {
     "placeholder": "Rechercher une application…",
     "loading": "Chargement des applications…",
     "no_results": "Aucun résultat pour",
     "hint": "↑↓/Tab naviguer  ↵ lancer  Esc fermer"
   },
-
   "notes": {
     "header_title": "📝 Notes rapides",
     "note_count": "%1 note(s)",
@@ -120,12 +186,10 @@
     "default_note_2": "Écrivez vos notes ici, elles seront sauvegardées automatiquement.",
     "default_note_3": "Cliquez sur une note pour l'éditer, survolez pour voir le bouton supprimer."
   },
-
   "notifications": {
     "dismiss": "Ignorer",
     "dismiss_all": "Tout effacer"
   },
-
   "cells": {
     "calendar": {
       "icon": "📅",
@@ -192,7 +256,6 @@
       "action": "detail:network"
     }
   },
-
   "studio": {
     "title": "BeeStudio",
     "subtitle": "Centre de Contrôle",
@@ -257,9 +320,10 @@
     "wallpaper_example_light_bee": "Abeille Claire",
     "wallpaper_example_soft_light": "Lumière Douce",
     "categories_label": "CATÉGORIES",
-    "maya_status": "Statut de Maya"
+    "maya_status": "Statut de Maya",
+    "category_presets": "Présets",
+    "presets_desc": "Changement rapide de disposition"
   },
-
   "network": {
     "title": "Réseau",
     "ethernet": "Ethernet",
@@ -280,7 +344,6 @@
     "no_history": "Aucun test",
     "chart_label": "Débit"
   },
-
   "common": {
     "bee_power": "BEE POWER",
     "bee_hive_time": "🐝 Bee-Hive Time",
@@ -297,5 +360,21 @@
     "beehive_label": "BEE-HIVE",
     "focus_label": "FOCUS",
     "beebar_stats_title": "Affichage BeeBar 📊"
+  },
+  "presets": {
+    "title": "Présets",
+    "apply": "Appliquer",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "applied": "Préset appliqué",
+    "saved": "Préset sauvegardé",
+    "deleted": "Préset supprimé",
+    "confirm_delete": "Supprimer le préset ?",
+    "default_name": "Mon Préset",
+    "module_library": "Bibliothèque de modules",
+    "current_grid": "Changement rapide de disposition",
+    "saved_presets": "Présets enregistrés",
+    "save_current": "Sauvegarder la disposition actuelle",
+    "alveoles_count": "alvéoles"
   }
 }
