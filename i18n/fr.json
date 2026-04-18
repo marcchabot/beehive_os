@@ -375,6 +375,7 @@
     "current_grid": "Changement rapide de disposition",
     "saved_presets": "Présets enregistrés",
     "save_current": "Sauvegarder la disposition actuelle",
-    "alveoles_count": "alvéoles"
+    "alveoles_count": "alvéoles",
+    "drag_hint": "Maintenir appuyé sur une alvéole pour la déplacer"
   }
 }

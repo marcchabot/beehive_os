@@ -1,11 +1,12 @@
+pragma Singleton
 import QtQuick
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════════
 // BeePresets.qml — Alvéoles Presets Manager 🐝✨
 // Permet de basculer entre des configurations de grille prédéfinies.
-// v2.0: Presets persisted in user_config.json → cellPresets
-// ═════════════════════════════════════════════════════════════════
+// v2.1: Fixed QtObject child property error; drag reordering support
+// ═══════════════════════════════════════════════════════════════════
 
 QtObject {
     id: beePresets
@@ -219,6 +220,59 @@ QtObject {
         return true
     }
 
+    // ─── Move a cell within the current grid (for drag & drop) ──
+    function moveCell(fromIndex, toIndex) {
+        if (fromIndex === toIndex) return false
+        if (fromIndex < 0 || fromIndex >= BeeConfig.cells.count) return false
+        if (toIndex < 0 || toIndex >= BeeConfig.cells.count) return false
+
+        // Get source cell data
+        var src = BeeConfig.cells.get(fromIndex)
+        var cellData = {
+            icon:         src.icon,
+            title:        src.title,
+            subtitle:     src.subtitle || "",
+            detail:       src.detail || "",
+            action:       src.action || "none",
+            highlighted:  src.highlighted || false,
+            customizable: src.customizable !== false,
+            color:        src.color || ""
+        }
+
+        // Remove from old position
+        BeeConfig.cells.remove(fromIndex)
+
+        // Re-insert at new position (adjust for removal shift)
+        var insertAt = toIndex > fromIndex ? toIndex : toIndex
+        BeeConfig.cells.insert(insertAt, cellData)
+
+        BeeConfig.cellsRevision++
+        BeeConfig.saveConfig()
+        return true
+    }
+
+    // ─── Swap two cells (for drag & drop) ───────────────────────
+    function swapCells(indexA, indexB) {
+        if (indexA === indexB) return false
+        if (indexA < 0 || indexA >= BeeConfig.cells.count) return false
+        if (indexB < 0 || indexB >= BeeConfig.cells.count) return false
+
+        var a = BeeConfig.cells.get(indexA)
+        var b = BeeConfig.cells.get(indexB)
+
+        var props = ["icon", "title", "subtitle", "detail", "action", "highlighted", "customizable", "color"]
+        for (var i = 0; i < props.length; i++) {
+            var key = props[i]
+            var tmp = a[key]
+            BeeConfig.cells.setProperty(indexA, key, b[key])
+            BeeConfig.cells.setProperty(indexB, key, tmp)
+        }
+
+        BeeConfig.cellsRevision++
+        BeeConfig.saveConfig()
+        return true
+    }
+
     // ─── Sync presets to BeeConfig._rawConfig and save ──────────
     function _syncToConfig() {
         if (!BeeConfig._rawConfig) return
@@ -226,18 +280,25 @@ QtObject {
         BeeConfig.saveConfig()
     }
 
-    // ─── Auto-load when BeeConfig is ready ──────────────────────
-    Connections {
-        target: BeeConfig
-        function onConfigLoaded() {
-            beePresets.loadFromConfig()
+    // ─── Initialization: load from config or fallback ───────────
+    // Using a Timer instead of Component.onCompleted because QtObject
+    // doesn't have a default property for child items (Connections, etc.)
+    property Timer _initTimer: Timer {
+        interval: 50
+        running: true
+        repeat: false
+        onTriggered: {
+            if (BeeConfig._loaded) {
+                beePresets.loadFromConfig()
+            }
         }
     }
 
-    Component.onCompleted: {
-        // Try loading from config immediately
-        if (BeeConfig._loaded) {
-            loadFromConfig()
+    // Listen for BeeConfig load completion
+    property Connections _configConn: Connections {
+        target: BeeConfig
+        function onConfigLoaded() {
+            beePresets.loadFromConfig()
         }
     }
 }

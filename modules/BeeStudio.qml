@@ -1237,6 +1237,12 @@ Item {
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                                         font.pixelSize: 10
                                     }
+                                    Text {
+                                        text: BeePresets.tr("drag_hint")
+                                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
+                                        font.pixelSize: 9
+                                        font.italic: true
+                                    }
                                 }
                                 Item { Layout.fillWidth: true }
                             }

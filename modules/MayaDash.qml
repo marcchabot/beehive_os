@@ -36,6 +36,11 @@ Rectangle {
     signal openStudio()
     signal openNotes()
 
+    // ─── Drag & Drop state ──────────────────────────────────────
+    property int dragFromIndex: -1    // Cell being dragged
+    property int dragOverIndex: -1    // Cell currently under the drop target
+    property bool dragActive: false   // Whether a drag is in progress
+
     // ─── BeeNetwork instance ────────────────────────────────
     property bool networkDetailVisible: false
 
@@ -447,18 +452,121 @@ Rectangle {
             }
         }
 
-        // ─── Hover interactif + Click dispatcher ──────────────
-        MouseArea {
+        // ─── Drop zone highlight ─────────────────────────────
+        Rectangle {
             anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onEntered:  { hexScale.xScale = 1.04; hexScale.yScale = 1.04; hexCell.glowIntensity = 0.9 }
-            onExited:  { hexScale.xScale = 1.0;  hexScale.yScale = 1.0;  hexCell.glowIntensity = hexCell.isHighlighted ? 0.8 : 0.3 }
-            onClicked: {
-                BeeSound.playEvent("ui.cell.click", {})
-                mayaDash.handleCellAction(cellData ? cellData.action : "none")
+            radius: 20
+            color: "transparent"
+            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, mayaDash.dragActive && mayaDash.dragOverIndex === cellIndex ? 0.9 : 0.0)
+            border.width: 3
+            visible: mayaDash.dragActive && mayaDash.dragOverIndex === cellIndex
+            Behavior on border.color { ColorAnimation { duration: 200 } }
+
+            SequentialAnimation on border.width {
+                loops: Animation.Infinite
+                running: mayaDash.dragActive && mayaDash.dragOverIndex === cellIndex
+                NumberAnimation { to: 4; duration: 400; easing.type: Easing.InOutSine }
+                NumberAnimation { to: 2; duration: 400; easing.type: Easing.InOutSine }
             }
         }
+
+        // ─── Hover interactif + Click + Long-press Drag ──────
+        MouseArea {
+            id: hexMouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: mayaDash.dragActive ? (mayaDash.dragFromIndex === cellIndex ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.PointingHandCursor
+
+            property int longPressTimer: 0
+            property bool longPressed: false
+            property point pressPos
+
+            onPressed: (mouse) => {
+                pressPos = Qt.point(mouse.x, mouse.y)
+                longPressed = false
+                longPressTimer = 0
+                _longPressLoop.start()
+            }
+            onReleased: (mouse) => {
+                _longPressLoop.stop()
+                if (mayaDash.dragActive && mayaDash.dragFromIndex === cellIndex) {
+                    // Drop on self = cancel drag
+                    mayaDash.dragActive = false
+                    mayaDash.dragFromIndex = -1
+                    mayaDash.dragOverIndex = -1
+                } else if (mayaDash.dragActive && mayaDash.dragOverIndex >= 0 && mayaDash.dragOverIndex !== mayaDash.dragFromIndex) {
+                    // Complete the swap
+                    BeePresets.swapCells(mayaDash.dragFromIndex, mayaDash.dragOverIndex)
+                    mayaDash.dragActive = false
+                    mayaDash.dragFromIndex = -1
+                    mayaDash.dragOverIndex = -1
+                } else if (!longPressed) {
+                    // Normal click
+                    BeeSound.playEvent("ui.cell.click", {})
+                    mayaDash.handleCellAction(cellData ? cellData.action : "none")
+                }
+                hexScale.xScale = 1.0
+                hexScale.yScale = 1.0
+                hexCell.glowIntensity = hexCell.isHighlighted ? 0.8 : 0.3
+            }
+            onCanceled: {
+                _longPressLoop.stop()
+                mayaDash.dragActive = false
+                mayaDash.dragFromIndex = -1
+                mayaDash.dragOverIndex = -1
+            }
+
+            onPositionChanged: (mouse) => {
+                if (mayaDash.dragActive && mayaDash.dragFromIndex === cellIndex) {
+                    // Determine which cell we're over based on mouse position relative to the grid
+                    var globalPos = mapToItem(mayaDash, mouse.x, mouse.y)
+                    var targetIdx = mayaDash.cellIndexAt(globalPos.x, globalPos.y)
+                    mayaDash.dragOverIndex = (targetIdx >= 0 && targetIdx !== cellIndex) ? targetIdx : -1
+                }
+            }
+
+            onEntered: {
+                if (!mayaDash.dragActive) {
+                    hexScale.xScale = 1.04
+                    hexScale.yScale = 1.04
+                    hexCell.glowIntensity = 0.9
+                }
+            }
+            onExited: {
+                if (!mayaDash.dragActive) {
+                    hexScale.xScale = 1.0
+                    hexScale.yScale = 1.0
+                    hexCell.glowIntensity = hexCell.isHighlighted ? 0.8 : 0.3
+                }
+            }
+
+            // Long-press detection via Timer
+            Timer {
+                id: _longPressLoop
+                interval: 100
+                repeat: true
+                onTriggered: {
+                    hexMouseArea.longPressTimer += 100
+                    if (hexMouseArea.longPressTimer >= 500 && !hexMouseArea.longPressed) {
+                        hexMouseArea.longPressed = true
+                        // Activate drag mode
+                        mayaDash.dragActive = true
+                        mayaDash.dragFromIndex = cellIndex
+                        mayaDash.dragOverIndex = -1
+                        hexScale.xScale = 1.10
+                        hexScale.yScale = 1.10
+                        hexCell.glowIntensity = 1.0
+                        BeeSound.playEvent("ui.cell.click", {})
+                    }
+                }
+            }
+        }
+
+        // ─── Drag mode visual feedback ────────────────────────
+        opacity: mayaDash.dragActive && mayaDash.dragFromIndex >= 0 && mayaDash.dragFromIndex !== cellIndex
+            ? (mayaDash.dragOverIndex === cellIndex ? 0.7 : 0.45)
+            : 1.0
+        Behavior on opacity { NumberAnimation { duration: 200 } }
 
         transform: Scale {
             id: hexScale
@@ -467,6 +575,20 @@ Rectangle {
             Behavior on yScale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
         }
     }
+    }
+
+    // ─── Hit-test helper for drag & drop ────────────────────────
+    function cellIndexAt(globalX, globalY) {
+        // Map global coordinates to each HexCell and find which one contains the point
+        for (var i = 0; i < 8; i++) {
+            var cell = hexGrid.findCell(i)
+            if (!cell) continue
+            var cellPos = cell.mapFromItem(mayaDash, globalX, globalY)
+            if (cellPos.x >= 0 && cellPos.x <= cell.width && cellPos.y >= 0 && cellPos.y <= cell.height) {
+                return i
+            }
+        }
+        return -1
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -480,6 +602,14 @@ Rectangle {
 
         // On applique le scale global ici car Rectangle n'a pas de propriété scale
         scale: mayaDash.dashScale
+
+        // Cell references for drag & drop hit-testing
+        property var cellRefs: [null, null, null, null, null, null, null, null]
+
+        function findCell(idx) {
+            if (idx >= 0 && idx < 8) return cellRefs[idx]
+            return null
+        }
 
         // ─── Titre du dashboard ───────────────────────────────
         Text {
@@ -502,26 +632,26 @@ Rectangle {
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
-            HexCell { cellIndex: 0 }
-            HexCell { cellIndex: 1 }
+            HexCell { cellIndex: 0; Component.onCompleted: hexGrid.cellRefs[0] = this }
+            HexCell { cellIndex: 1; Component.onCompleted: hexGrid.cellRefs[1] = this }
         }
 
         // ─── Rangée 2 : 3 alvéoles décalées (indices 2–4) ────
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
-            HexCell { cellIndex: 2 }
-            HexCell { cellIndex: 3 }
-            HexCell { cellIndex: 4 }
+            HexCell { cellIndex: 2; Component.onCompleted: hexGrid.cellRefs[2] = this }
+            HexCell { cellIndex: 3; Component.onCompleted: hexGrid.cellRefs[3] = this }
+            HexCell { cellIndex: 4; Component.onCompleted: hexGrid.cellRefs[4] = this }
         }
 
         // ─── Rangée 3 : 3 alvéoles (indices 5–7) ─────────────
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
-            HexCell { cellIndex: 5 }
-            HexCell { cellIndex: 6 }
-            HexCell { cellIndex: 7 }
+            HexCell { cellIndex: 5; Component.onCompleted: hexGrid.cellRefs[5] = this }
+            HexCell { cellIndex: 6; Component.onCompleted: hexGrid.cellRefs[6] = this }
+            HexCell { cellIndex: 7; Component.onCompleted: hexGrid.cellRefs[7] = this }
         }
     }
 
@@ -541,7 +671,7 @@ Rectangle {
 
     // ─── Label version ────────────────────────────────────────
     Text {
-        text: "Bee-Hive OS v0.9.0 · BeeMotion2D · BeeVibe · BeeNetwork 🐝"
+        text: "Bee-Hive OS v0.9.0 · BeeMotion2D · BeeVibe · BeeNetwork · DragReorder 🐝"
         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
         font { pixelSize: 10; letterSpacing: 1 }
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15

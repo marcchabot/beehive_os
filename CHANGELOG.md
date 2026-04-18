@@ -4,6 +4,26 @@ All notable changes to Bee-Hive OS will be documented in this file.
 
 ---
 
+## [0.8.7] — 2026-04-18
+
+### Critical Bug Fix 🚨
+
+- **BeePresets Crash Fix**: Fixed `Cannot assign to non-existent default property` error in `BeePresets.qml` that prevented the entire Bee-Hive OS shell from loading. The issue was `Connections` and `Component.onCompleted` child elements inside a `QtObject` singleton without a default property. Fixed by adding `pragma Singleton` directive and converting child elements to property declarations (`property Timer _initTimer`, `property Connections _configConn`).
+
+### Alvéoles Drag & Drop Reorder 🎯
+
+- **Long-press drag**: Long-press (500ms) on any alvéole in MayaDash to initiate drag mode. The source cell scales up with glow feedback.
+- **Visual swap target**: Drop target cells highlight with an animated accent border and pulse effect during drag.
+- **Opacity feedback**: Non-target cells dim during drag; target cell brightens.
+- **Swap on drop**: Releasing over another alvéole swaps the two cells via `BeePresets.swapCells()`, persisted immediately to `user_config.json`.
+- **BeePresets.moveCell() / swapCells()**: New API methods for programmatic cell reordering with automatic config persistence.
+- **Drag hint**: Added "Maintenir appuyé sur une alvéole pour la déplacer" hint in BeeStudio Presets tab (i18n FR/EN).
+
+### i18n
+- Added `drag_hint` key to French and English locale files.
+
+---
+
 ## [2.1.1] — 2026-04-16
 
 ### BeeNotes — Quick Notes Widget 📝

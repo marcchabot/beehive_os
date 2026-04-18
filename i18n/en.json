@@ -375,6 +375,7 @@
     "current_grid": "Quick switch between layouts",
     "saved_presets": "Saved Presets",
     "save_current": "Save Current Layout",
-    "alveoles_count": "cells"
+    "alveoles_count": "cells",
+    "drag_hint": "Long-press an alvéole to drag and reorder"
   }
 }
