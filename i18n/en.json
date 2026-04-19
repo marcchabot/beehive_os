@@ -256,7 +256,15 @@
     "categories_label": "CATEGORIES",
     "maya_status": "Maya Status",
     "category_presets": "Presets",
-    "presets_desc": "Quick switch between layouts"
+    "presets_desc": "Quick switch between layouts",
+    "autotheme_ok": "Auto theme applied.",
+    "autotheme_running": "Generating theme...",
+    "autotheme_error": "Auto-theme generation error.",
+    "autotheme_warn": "Overlay generated, invalid palette.",
+    "autotheme_busy": "Generation already in progress.",
+    "autotheme_dedup": "Wallpaper already processed.",
+    "autotheme_disabled": "Nectar Sync disabled.",
+    "autotheme_invalid": "Invalid wallpaper."
   },
   "cells": {
     "calendar": {

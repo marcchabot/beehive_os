@@ -159,24 +159,8 @@ Item {
     }
 
     function refreshAutoThemeHint() {
-        if (BeeConfig.autoThemeStatus === "ok")
-            autoThemeHint = "Theme auto applique."
-        else if (BeeConfig.autoThemeStatus === "running")
-            autoThemeHint = "Generation du theme en cours..."
-        else if (BeeConfig.autoThemeStatus === "error")
-            autoThemeHint = "Erreur generation auto-theme."
-        else if (BeeConfig.autoThemeStatus === "warn")
-            autoThemeHint = "Overlay genere, palette invalide."
-        else if (BeeConfig.autoThemeStatus === "busy")
-            autoThemeHint = "Generation deja en cours."
-        else if (BeeConfig.autoThemeStatus === "dedup")
-            autoThemeHint = "Wallpaper deja traite."
-        else if (BeeConfig.autoThemeStatus === "disabled")
-            autoThemeHint = "Nectar Sync desactive."
-        else if (BeeConfig.autoThemeStatus === "invalid")
-            autoThemeHint = "Wallpaper invalide."
-        else
-            autoThemeHint = ""
+        var statusKey = "autotheme_" + BeeConfig.autoThemeStatus
+        autoThemeHint = (BeeConfig.autoThemeStatus && BeeConfig.autoThemeStatus !== "") ? tr(statusKey) : ""
     }
 
     function applyThemeFromCurrentWallpaper(force) {

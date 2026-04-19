@@ -1,2 +1,28 @@
+# Runtime & logs
 boot_scan.log
+*.log
+
+# Python cache
 scripts/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+
+# QML dev artefacts
+*.backup
+*.fixed
+*.orig
+*.rej
+
+# Private user data (never ship these)
+user_config.json
+data/events.json
+data/notes.txt
+client_secret.json
+google_access.json
+GATEWAY_TOKEN.txt
+pending_messages.json
+
+# OS files
+.DS_Store
+Thumbs.db

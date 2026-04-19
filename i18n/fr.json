@@ -322,7 +322,15 @@
     "categories_label": "CATÉGORIES",
     "maya_status": "Statut de Maya",
     "category_presets": "Présets",
-    "presets_desc": "Changement rapide de disposition"
+    "presets_desc": "Changement rapide de disposition",
+    "autotheme_ok": "Thème auto appliqué.",
+    "autotheme_running": "Génération du thème en cours...",
+    "autotheme_error": "Erreur génération auto-thème.",
+    "autotheme_warn": "Overlay généré, palette invalide.",
+    "autotheme_busy": "Génération déjà en cours.",
+    "autotheme_dedup": "Fond d'écran déjà traité.",
+    "autotheme_disabled": "Nectar Sync désactivé.",
+    "autotheme_invalid": "Fond d'écran invalide."
   },
   "network": {
     "title": "Réseau",

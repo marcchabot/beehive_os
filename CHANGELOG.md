@@ -4,6 +4,19 @@ All notable changes to Bee-Hive OS will be documented in this file.
 
 ---
 
+## [0.8.8] — 2026-04-19
+
+### Housekeeping & API Documentation 🧹
+
+- **i18n autoThemeHint**: Replaced 8 hardcoded French strings in `BeeStudio.qml` with proper i18n keys (`autotheme_ok`, `autotheme_running`, `autotheme_error`, `autotheme_warn`, `autotheme_busy`, `autotheme_dedup`, `autotheme_disabled`, `autotheme_invalid`) in both `fr.json` and `en.json`. `refreshAutoThemeHint()` now uses dynamic key lookup.
+- **Dev artefacts removed**: Deleted `BeeStudio.qml.backup` (76KB) and `BeeStudio.qml.fixed` (3KB) from `modules/`.
+- **`.gitignore` hardened**: Added `*.backup`, `*.fixed`, `*.orig`, `*.rej`, `__pycache__/`, `*.pyc`, `*.pyo`, `user_config.json`, `data/events.json`, `data/notes.txt`, and private data patterns.
+- **`docs/MODULE_API.md` completed**: Added full model roles reference tables, versioning policy (patch/minor/breaking), step-by-step external module registration guide, action contract table, and extensibility notes.
+- **`CONTRIBUTING.md` enriched**: Added full repository layout with all 25+ modules documented, module creation checklist, i18n guidelines, debugging tips, code style conventions, and PR checklist.
+- **VERSION bump**: `0.8.7` → `0.8.8`
+
+---
+
 ## [0.8.7] — 2026-04-18
 
 ### Critical Bug Fix 🚨
