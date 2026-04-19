@@ -189,9 +189,9 @@ Rectangle {
         // so bindings re-evaluate properly after drag & drop swaps.
         property var    cellData:      mayaDash.resolveCellData(cellIndex)
 
-        property string icon:          isNetworkCell ? beeNet.networkIcon : (cellData ? cellData.icon : "🐝")
+        property string icon:          (cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")) ? beeNet.networkIcon : (cellData ? cellData.icon : "🐝")
         property string title:         cellData ? cellData.title         : "Module"
-        property string subtitle:      isNetworkCell ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData ? cellData.subtitle : "")) : (cellData ? cellData.subtitle : "")
+        property string subtitle:      (cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")) ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData ? cellData.subtitle : "")) : (cellData ? cellData.subtitle : "")
         property string detail:        cellData ? cellData.detail        : ""
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
