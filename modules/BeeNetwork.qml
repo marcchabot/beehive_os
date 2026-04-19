@@ -226,7 +226,7 @@ Item {
         id: _stDlProc
         running: false
         command: ["bash", "-c",
-            "SPEED=$(curl -o /dev/null -s -w '%{speed_download}' --max-time 10 http://speedtest.tele2.net/10MB.zip 2>/dev/null); " +
+            "SPEED=$(curl -o /\dev/null -s -w '\\n%{speed_download}' --max-time 10 http://speedtest.tele2.net/10MB.zip 2>/dev/null | tail -1); " +
             "echo \"$SPEED\""
         ]
         stdout: SplitParser {
@@ -248,9 +248,9 @@ Item {
         command: ["bash", "-c",
             "TMPF=$(mktemp /tmp/beenet_ul_XXXXXX); " +
             "dd if=/dev/urandom of=$TMPF bs=1M count=2 2>/dev/null; " +
-            "SPEED=$(curl -s -w '%{speed_upload}' -T $TMPF --max-time 10 http://speedtest.tele2.net/upload.php 2>/dev/null || echo '0'); " +
-            "if [ \"$SPEED\" = '0' ] || [ -z \"$SPEED\" ]; then " +
-            "  SPEED=$(curl -s -w '%{speed_upload}' -T $TMPF --max-time 10 https://speed.cloudflare.com/__up 2>/dev/null || echo '0'); " +
+            "SPEED=$(curl -s -w '\\n%{speed_upload}' -T $TMPF --max-time 10 http://speedtest.tele2.net/upload.php 2>/dev/null | tail -1); " +
+            "if [ \"$SPEED\" = '0' ] || [ -z \"$SPEED\" ] || echo \"$SPEED\" | grep -qE '[a-zA-Z]'; then " +
+            "  SPEED=$(curl -s -w '\\n%{speed_upload}' -T $TMPF --max-time 10 https://speed.cloudflare.com/__up 2>/dev/null | tail -1); " +
             "fi; " +
             "rm -f $TMPF; " +
             "echo \"$SPEED\""
