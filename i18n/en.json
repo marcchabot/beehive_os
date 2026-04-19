@@ -344,12 +344,14 @@
     "gateway": "Gateway",
     "dns": "DNS",
     "mac": "MAC",
-    "speed_test": "⚡ Speed Test",
+    "speed_test": "Speed Test",
     "speed_test_running": "Testing…",
     "speed_test_done": "Done!",
     "speed_test_error": "Error",
     "history": "History",
     "no_history": "No tests yet",
+    "results": "Results",
+    "not_available": "N/A",
     "chart_label": "Throughput"
   },
   "common": {

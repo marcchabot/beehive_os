@@ -734,8 +734,8 @@ Rectangle {
         }
 
         Rectangle {
-            width: 420
-            height: 520
+            width: 480
+            height: 620
             anchors.centerIn: parent
             color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
             radius: 16
@@ -752,7 +752,8 @@ Rectangle {
             Column {
                 anchors.fill: parent
                 anchors.margins: 20
-                spacing: 12
+                anchors.bottomMargin: 24
+                spacing: 16
 
                 // ─── Header ──
                 Row {
@@ -926,6 +927,56 @@ Rectangle {
                     }
                 }
 
+                // ─── Speed Test Results (shown after completion) ──
+                Rectangle {
+                    width: parent.width - 40
+                    height: 80
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    radius: 10
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                    border.width: 1
+                    visible: beeNet.speedTestCompleted
+                    Behavior on color { ColorAnimation { duration: 300 } }
+                    Behavior on border.color { ColorAnimation { duration: 300 } }
+                    Behavior on opacity { NumberAnimation { duration: 300 } }
+                    opacity: beeNet.speedTestCompleted ? 1.0 : 0.0
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 4
+
+                        Text {
+                            text: beeNet.tr("results")
+                            color: BeeTheme.textSecondary
+                            font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+
+                        Row {
+                            spacing: 20
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            Column {
+                                spacing: 2
+                                Text { text: "\u2193"; color: BeeTheme.accent; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stDlResult === "—" || beeNet._stDlResult === "") ? beeNet.tr("not_available") : beeNet._stDlResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                            }
+                            Column {
+                                spacing: 2
+                                Text { text: "\u2191"; color: BeeTheme.textSecondary; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stUlResult === "—" || beeNet._stUlResult === "") ? beeNet.tr("not_available") : beeNet._stUlResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                            }
+                            Column {
+                                spacing: 2
+                                Text { text: "\u23f1"; color: BeeTheme.textSecondary; font.pixelSize: 14; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stPingResult === "—" || beeNet._stPingResult === "") ? beeNet.tr("not_available") : beeNet._stPingResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                            }
+                        }
+                    }
+                }
+
                 // ─── Speed Test button ──
                 Rectangle {
                     width: parent.width - 40
@@ -978,11 +1029,11 @@ Rectangle {
                     }
                 }
 
-                // ─── Speed Test History ──
+                // ─── Speed Test History (2-line entries) ──
                 Column {
                     width: parent.width - 40
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 4
+                    spacing: 6
                     visible: beeNet.speedTestHistory.length > 0
 
                     Text {
@@ -996,18 +1047,27 @@ Rectangle {
                         model: beeNet.speedTestHistory.length
                         delegate: Rectangle {
                             width: parent.width
-                            height: 22
-                            radius: 4
+                            height: 38
+                            radius: 6
                             color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.2)
                             Behavior on color { ColorAnimation { duration: 600 } }
 
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: 10
-                                Text { text: "\u2193 " + beeNet.speedTestHistory[index].download; color: BeeTheme.accent; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: "\u2191 " + beeNet.speedTestHistory[index].upload; color: BeeTheme.textSecondary; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: beeNet.speedTestHistory[index].ping; color: BeeTheme.textSecondary; font.pixelSize: 10; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: beeNet.speedTestHistory[index].timestamp; color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5); font.pixelSize: 9; Behavior on color { ColorAnimation { duration: 600 } } }
+                            Column {
+                                anchors.fill: parent
+                                anchors.margins: 6
+                                spacing: 2
+
+                                Row {
+                                    spacing: 14
+                                    Text { text: "\u2193 " + beeNet.speedTestHistory[index].download; color: BeeTheme.accent; font.pixelSize: 11; font.bold: true; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: "\u2191 " + beeNet.speedTestHistory[index].upload; color: BeeTheme.textSecondary; font.pixelSize: 11; font.bold: true; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                }
+
+                                Row {
+                                    spacing: 14
+                                    Text { text: "\u23f1 " + beeNet.speedTestHistory[index].ping; color: BeeTheme.textSecondary; font.pixelSize: 9; font.family: "monospace"; Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: beeNet.speedTestHistory[index].timestamp; color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5); font.pixelSize: 9; Behavior on color { ColorAnimation { duration: 600 } } }
+                                }
                             }
                         }
                     }

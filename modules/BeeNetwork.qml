@@ -57,12 +57,14 @@ Item {
             "gateway": "Gateway",
             "dns": "DNS",
             "mac": "MAC",
-            "speed_test": "⚡ Speed Test",
+            "speed_test": "Speed Test",
             "speed_test_running": "Testing…",
             "speed_test_done": "Done!",
             "speed_test_error": "Error",
             "history": "History",
             "no_history": "No tests yet",
+            "results": "Results",
+            "not_available": "N/A",
             "detail_label": "Details",
             "chart_label": "Throughput"
         }
@@ -247,6 +249,9 @@ Item {
             "TMPF=$(mktemp /tmp/beenet_ul_XXXXXX); " +
             "dd if=/dev/urandom of=$TMPF bs=1M count=2 2>/dev/null; " +
             "SPEED=$(curl -s -w '%{speed_upload}' -T $TMPF --max-time 10 http://speedtest.tele2.net/upload.php 2>/dev/null || echo '0'); " +
+            "if [ \"$SPEED\" = '0' ] || [ -z \"$SPEED\" ]; then " +
+            "  SPEED=$(curl -s -w '%{speed_upload}' -T $TMPF --max-time 10 https://speed.cloudflare.com/__up 2>/dev/null || echo '0'); " +
+            "fi; " +
             "rm -f $TMPF; " +
             "echo \"$SPEED\""
         ]
@@ -260,12 +265,13 @@ Item {
             beeNet.speedTestProgress = 1.0
             beeNet.speedTestRunning = false
             beeNet.speedTestStatus = beeNet.tr("speed_test_done")
+            beeNet.speedTestCompleted = true
 
             // Save to history
             var entry = {
-                download: beeNet._stDlResult,
-                upload: beeNet._stUlResult,
-                ping: beeNet._stPingResult,
+                download: beeNet._stDlResult === "—" || beeNet._stDlResult === "" ? beeNet.tr("not_available") : beeNet._stDlResult,
+                upload: beeNet._stUlResult === "—" || beeNet._stUlResult === "" ? beeNet.tr("not_available") : beeNet._stUlResult,
+                ping: beeNet._stPingResult === "—" || beeNet._stPingResult === "" ? beeNet.tr("not_available") : beeNet._stPingResult,
                 timestamp: new Date().toLocaleString(Qt.locale(), Locale.ShortFormat)
             }
             var hist = beeNet.speedTestHistory.slice()
@@ -277,18 +283,22 @@ Item {
         }
     }
 
+    property bool speedTestCompleted: false
+
     Timer {
         id: _stResetTimer
-        interval: 3000
+        interval: 8000
         onTriggered: {
             beeNet.speedTestStatus = ""
             beeNet.speedTestProgress = 0.0
+            beeNet.speedTestCompleted = false
         }
     }
 
     function runSpeedTest() {
         if (speedTestRunning) return
         speedTestRunning = true
+        speedTestCompleted = false
         speedTestProgress = 0.0
         speedTestStatus = tr("latency") + "…"
         _stPingResult = ""
@@ -306,7 +316,7 @@ Item {
     }
 
     function formatSpeed(bytesPerSec) {
-        if (bytesPerSec <= 0) return "—"
+        if (bytesPerSec <= 0) return tr("not_available")
         var mbps = (bytesPerSec * 8) / 1000000
         if (mbps < 1) return (mbps * 1000).toFixed(0) + " Kbps"
         return mbps.toFixed(1) + " Mbps"

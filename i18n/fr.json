@@ -344,12 +344,14 @@
     "gateway": "Passerelle",
     "dns": "DNS",
     "mac": "MAC",
-    "speed_test": "⚡ Test de débit",
+    "speed_test": "Test de débit",
     "speed_test_running": "Test en cours…",
     "speed_test_done": "Terminé !",
     "speed_test_error": "Erreur",
     "history": "Historique",
     "no_history": "Aucun test",
+    "results": "Résultats",
+    "not_available": "N/A",
     "chart_label": "Débit"
   },
   "common": {
