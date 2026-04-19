@@ -961,17 +961,17 @@ Rectangle {
                             Column {
                                 spacing: 2
                                 Text { text: "\u2193"; color: BeeTheme.accent; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stDlResult === "—" || beeNet._stDlResult === "") ? beeNet.tr("not_available") : beeNet._stDlResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stDlResult === "—" || beeNet._stDlResult === "") ? beeNet.tr("not_available") : beeNet._stDlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                             Column {
                                 spacing: 2
                                 Text { text: "\u2191"; color: BeeTheme.textSecondary; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stUlResult === "—" || beeNet._stUlResult === "") ? beeNet.tr("not_available") : beeNet._stUlResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stUlResult === "—" || beeNet._stUlResult === "") ? beeNet.tr("not_available") : beeNet._stUlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                             Column {
                                 spacing: 2
                                 Text { text: "\u23f1"; color: BeeTheme.textSecondary; font.pixelSize: 14; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stPingResult === "—" || beeNet._stPingResult === "") ? beeNet.tr("not_available") : beeNet._stPingResult; color: BeeTheme.textPrimary; font { pixelSize: 16; bold: true; family: "monospace" }; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stPingResult === "—" || beeNet._stPingResult === "") ? beeNet.tr("not_available") : beeNet._stPingResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                         }
                     }
