@@ -146,6 +146,9 @@ ShellRoot {
 
 
     // ─── Réserve d'espace pour la BeeBar ─────────────
+    // Stealth Mode v2: When stealth is active and bar is hidden,
+    // shrink the reserve to just a 3px sentinel strip. When the
+    // bar is shown, use full 45px reserve.
     Variants {
         model: Quickshell.screens
         delegate: PanelWindow {
@@ -153,12 +156,29 @@ ShellRoot {
             screen: modelData
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "beehive-bar-reserve"
-            exclusiveZone: 45
+            exclusiveZone: BeeBarState.barShown ? 45 : 3
             focusable: false
             anchors { top: true; left: true; right: true }
-            implicitHeight: 45
+            implicitHeight: BeeBarState.barShown ? 45 : 3
             mask: Region {}
             color: "transparent"
+
+            // Sentinel zone: invisible strip that detects mouse hover
+            // when Stealth Mode is active, causing the bar to slide in
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: BeeBarState.stealthEnabled
+                onEntered: {
+                    if (BeeBarState.stealthEnabled) {
+                        BeeBarState.sentinelHovered = true
+                    }
+                }
+                onExited: {
+                    if (BeeBarState.stealthEnabled) {
+                        BeeBarState.sentinelHovered = false
+                    }
+                }
+            }
         }
     }
 

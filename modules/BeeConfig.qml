@@ -13,6 +13,11 @@ QtObject {
     id: root
 
     // ─── Stealth Mode ─────────────────────────────────────────
+    property bool stealthMode: false
+    onStealthModeChanged: {
+        BeeBarState.stealthEnabled = stealthMode
+        if (root._loaded) saveConfig()
+    }
 
     // ─── BeeVibe ───────────────────────────────────────────────
     property bool vibeMode: false
@@ -382,6 +387,7 @@ QtObject {
         console.log("BeeConfig: Application de la configuration...")
         
         // ... (autres propriétés)
+        if (cfg.stealth_mode !== undefined) stealthMode = cfg.stealth_mode === true
         if (cfg.vibe_mode !== undefined)    vibeMode = cfg.vibe_mode === true
         if (cfg.focus_mode !== undefined)   focusMode = cfg.focus_mode === true
         if (cfg.corners_mode !== undefined) cornersMode = cfg.corners_mode === true
@@ -591,6 +597,7 @@ QtObject {
         
         // Update only dynamically managed fields
         cfg.lang         = uiLang
+        cfg.stealth_mode = stealthMode
         cfg.vibe_mode    = vibeMode
         cfg.focus_mode   = focusMode
         cfg.corners_mode = cornersMode

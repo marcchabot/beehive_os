@@ -20,13 +20,35 @@ Rectangle {
     radius: 18
     anchors.horizontalCenter: parent.horizontalCenter
 
-    y: 12
-    opacity: 1.0
+    // ─── Stealth Mode v2 : Slide animation ────────────────
+    // When stealth is ON and barShown is false, slide the bar
+    // up above the screen edge (y = -60). When visible, y = 12.
+    y: BeeBarState.barShown ? 12 : -60
+    opacity: BeeBarState.barShown ? 1.0 : 0.0
 
     Behavior on y       { NumberAnimation { duration: 400; easing.type: Easing.InOutCubic } }
-    Behavior on opacity { NumberAnimation { duration: 250 } }
+    Behavior on opacity { NumberAnimation { duration: 300 } }
 
     Component.onCompleted: BeeBarState.barShown = true
+
+    // ─── Stealth Mode v2 : Mouse leave tracking ─────────
+    // When stealth is active, detect when the mouse exits
+    // the bar area to start the auto-hide timer.
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: BeeBarState.stealthEnabled
+        z: -1  // Below all interactive elements
+        onEntered: {
+            if (BeeBarState.stealthEnabled) {
+                BeeBarState.sentinelHovered = true
+            }
+        }
+        onExited: {
+            if (BeeBarState.stealthEnabled) {
+                BeeBarState.sentinelHovered = false
+            }
+        }
+    }
 
     function dispatchModuleAction(action) {
         if (!action || action === "none") return

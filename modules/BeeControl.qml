@@ -7,8 +7,9 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeControl.qml — "The Hive" Control Center 🐝🍯
-// Consolidation v2.0 : Settings + Studio + History
+// Consolidation v2.1 : Settings + Studio + History
 // Navigation latérale intuitive, design Glassmorphism
+// v2.1 : Dynamic backdrop blur (frosted glass effect)
 // ═══════════════════════════════════════════════════════════════
 
 Rectangle {
@@ -18,6 +19,14 @@ Rectangle {
     radius: 28
     visible: false
     anchors.centerIn: parent
+
+    // ─── Entry / Exit animation ───────────────────────────
+    property real panelScale: visible ? 1.0 : 0.92
+    property real panelOpacity: visible ? 1.0 : 0.0
+    Behavior on panelScale   { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+    Behavior on panelOpacity { NumberAnimation { duration: 200 } }
+    scale: panelScale
+    opacity: panelOpacity
 
     onVisibleChanged: {
         if (visible) {
@@ -30,22 +39,29 @@ Rectangle {
     property var _s: BeeConfig.tr.settings || {}
 
     // ─── Styles ─────────────────────────────────────────────
+    // v2.1: Frosted glass — slightly more transparent to let
+    // the wallpaper bleed through, creating a glassmorphism look
     color: BeeTheme.mode === "HoneyDark"
-        ? Qt.rgba(0.06, 0.05, 0.08, 0.94)
-        : Qt.rgba(0.96, 0.94, 0.90, 0.96)
+        ? Qt.rgba(0.06, 0.05, 0.08, 0.82)
+        : Qt.rgba(0.96, 0.94, 0.90, 0.88)
     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
     border.width: 1
 
     Behavior on color        { ColorAnimation { duration: 600 } }
     Behavior on border.color { ColorAnimation { duration: 600 } }
 
-    // Drop shadow
+    // Drop shadow + frosted blur
     layer.enabled: true
     layer.effect: MultiEffect {
         shadowEnabled: true
         shadowColor: Qt.rgba(0,0,0, BeeTheme.mode === "HoneyDark" ? 0.45 : 0.12)
         shadowBlur: 1.0
         shadowVerticalOffset: 6
+        // Frosted glass: subtle blur on the panel itself gives
+        // a diffused, glass-like quality to the semi-transparent bg
+        blurEnabled: true
+        blur: 0.15
+        blurMax: 32
     }
 
     // ─── Reusable Components ───────────────────────────────
@@ -225,6 +241,17 @@ Rectangle {
                     spacing: 25
 
                     Text { text: "📊 BeeBar Stats"; color: BeeTheme.accent; font { bold: true; pixelSize: 22 } }
+                    SectionHeader { title: "STEALTH MODE" }
+
+                    SettingRow {
+                        label: (BeeConfig.uiLang === "fr" ? "Mode Furtif 🫥" : "Stealth Mode 🫥")
+                        desc: (BeeConfig.uiLang === "fr" ? "Masque automatiquement la BeeBar. Survole le haut de l'écran pour la révéler." : "Auto-hides the BeeBar. Hover the top edge to reveal it.")
+                        checked: BeeConfig.stealthMode
+                        onToggled: (val) => { BeeConfig.stealthMode = val; BeeConfig.saveConfig(); BeeBarState.logAction("System", "Mode Furtif " + (val ? "activé" : "désactivé"), "🫥") }
+                    }
+
+                    Item { height: 10 }
+
                     SectionHeader { title: "FOCUS MODE" }
 
                     SettingRow {

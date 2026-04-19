@@ -4,6 +4,27 @@ All notable changes to Bee-Hive OS will be documented in this file.
 
 ---
 
+## [0.8.9] — 2026-04-19
+
+### Animations & Transitions Polish ✨
+
+- **Stealth Mode v2** 🫥: Full implementation of auto-hiding BeeBar. When Stealth Mode is enabled (BeeControl → Stats → Stealth Mode toggle), the BeeBar slides up off-screen after 800ms grace period. A 3px sentinel strip at the top edge detects mouse hover and smoothly slides the bar back in. Animations use InOutCubic easing (400ms slide + 300ms fade). The bar reserve zone dynamically adjusts `exclusiveZone` between 45px (shown) and 3px (sentinel).
+  - `BeeBarState.qml` v3.0: New `stealthEnabled`, `sentinelHovered`, `_stealthHideTimer` (800ms) properties with reactive `barShown` logic.
+  - `BeeBar.qml`: y-anchored slide animation (y: 12 ↔ -60) with opacity cross-fade.
+  - `BeeHiveShell.qml`: Reserve PanelWindow gains sentinel `MouseArea` with `hoverEnabled` bound to `stealthEnabled`.
+  - `BeeConfig.qml`: New `stealthMode` property with persistence (`stealth_mode` key in user_config.json).
+  - BeeControl Tab 2 (Stats): New "Stealth Mode 🫥" toggle with i18n description.
+
+- **BeeControl Frosted Glass** 🪟: Dynamic backdrop blur effect on the Control Center panel. Background opacity reduced (0.82 dark / 0.88 light) to let wallpaper bleed through. `MultiEffect` enhanced with `blurEnabled: true, blur: 0.15, blurMax: 32` for a soft frosted glass aesthetic.
+
+- **BeeControl Entry/Exit Animation** 🎬: Consistent scale+fade open/close animation (scale 0.92→1.0, opacity 0→1) with OutCubic easing (250ms scale, 200ms fade).
+
+- **i18n**: Added `stealth_mode` and `stealth_desc` keys to both `fr.json` and `en.json`.
+
+- **VERSION bump**: `0.8.8` → `0.8.9`
+
+---
+
 ## [0.8.8] — 2026-04-19
 
 ### Housekeeping & API Documentation 🧹

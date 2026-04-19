@@ -5,17 +5,64 @@ import Quickshell
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════
-// BeeBarState.qml — Shared Stealth Mode state (MINIMAL TEST)
-// v2.1 : Minimal version to test Process API
+// BeeBarState.qml — Shared State & Stealth Mode Engine 🐝
+// v3.0 : Stealth Mode v2 — sentinel zone + smooth auto-hide
+//        When stealthMode is ON, the BeeBar slides out of view
+//        after a grace period. A thin sentinel strip at the top
+//        edge detects mouse hover and slides the bar back in.
 // ═══════════════════════════════════════════════════════════
 QtObject {
     id: root
 
-    // true  = sentinel detected mouse → force display
-    // false = normal state (handled by BeeBar)
+    // ─── Stealth Mode v2 ───────────────────────────────────
+    // stealthEnabled: bound from BeeConfig.stealthMode
+    property bool stealthEnabled: false
+
+    // sentinelHovered: true when mouse is in the top sentinel strip
+    property bool sentinelHovered: false
+
+    // forceVisible: true when sentinel is hovered or any panel is open
     property bool forceVisible: false
-    // Mirrors the current visual state of BeeBar to drive reserved top space.
-    property bool barShown: true
+
+    // barShown: the effective visibility of the BeeBar
+    //   - stealth OFF → always true
+    //   - stealth ON  → forceVisible (sentinel or panel open)
+    property bool barShown: !stealthEnabled || forceVisible
+
+    // ─── Stealth auto-hide timer ──────────────────────────
+    // After the mouse leaves the bar area, wait 800ms before hiding.
+    property Timer _stealthHideTimer: Timer {
+        interval: 800
+        repeat: false
+        onTriggered: {
+            if (root.stealthEnabled && !root.sentinelHovered) {
+                root.forceVisible = false
+            }
+        }
+    }
+
+    // When sentinelHovered changes, update forceVisible and timer
+    onSentinelHoveredChanged: {
+        if (stealthEnabled) {
+            _stealthHideTimer.stop()
+            if (sentinelHovered) {
+                forceVisible = true
+            } else {
+                _stealthHideTimer.start()
+            }
+        }
+    }
+
+    // When stealth is toggled OFF, ensure bar is shown
+    onStealthEnabledChanged: {
+        if (!stealthEnabled) {
+            forceVisible = false
+            _stealthHideTimer.stop()
+        } else {
+            // Stealth just enabled — bar stays visible until mouse leaves
+            forceVisible = true
+        }
+    }
 
     // Inter-window signals to open Settings/Studio from BeeSearch
     property bool openSettingsRequested: false

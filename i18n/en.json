@@ -148,7 +148,7 @@
     "focus_mode": "Focus Mode 🎯",
     "focus_desc": "Hides the dashboard, clock and events. Ideal for focus.",
     "stealth_mode": "Stealth Mode 🫥",
-    "stealth_desc": "BeeBar hides after 3s of inactivity. Hover the top of the screen to reveal.",
+    "stealth_desc": "Auto-hides the BeeBar. Hover the top edge to reveal it.",
     "sound": "Sound Effects",
     "sound_desc": "Enable hive ambient sounds.",
     "language": "Language",
