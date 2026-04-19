@@ -36,6 +36,7 @@ Rectangle {
     signal openSettings()
     signal openStudio()
     signal openNotes()
+    signal cellsNeedRefresh()  // Emitted after drag & drop swap
 
     // ─── Drag & Drop state ──────────────────────────────────────
     property int dragFromIndex: -1    // Cell being dragged
@@ -50,8 +51,27 @@ Rectangle {
     }
 
     function resolveCellData(slot) {
-        var _rev = BeeConfig.cellsRevision
-        if (BeeConfig.cells.count > slot) return BeeConfig.cells.get(slot)
+        // cellsRevision is evaluated first (comma operator) to create
+        // a reactive dependency — without it, ListModel changes won’t
+        // trigger re-evaluation of property bindings.
+        var _rev = (BeeConfig.cellsRevision, 0)
+        if (BeeConfig.cells.count > slot) {
+            var item = BeeConfig.cells.get(slot)
+            // Return a PLAIN COPY so QML bindings detect the change when
+            // cellsRevision bumps (drag & drop swap, etc.). Returning the
+            // live ListModel reference breaks icon/subtitle/detail updates
+            // because QML caches property reads on the same object ref.
+            return {
+                icon:         item.icon         || "",
+                title:        item.title        || "",
+                subtitle:     item.subtitle     || "",
+                detail:       item.detail      || "",
+                action:       item.action      || "none",
+                highlighted:  item.highlighted || false,
+                customizable: item.customizable !== false,
+                color:        item.color       || ""
+            }
+        }
 
         var registered = BeeModuleRegistry.mayaDashCellAt(slot)
         if (!registered || registered.enabled === false) return null
@@ -165,8 +185,8 @@ Rectangle {
 
         // ─── Data from BeeConfig ───────────────────────────────
         property int    cellIndex:     0
-        // BeeConfig.cellsRevision est évalué en premier (opérateur virgule) pour
-        // créer une dépendance réactive — ListModel.get() seul ne suffit pas.
+        // resolveCellData returns a plain JS copy keyed on cellsRevision,
+        // so bindings re-evaluate properly after drag & drop swaps.
         property var    cellData:      mayaDash.resolveCellData(cellIndex)
 
         property string icon:          isNetworkCell ? beeNet.networkIcon : (cellData ? cellData.icon : "🐝")
@@ -495,6 +515,7 @@ Rectangle {
                     if (mayaDash.dragOverIndex >= 0 && mayaDash.dragOverIndex !== mayaDash.dragFromIndex) {
                         // Complete the swap
                         BeePresets.swapCells(mayaDash.dragFromIndex, mayaDash.dragOverIndex)
+                        mayaDash.cellsNeedRefresh()
                     }
                     // Cancel drag regardless (drop on self = cancel, valid drop = complete)
                     mayaDash.dragActive = false

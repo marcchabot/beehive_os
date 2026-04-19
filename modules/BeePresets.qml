@@ -257,16 +257,42 @@ QtObject {
         if (indexA < 0 || indexA >= BeeConfig.cells.count) return false
         if (indexB < 0 || indexB >= BeeConfig.cells.count) return false
 
+        // Extract full data for both cells before any mutation
         var a = BeeConfig.cells.get(indexA)
-        var b = BeeConfig.cells.get(indexB)
-
-        var props = ["icon", "title", "subtitle", "detail", "action", "highlighted", "customizable", "color"]
-        for (var i = 0; i < props.length; i++) {
-            var key = props[i]
-            var tmp = a[key]
-            BeeConfig.cells.setProperty(indexA, key, b[key])
-            BeeConfig.cells.setProperty(indexB, key, tmp)
+        var dataA = {
+            icon:         a.icon,
+            title:        a.title,
+            subtitle:     a.subtitle   || "",
+            detail:       a.detail      || "",
+            action:       a.action      || "none",
+            highlighted:  a.highlighted || false,
+            customizable: a.customizable !== false,
+            color:        a.color       || ""
         }
+        var b = BeeConfig.cells.get(indexB)
+        var dataB = {
+            icon:         b.icon,
+            title:        b.title,
+            subtitle:     b.subtitle    || "",
+            detail:       b.detail      || "",
+            action:       b.action      || "none",
+            highlighted:  b.highlighted || false,
+            customizable: b.customizable !== false,
+            color:        b.color       || ""
+        }
+
+        // Remove higher index first to avoid index shift
+        var hi = Math.max(indexA, indexB)
+        var lo = Math.min(indexA, indexB)
+
+        // Remove both and re-insert swapped (higher index first)
+        BeeConfig.cells.remove(hi)
+        BeeConfig.cells.remove(lo)
+
+        // Insert at lower index first, then higher
+        // dataB goes where dataA was (lo), dataA goes where dataB was (hi)
+        BeeConfig.cells.insert(lo, dataB)
+        BeeConfig.cells.insert(hi, dataA)
 
         BeeConfig.cellsRevision++
         BeeConfig.saveConfig()
