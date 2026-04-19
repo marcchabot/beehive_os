@@ -257,42 +257,34 @@ QtObject {
         if (indexA < 0 || indexA >= BeeConfig.cells.count) return false
         if (indexB < 0 || indexB >= BeeConfig.cells.count) return false
 
-        // Extract full data for both cells before any mutation
-        var a = BeeConfig.cells.get(indexA)
-        var dataA = {
-            icon:         a.icon,
-            title:        a.title,
-            subtitle:     a.subtitle   || "",
-            detail:       a.detail      || "",
-            action:       a.action      || "none",
-            highlighted:  a.highlighted || false,
-            customizable: a.customizable !== false,
-            color:        a.color       || ""
-        }
-        var b = BeeConfig.cells.get(indexB)
-        var dataB = {
-            icon:         b.icon,
-            title:        b.title,
-            subtitle:     b.subtitle    || "",
-            detail:       b.detail      || "",
-            action:       b.action      || "none",
-            highlighted:  b.highlighted || false,
-            customizable: b.customizable !== false,
-            color:        b.color       || ""
+        // Snapshot ALL cells into plain JS objects BEFORE any mutation.
+        // ListModel.get() returns a live reference that becomes invalid after
+        // remove(), so we must copy everything upfront.
+        var snapshot = []
+        for (var i = 0; i < BeeConfig.cells.count; i++) {
+            var c = BeeConfig.cells.get(i)
+            snapshot.push({
+                icon:         c.icon         || "",
+                title:        c.title        || "",
+                subtitle:     c.subtitle     || "",
+                detail:       c.detail       || "",
+                action:       c.action       || "none",
+                highlighted:  c.highlighted   || false,
+                customizable: c.customizable !== false,
+                color:        c.color        || ""
+            })
         }
 
-        // Remove higher index first to avoid index shift
-        var hi = Math.max(indexA, indexB)
-        var lo = Math.min(indexA, indexB)
+        // Swap the two entries in the snapshot
+        var tmp = snapshot[indexA]
+        snapshot[indexA] = snapshot[indexB]
+        snapshot[indexB] = tmp
 
-        // Remove both and re-insert swapped (higher index first)
-        BeeConfig.cells.remove(hi)
-        BeeConfig.cells.remove(lo)
-
-        // Insert at lower index first, then higher
-        // dataB goes where dataA was (lo), dataA goes where dataB was (hi)
-        BeeConfig.cells.insert(lo, dataB)
-        BeeConfig.cells.insert(hi, dataA)
+        // Rebuild the entire ListModel from the snapshot
+        BeeConfig.cells.clear()
+        for (var j = 0; j < snapshot.length; j++) {
+            BeeConfig.cells.append(snapshot[j])
+        }
 
         BeeConfig.cellsRevision++
         BeeConfig.saveConfig()
