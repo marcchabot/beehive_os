@@ -152,37 +152,24 @@ Rectangle {
         }
 
         // ─── Main Content (Tabs) ───
-        StackLayout {
-            id: contentStack
+        Loader {
+            id: contentLoader
             Layout.fillWidth: true; Layout.fillHeight: true
-            currentIndex: controlRoot.currentTab
-
-            // Tab 0 : General
-            // GeneralTab {}  // removed for testing
-
-            // Tab 1 : Appearance
-            // AppearanceTab {}
-
-            // Tab 2 : Wallpaper
-            // WallpaperTab {}
-
-            // Tab 3 : Bar & Widgets
-            // BarWidgetsTab {}
-
-            // Tab 4 : Productivity
-            // ProductivityTab {}
-
-            // Tab 5 : Shortcuts
-            // ShortcutsTab {}
-
-            // Tab 6 : Extensions
-            // ExtensionsTab {}
-
-            // Tab 7 : Accessibility
-            // AccessibilityTab {}
-
-            // Tab 8 : Journal
-            // HistoryTab {}
+            clip: true
+            source: {
+                switch (controlRoot.currentTab) {
+                    case 0: return "GeneralTab.qml"
+                    // case 1: return "AppearanceTab.qml"
+                    // case 2: return "WallpaperTab.qml"
+                    // case 3: return "BarWidgetsTab.qml"
+                    // case 4: return "ProductivityTab.qml"
+                    // case 5: return "ShortcutsTab.qml"
+                    // case 6: return "ExtensionsTab.qml"
+                    // case 7: return "AccessibilityTab.qml"
+                    // case 8: return "HistoryTab.qml"
+                    default: return "GeneralTab.qml"
+                }
+            }
         }
     }
 
