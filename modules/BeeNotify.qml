@@ -138,7 +138,7 @@ Item {
                         Text {
                             text: title
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 14 }
+                            font.bold: true; font.pixelSize: 14
                             Layout.fillWidth: true
                         }
                         Text {

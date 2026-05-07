@@ -143,7 +143,7 @@ Item {
 
         Text {
             text: beeWeather.icon
-            font { pixelSize: 22; family: "Noto Color Emoji" }
+            font.pixelSize: 22; font.family: "Noto Color Emoji"
             Layout.alignment: Qt.AlignVCenter
         }
 
@@ -154,13 +154,13 @@ Item {
             Text {
                 text: beeWeather.temperature
                 color: BeeTheme.accent
-                font { pixelSize: 14; bold: true; family: "monospace" }
+                font.pixelSize: 14; font.bold: true; font.family: "monospace"
                 Behavior on color { ColorAnimation { duration: 600 } }
             }
             Text {
                 text: beeWeather.city
                 color: BeeTheme.textSecondary
-                font { pixelSize: 9; letterSpacing: 0.5; bold: true }
+                font.pixelSize: 9; font.letterSpacing: 0.5; font.bold: true
                 textFormat: Text.PlainText
                 Behavior on color { ColorAnimation { duration: 600 } }
             }
@@ -170,7 +170,7 @@ Item {
         Text {
             text: beeWeather.condition
             color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.7)
-            font { pixelSize: 10; italic: true }
+            font.pixelSize: 10; font.italic: true
             visible: true
             Layout.alignment: Qt.AlignVCenter
             Layout.maximumWidth: beeWeather.conditionMaxWidth

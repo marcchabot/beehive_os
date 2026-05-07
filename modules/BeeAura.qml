@@ -95,7 +95,7 @@ Rectangle {
                 Text {
                     text: beeAura.osdLabel
                     color: BeeTheme.textSecondary
-                    font { pixelSize: 12; bold: true }
+                    font.pixelSize: 12; font.bold: true
                     horizontalAlignment: Text.AlignLeft
                 }
                 
@@ -117,7 +117,7 @@ Rectangle {
                 Text {
                     text: beeAura.osdValue + "%"
                     color: BeeTheme.textPrimary
-                    font { pixelSize: 14; bold: true; family: "monospace" }
+                    font.pixelSize: 14; font.bold: true; font.family: "monospace"
                     horizontalAlignment: Text.AlignRight
                 }
             }

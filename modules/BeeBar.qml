@@ -413,7 +413,7 @@ Rectangle {
                         }
                         return (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
                     }
-                    font { bold: true; pixelSize: 13; letterSpacing: 2 }
+                    font.bold: true; font.pixelSize: 13; font.letterSpacing: 2
                     color: BeeBarState.focusActive ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7) : BeeTheme.accent
                 }
                 
@@ -490,10 +490,10 @@ Rectangle {
                                 height: parent.height; radius: 2; color: beeBar.cpuPercent > 80 ? '#FF4444' : BeeTheme.accent
                             }
                         }
-                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_cpu) || 'CPU'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_cpu) || 'CPU'; color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true }
                         Text {
                             text: beeBar.cpuUsage; color: BeeTheme.accent
-                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            font.pixelSize: 12; font.bold: true; font.family: "monospace"
                             Layout.minimumWidth: 32; Layout.preferredWidth: 32
                             horizontalAlignment: Text.AlignRight
                         }
@@ -510,10 +510,10 @@ Rectangle {
                                 height: parent.height; radius: 2; color: beeBar.ramPercent > 85 ? '#FF4444' : BeeTheme.accent
                             }
                         }
-                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_ram) || 'RAM'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_ram) || 'RAM'; color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true }
                         Text {
                             text: beeBar.ramUsed; color: BeeTheme.accent
-                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            font.pixelSize: 12; font.bold: true; font.family: "monospace"
                             Layout.minimumWidth: 38; Layout.preferredWidth: 38
                             horizontalAlignment: Text.AlignRight
                         }
@@ -522,10 +522,10 @@ Rectangle {
                     // ─── NET ────────────────────────────
                     RowLayout {
                         visible: BeeConfig.showNet; spacing: 6
-                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_net) || 'NET'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                        Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_net) || 'NET'; color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true }
                         Text {
                             text: beeBar.netSpeed; color: BeeTheme.accent
-                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            font.pixelSize: 12; font.bold: true; font.family: "monospace"
                             Layout.minimumWidth: 52; Layout.preferredWidth: 52
                             horizontalAlignment: Text.AlignRight
                         }
@@ -552,10 +552,10 @@ Rectangle {
                         height: parent.height; radius: 2; color: beeBar.diskPercent > 90 ? '#FF4444' : BeeTheme.accent
                     }
                 }
-                Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_disk) || 'DISK'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_disk) || 'DISK'; color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true }
                 Text {
                     text: beeBar.diskUsed; color: BeeTheme.accent
-                    font { pixelSize: 12; bold: true; family: "monospace" }
+                    font.pixelSize: 12; font.bold: true; font.family: "monospace"
                     Layout.minimumWidth: 38; Layout.preferredWidth: 38
                     horizontalAlignment: Text.AlignRight
                 }
@@ -572,10 +572,10 @@ Rectangle {
                         height: parent.height; radius: 2; color: beeBar.batteryPercent < 20 ? '#FF4444' : BeeTheme.accent
                     }
                 }
-                Text { text: beeBar.batteryStatus === "Charging" ? '⚡' : (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_battery) || 'BAT'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
+                Text { text: beeBar.batteryStatus === "Charging" ? '⚡' : (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_battery) || 'BAT'; color: BeeTheme.textSecondary; font.pixelSize: 10; font.bold: true }
                 Text {
                     text: beeBar.batteryPercent + "%"; color: BeeTheme.accent
-                    font { pixelSize: 12; bold: true; family: "monospace" }
+                    font.pixelSize: 12; font.bold: true; font.family: "monospace"
                     Layout.minimumWidth: 32; Layout.preferredWidth: 32
                     horizontalAlignment: Text.AlignRight
                 }
@@ -662,12 +662,12 @@ Rectangle {
                 Text {
                     text: beeBar.currentTime
                     color: BeeTheme.textPrimary
-                    font { pixelSize: 15; weight: Font.DemiBold; family: "monospace" }
+                    font.pixelSize: 15; font.weight: Font.DemiBold; font.family: "monospace"
                 }
                 Text {
                     text: beeBar.currentDate
                     color: BeeTheme.textSecondary
-                    font { pixelSize: 9; letterSpacing: 0.5 }
+                    font.pixelSize: 9; font.letterSpacing: 0.5
                 }
             }
 

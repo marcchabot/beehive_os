@@ -78,7 +78,7 @@ Item {
                 anchors { right: parent.right; top: parent.top; margins: 6 }
                 width: 20; height: 20; radius: 10
                 color: BeeTheme.accent
-                Text { text: "✓"; anchors.centerIn: parent; color: BeeTheme.textPrimary; font { pixelSize: 10; bold: true } }
+                Text { text: "✓"; anchors.centerIn: parent; color: BeeTheme.textPrimary; font.pixelSize: 10; font.bold: true }
             }
 
             // Overlay hover
@@ -308,7 +308,7 @@ Item {
             Text {
                 text: "✕"; anchors.centerIn: parent
                 color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent
-                font { pixelSize: 14; bold: true }
+                font.pixelSize: 14; font.bold: true
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
             MouseArea {
@@ -364,7 +364,7 @@ Item {
                                 Text {
                                     text: tr("title")
                                     color: BeeTheme.accent
-                                    font { bold: true; pixelSize: 18; letterSpacing: 1.2 }
+                                    font.bold: true; font.pixelSize: 18; font.letterSpacing: 1.2
                                     anchors.verticalCenter: parent.verticalCenter
                                     Behavior on color { ColorAnimation { duration: 600 } }
                                 }
@@ -372,7 +372,7 @@ Item {
                             Text {
                                 text: tr("subtitle") + "  v2.1"
                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.30)
-                                font { pixelSize: 9; letterSpacing: 0.8 }
+                                font.pixelSize: 9; font.letterSpacing: 0.8
                                 Layout.alignment: Qt.AlignHCenter
                             }
                         }
@@ -396,7 +396,7 @@ Item {
                     Text {
                         text: tr("categories_label")
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.32)
-                        font { pixelSize: 8; bold: true; letterSpacing: 2.2 }
+                        font.pixelSize: 8; font.bold: true; font.letterSpacing: 2.2
                         Layout.leftMargin: 20
                     }
 
@@ -459,7 +459,7 @@ Item {
                                     Text {
                                         text: tr(catKey)
                                         color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
-                                        font { pixelSize: 13; bold: isActive }
+                                        font.pixelSize: 13; font.bold: isActive
                                         Layout.fillWidth: true; elide: Text.ElideRight
                                         Behavior on color { ColorAnimation { duration: 600 } }
                                     }
@@ -502,13 +502,13 @@ Item {
                                 Text {
                                     text: (BeeConfig.tr.common && BeeConfig.tr.common.bee_studio_title) || "The Hive 🍯"
                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.22)
-                                    font { pixelSize: 9; letterSpacing: 0.5 }
+                                    font.pixelSize: 9; font.letterSpacing: 0.5
                                 }
                                 Text {
                                     visible: beeStudio._saveDirty
                                     text: (BeeConfig.tr.common && BeeConfig.tr.common.unsaved) || (BeeConfig.tr.common && BeeConfig.tr.common.unsaved) || "● unsaved"
                                     color: Qt.rgba(1.0, 0.75, 0.2, 0.70)
-                                    font { pixelSize: 8; italic: true }
+                                    font.pixelSize: 8; font.italic: true
                                 }
                             }
 
@@ -553,7 +553,7 @@ Item {
                                     Text {
                                         text: (BeeConfig.tr.common && BeeConfig.tr.common.cells) || (BeeConfig.tr.common && BeeConfig.tr.common.cells) || "Cells"
                                         color: BeeTheme.accent
-                                        font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
+                                        font.bold: true; font.pixelSize: 17; font.letterSpacing: 0.8
                                         Behavior on color { ColorAnimation { duration: 600 } }
                                     }
                                     Text {
@@ -604,7 +604,7 @@ Item {
                                             Text {
                                                 text: tr("section_cells")
                                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                                                font { pixelSize: 9; bold: true; letterSpacing: 2 }
+                                                font.pixelSize: 9; font.bold: true; font.letterSpacing: 2
                                             }
 
                                             ListView {
@@ -637,7 +637,7 @@ Item {
                                                                 text: (beeStudio.selectedIndex === index)
                                                                     ? (beeStudio.editTitle || "—") : (model.title || "—")
                                                                 color: beeStudio.selectedIndex === index ? BeeTheme.accent : BeeTheme.textPrimary
-                                                                font { pixelSize: 11; bold: true }
+                                                                font.pixelSize: 11; font.bold: true
                                                                 Layout.fillWidth: true; elide: Text.ElideRight
                                                                 Behavior on color { ColorAnimation { duration: 150 } }
                                                             }
@@ -680,7 +680,7 @@ Item {
                                             }
                                             Text {
                                                 text: tr("select_cell_prompt")
-                                                color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 }
+                                                color: BeeTheme.accent; font.bold: true; font.pixelSize: 14; font.letterSpacing: 0.6
                                                 Layout.alignment: Qt.AlignHCenter
                                                 Behavior on color { ColorAnimation { duration: 600 } }
                                             }
@@ -703,7 +703,7 @@ Item {
                                                         spacing: 2; Layout.fillWidth: true
                                                         Text {
                                                             text: beeStudio.editTitle || "Cell"
-                                                            color: BeeTheme.accent; font { bold: true; pixelSize: 15 }
+                                                            color: BeeTheme.accent; font.bold: true; font.pixelSize: 15
                                                             elide: Text.ElideRight; Layout.fillWidth: true
                                                             Behavior on color { ColorAnimation { duration: 300 } }
                                                         }
@@ -722,7 +722,7 @@ Item {
                                                     property string labelText: ""
                                                     text: labelText
                                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
-                                                    font { pixelSize: 9; bold: true; letterSpacing: 1.5 }
+                                                    font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.5
                                                 }
                                                 component BeeField: TextField {
                                                     Layout.fillWidth: true; height: 36
@@ -780,7 +780,7 @@ Item {
                                                         spacing: 1; Layout.fillWidth: true
                                                         Text {
                                                             text: tr("highlighted_checkbox"); color: BeeTheme.textPrimary
-                                                            font { pixelSize: 12; bold: true }
+                                                            font.pixelSize: 12; font.bold: true
                                                             Behavior on color { ColorAnimation { duration: 600 } }
                                                         }
                                                         Text { text: tr("highlighted_tooltip"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 9 }
@@ -815,7 +815,7 @@ Item {
                                     width: 100; height: 30; radius: 15
                                     color: Qt.rgba(0.2, 0.7, 0.3, 0.15)
                                     border.color: Qt.rgba(0.2, 0.7, 0.3, 0.40); border.width: 1
-                                    Text { text: "➕ Add"; color: "#4CAF50"; font { pixelSize: 11; bold: true } anchors.centerIn: parent }
+                                    Text { text: "➕ Add"; color: "#4CAF50"; font.pixelSize: 11; font.bold: true anchors.centerIn: parent }
                                     MouseArea { 
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -848,7 +848,7 @@ Item {
                                     Text { 
                                         text: "🗑️ Delete"; 
                                         color: beeStudio.selectedIndex >= 0 && beeStudio._cellDeletable ? "#ff4444" : "#888888"; 
-                                        font { pixelSize: 11; bold: true } 
+                                        font.pixelSize: 11; font.bold: true 
                                         anchors.centerIn: parent 
                                     }
                                     MouseArea { 
@@ -870,7 +870,7 @@ Item {
                                     width: 130; height: 30; radius: 15
                                     color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
                                     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
-                                    Text { text: tr("save_button"); color: BeeTheme.accent; font { pixelSize: 11; bold: true } anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("save_button"); color: BeeTheme.accent; font.pixelSize: 11; font.bold: true anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: { beeStudio.applyEdits(); BeeBarState.logAction("My Hive", "Alvéoles sauvegardées", "🍯") } }
                                 }
                             }
@@ -908,7 +908,7 @@ Item {
                                 Text { text: "🖼"; font.pixelSize: 24 }
                                 ColumnLayout {
                                     spacing: 1
-                                    Text { text: tr("wallpapers_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("wallpapers_header"); color: BeeTheme.accent; font.bold: true; font.pixelSize: 17; font.letterSpacing: 0.8 Behavior on color { ColorAnimation { duration: 600 } } }
                                     Text { text: tr("subtitle_wallpapers_hover"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
 
@@ -974,7 +974,7 @@ Item {
                             Text {
                                 text: (BeeConfig.tr.common && BeeConfig.tr.common.beehive_originals) || "BEE-HIVE ORIGINALS 🍯"
                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
-                                font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             }
                             Flow {
                                 Layout.fillWidth: true; spacing: 10
@@ -998,7 +998,7 @@ Item {
                             Text {
                                 text: (BeeConfig.tr.common && BeeConfig.tr.common.my_library) || "MY LIBRARY 🖼"
                                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
-                                font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                             }
 
                             // État vide bibliothèque
@@ -1056,7 +1056,7 @@ Item {
                                 Text { text: "🔔"; font.pixelSize: 24 }
                                 ColumnLayout {
                                     spacing: 1
-                                    Text { text: tr("history_header"); color: BeeTheme.accent; font { bold: true; pixelSize: 17; letterSpacing: 0.8 } Behavior on color { ColorAnimation { duration: 600 } } }
+                                    Text { text: tr("history_header"); color: BeeTheme.accent; font.bold: true; font.pixelSize: 17; font.letterSpacing: 0.8 Behavior on color { ColorAnimation { duration: 600 } } }
                                     Text { text: tr("history_desc"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40); font.pixelSize: 10 }
                                 }
                                 Item { Layout.fillWidth: true }
@@ -1077,7 +1077,7 @@ Item {
                                         ? BeeBarState.historyModel.length + " notification" + (BeeBarState.historyModel.length > 1 ? "s" : "")
                                         : "Aucune notification"
                                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
-                                    font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                    font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                                 }
 
                                 // État vide
@@ -1094,7 +1094,7 @@ Item {
                                                 NumberAnimation { to: 0.8; duration: 2000; easing.type: Easing.InOutSine }
                                             }
                                         }
-                                        Text { text: tr("empty_history"); color: BeeTheme.accent; font { bold: true; pixelSize: 14; letterSpacing: 0.6 } Layout.alignment: Qt.AlignHCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                        Text { text: tr("empty_history"); color: BeeTheme.accent; font.bold: true; font.pixelSize: 14; font.letterSpacing: 0.6 Layout.alignment: Qt.AlignHCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                                         Text { text: tr("empty_history_desc"); color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.4); font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; Layout.alignment: Qt.AlignHCenter }
                                     }
                                 }
@@ -1143,7 +1143,7 @@ Item {
                                                 RowLayout {
                                                     Text { 
                                                         text: (modelData && modelData.title) || ""
-                                                        color: BeeTheme.textPrimary; font { bold: true; pixelSize: 12 } 
+                                                        color: BeeTheme.textPrimary; font.bold: true; font.pixelSize: 12 
                                                         Layout.fillWidth: true; elide: Text.ElideRight 
                                                     }
                                                     Text { 
@@ -1188,7 +1188,7 @@ Item {
                                     height: 30; radius: 15; width: clearHistLbl.implicitWidth + 24
                                     color: Qt.rgba(1.0, 0.3, 0.3, 0.12)
                                     border.color: Qt.rgba(1.0, 0.3, 0.3, 0.40); border.width: 1
-                                    Text { id: clearHistLbl; anchors.centerIn: parent; text: tr("clear_history_button"); color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font { pixelSize: 11; bold: true } }
+                                    Text { id: clearHistLbl; anchors.centerIn: parent; text: tr("clear_history_button"); color: Qt.rgba(1.0, 0.45, 0.45, 0.95); font.pixelSize: 11; font.bold: true }
                                     MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: BeeBarState.clearNotificationHistory() }
                                 }
                             }
@@ -1220,7 +1220,7 @@ Item {
                                     Text {
                                         text: BeePresets.tr("title")
                                         color: BeeTheme.accent
-                                        font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
+                                        font.bold: true; font.pixelSize: 17; font.letterSpacing: 0.8
                                         Behavior on color { ColorAnimation { duration: 600 } }
                                     }
                                     Text {
@@ -1283,7 +1283,7 @@ Item {
                                             Text { text: "↩️"; font.pixelSize: 14 }
                                             Text {
                                                 text: BeeConfig.uiLang === "fr" ? "Restaurer la dernière grille" : "Restore last layout"
-                                                color: BeeTheme.textPrimary; font { pixelSize: 12; bold: true }
+                                                color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
                                             }
                                         }
                                         MouseArea {
@@ -1306,7 +1306,7 @@ Item {
                                     Text {
                                         text: (BeeConfig.tr && BeeConfig.tr.presets) ? BeeConfig.tr.presets.saved_presets || "Saved Presets" : "Saved Presets"
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                        font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                                     }
 
                                     // Preset grid
@@ -1351,7 +1351,7 @@ Item {
                                                         Text {
                                                             text: modelData.name
                                                             color: BeeTheme.accent
-                                                            font { bold: true; pixelSize: 14 }
+                                                            font.bold: true; font.pixelSize: 14
                                                             Behavior on color { ColorAnimation { duration: 600 } }
                                                         }
                                                         Item { Layout.fillWidth: true }
@@ -1429,7 +1429,7 @@ Item {
                                     Text {
                                         text: (BeeConfig.tr && BeeConfig.tr.presets) ? BeeConfig.tr.presets.save_current || "Save Current Layout" : "Save Current Layout"
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                        font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                                     }
 
                                     RowLayout {
@@ -1513,7 +1513,7 @@ Item {
                                             Text {
                                                 text: BeePresets.tr("save")
                                                 color: BeeTheme.accent
-                                                font { pixelSize: 12; bold: true }
+                                                font.pixelSize: 12; font.bold: true
                                                 anchors.centerIn: parent
                                             }
                                             MouseArea {
@@ -1540,7 +1540,7 @@ Item {
                                     Text {
                                         text: BeePresets.tr("module_library")
                                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                                        font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                        font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                                     }
 
                                     // Module library grid
@@ -1633,7 +1633,7 @@ Item {
                                         Text {
                                             text: tr("profiles_header")
                                             color: BeeTheme.accent
-                                            font { bold: true; pixelSize: 17; letterSpacing: 0.8 }
+                                            font.bold: true; font.pixelSize: 17; font.letterSpacing: 0.8
                                             Behavior on color { ColorAnimation { duration: 600 } }
                                         }
                                         Text {
@@ -1661,7 +1661,7 @@ Item {
                                             Text {
                                                 text: BeeProfiles.currentProfile.name || ""
                                                 color: BeeTheme.accent
-                                                font { pixelSize: 11; bold: true }
+                                                font.pixelSize: 11; font.bold: true
                                             }
                                         }
                                     }
@@ -1700,7 +1700,7 @@ Item {
                                         Text {
                                             text: tr("profiles_switch")
                                             color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                                            font { pixelSize: 10; bold: true; letterSpacing: 1.5 }
+                                            font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
                                         }
 
                                         // Profile grid
@@ -1767,7 +1767,7 @@ Item {
                                                         Text {
                                                             text: modelData.name
                                                             color: parent.parent.isActiveProfile ? BeeTheme.accent : BeeTheme.textPrimary
-                                                            font { bold: true; pixelSize: 14 }
+                                                            font.bold: true; font.pixelSize: 14
                                                             Layout.alignment: Qt.AlignHCenter
                                                             Behavior on color { ColorAnimation { duration: 300 } }
                                                         }
@@ -1829,7 +1829,7 @@ Item {
 
                                                     Text {
                                                         text: "+"
-                                                        font { pixelSize: 32; bold: true }
+                                                        font.pixelSize: 32; font.bold: true
                                                         color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.50)
                                                         Layout.alignment: Qt.AlignHCenter
                                                     }
@@ -1887,7 +1887,7 @@ Item {
                             Text {
                                 text: tr("profiles_switching")
                                 color: BeeTheme.accent
-                                font { bold: true; pixelSize: 16 }
+                                font.bold: true; font.pixelSize: 16
                                 Layout.alignment: Qt.AlignHCenter
                             }
                         }
@@ -1919,7 +1919,7 @@ Item {
             Text {
                 text: tr("profiles_add")
                 color: BeeTheme.accent
-                font { bold: true; pixelSize: 16 }
+                font.bold: true; font.pixelSize: 16
                 Layout.alignment: Qt.AlignHCenter
             }
 
@@ -1987,7 +1987,7 @@ Item {
                 Text {
                     text: tr("profiles_create")
                     color: BeeTheme.accent
-                    font { pixelSize: 13; bold: true }
+                    font.pixelSize: 13; font.bold: true
                     anchors.centerIn: parent
                 }
 

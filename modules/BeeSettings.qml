@@ -59,7 +59,7 @@ Rectangle {
         Text {
             text: "✕"; anchors.centerIn: parent
             color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent
-            font { pixelSize: 14; bold: true }
+            font.pixelSize: 14; font.bold: true
             Behavior on color { ColorAnimation { duration: 150 } }
         }
         MouseArea {
@@ -84,7 +84,7 @@ Rectangle {
             Text {
                 text: settingsRoot._s.title || "Bee-Hive Settings"
                 color: BeeTheme.accent
-                font { bold: true; pixelSize: 20; letterSpacing: 1 }
+                font.bold: true; font.pixelSize: 20; font.letterSpacing: 1
                 Layout.fillWidth: true
                 Behavior on color { ColorAnimation { duration: 600 } }
             }
@@ -123,7 +123,7 @@ Rectangle {
                         Text {
                             text: label
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 14 }
+                            font.bold: true; font.pixelSize: 14
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
@@ -150,7 +150,7 @@ Rectangle {
                         Text {
                             text: settingsRoot._s.language || "Langue"
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 14 }
+                            font.bold: true; font.pixelSize: 14
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
@@ -184,7 +184,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     text: modelData.label
                                     color: isActive ? BeeTheme.accent : BeeTheme.textPrimary
-                                    font { pixelSize: 12; bold: isActive }
+                                    font.pixelSize: 12; font.bold: isActive
                                     Behavior on color { ColorAnimation { duration: 150 } }
                                 }
 
@@ -208,7 +208,7 @@ Rectangle {
                     Text {
                         text: (BeeConfig.tr.common && BeeConfig.tr.common.beebar_stats_title) || "Affichage BeeBar 📊"
                         color: BeeTheme.accent
-                        font { bold: true; pixelSize: 13; letterSpacing: 1 }
+                        font.bold: true; font.pixelSize: 13; font.letterSpacing: 1
                     }
                     Flow {
                         Layout.fillWidth: true
@@ -233,7 +233,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     text: modelData.label
                                     color: BeeConfig[modelData.prop] ? BeeTheme.accent : BeeTheme.textSecondary
-                                    font { pixelSize: 11; bold: BeeConfig[modelData.prop] }
+                                    font.pixelSize: 11; font.bold: BeeConfig[modelData.prop]
                                 }
                                 MouseArea {
                                     anchors.fill: parent

@@ -174,7 +174,7 @@ Rectangle {
                         Text {
                             text: tr("welcome_title")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 28; letterSpacing: 0.5 }
+                            font.bold: true; font.pixelSize: 28; font.letterSpacing: 0.5
                             Layout.alignment: Qt.AlignHCenter
                             wrapMode: Text.WordWrap
                             horizontalAlignment: Text.AlignHCenter
@@ -184,7 +184,7 @@ Rectangle {
                         Text {
                             text: tr("welcome_tagline")
                             color: BeeTheme.textSecondary
-                            font { italic: true; pixelSize: 16 }
+                            font.italic: true; font.pixelSize: 16
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Item { height: 20 }
@@ -213,7 +213,7 @@ Rectangle {
                         Text {
                             text: tr("theme_title")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 22 }
+                            font.bold: true; font.pixelSize: 22
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Item { height: 4 }
@@ -279,7 +279,7 @@ Rectangle {
                                         Text {
                                             text: modelData.icon + " " + modelData.label
                                             color: welcomeRoot.selectedTheme === modelData.key ? BeeTheme.accent : BeeTheme.textPrimary
-                                            font { bold: true; pixelSize: 14 }
+                                            font.bold: true; font.pixelSize: 14
                                             Layout.alignment: Qt.AlignHCenter
                                         }
                                         Text {
@@ -326,7 +326,7 @@ Rectangle {
                         Text {
                             text: tr("lang_title")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 22 }
+                            font.bold: true; font.pixelSize: 22
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Item { height: 4 }
@@ -363,7 +363,7 @@ Rectangle {
                                     Text {
                                         text: "Français"
                                         color: welcomeRoot.selectedLang === "fr" ? BeeTheme.accent : BeeTheme.textPrimary
-                                        font { bold: true; pixelSize: 16 }
+                                        font.bold: true; font.pixelSize: 16
                                         Layout.alignment: Qt.AlignHCenter
                                     }
                                 }
@@ -396,7 +396,7 @@ Rectangle {
                                     Text {
                                         text: "English"
                                         color: welcomeRoot.selectedLang === "en" ? BeeTheme.accent : BeeTheme.textPrimary
-                                        font { bold: true; pixelSize: 16 }
+                                        font.bold: true; font.pixelSize: 16
                                         Layout.alignment: Qt.AlignHCenter
                                     }
                                 }
@@ -426,7 +426,7 @@ Rectangle {
                         Text {
                             text: tr("dash_title")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 22 }
+                            font.bold: true; font.pixelSize: 22
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Item { height: 4 }
@@ -445,7 +445,7 @@ Rectangle {
                             Text {
                                 text: tr("dash_select_all")
                                 color: BeeTheme.accent
-                                font { pixelSize: 11; underline: true }
+                                font.pixelSize: 11; font.underline: true
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
@@ -461,7 +461,7 @@ Rectangle {
                             Text {
                                 text: tr("dash_deselect_all")
                                 color: BeeTheme.accent
-                                font { pixelSize: 11; underline: true }
+                                font.pixelSize: 11; font.underline: true
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
@@ -507,13 +507,13 @@ Rectangle {
                                         Text {
                                             text: tr("cell_" + modelData.key)
                                             color: isSelected ? BeeTheme.accent : BeeTheme.textPrimary
-                                            font { bold: isSelected; pixelSize: 13 }
+                                            font.bold: isSelected; font.pixelSize: 13
                                             Layout.fillWidth: true
                                         }
                                         Text {
                                             text: isSelected ? "✓" : ""
                                             color: BeeTheme.accent
-                                            font { bold: true; pixelSize: 14 }
+                                            font.bold: true; font.pixelSize: 14
                                         }
                                     }
 
@@ -555,7 +555,7 @@ Rectangle {
                         Text {
                             text: tr("done_title")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 28 }
+                            font.bold: true; font.pixelSize: 28
                             Layout.alignment: Qt.AlignHCenter
                         }
                         Item { height: 6 }
@@ -586,7 +586,7 @@ Rectangle {
                                     Text { text: "🎨"; font.pixelSize: 16 }
                                     Text {
                                         text: tr("done_summary_theme") + ":"
-                                        color: BeeTheme.textSecondary; font { bold: true; pixelSize: 13 }
+                                        color: BeeTheme.textSecondary; font.bold: true; font.pixelSize: 13
                                     }
                                     Text {
                                         text: selectedTheme
@@ -600,7 +600,7 @@ Rectangle {
                                     Text { text: "🌍"; font.pixelSize: 16 }
                                     Text {
                                         text: tr("done_summary_lang") + ":"
-                                        color: BeeTheme.textSecondary; font { bold: true; pixelSize: 13 }
+                                        color: BeeTheme.textSecondary; font.bold: true; font.pixelSize: 13
                                     }
                                     Text {
                                         text: selectedLang === "fr" ? "Français 🇫🇷" : "English 🇬🇧"
@@ -614,7 +614,7 @@ Rectangle {
                                     Text { text: "📱"; font.pixelSize: 16 }
                                     Text {
                                         text: tr("done_summary_cells") + ":"
-                                        color: BeeTheme.textSecondary; font { bold: true; pixelSize: 13 }
+                                        color: BeeTheme.textSecondary; font.bold: true; font.pixelSize: 13
                                     }
                                     Text {
                                         text: selectedCells.length + " " + (selectedLang === "fr" ? "alvéoles" : "cells")
@@ -648,7 +648,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: "← " + tr("btn_back")
                         color: BeeTheme.textSecondary
-                        font { pixelSize: 14 }
+                        font.pixelSize: 14
                     }
                     MouseArea {
                         id: backHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -674,7 +674,7 @@ Rectangle {
                             ? tr("btn_next") + " →"
                             : tr("btn_start")
                         color: BeeTheme.accent
-                        font { bold: true; pixelSize: 15; letterSpacing: 0.5 }
+                        font.bold: true; font.pixelSize: 15; font.letterSpacing: 0.5
                     }
                     MouseArea {
                         id: nextHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor

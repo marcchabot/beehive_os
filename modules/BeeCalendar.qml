@@ -41,7 +41,7 @@ Rectangle {
         Text {
             text: "✕"; anchors.centerIn: parent
             color: calCloseHov.containsMouse ? "#ff5555" : BeeTheme.accent
-            font { pixelSize: 14; bold: true }
+            font.pixelSize: 14; font.bold: true
             Behavior on color { ColorAnimation { duration: 150 } }
         }
         MouseArea {
@@ -2095,7 +2095,7 @@ Rectangle {
                 Text {
                     text: "✕"; anchors.centerIn: parent
                     color: detailCloseHov.containsMouse ? "#ff5555" : BeeTheme.accent
-                    font { pixelSize: 12; bold: true }
+                    font.pixelSize: 12; font.bold: true
                     Behavior on color { ColorAnimation { duration: 150 } }
                 }
                 MouseArea {
@@ -2359,7 +2359,7 @@ Rectangle {
                     Text {
                         text: "✕"; anchors.centerIn: parent
                         color: snoozeDismissHov.containsMouse ? "#ff5555" : BeeTheme.accent
-                        font { pixelSize: 10; bold: true }
+                        font.pixelSize: 10; font.bold: true
                         Behavior on color { ColorAnimation { duration: 150 } }
                     }
                     MouseArea {

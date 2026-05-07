@@ -71,7 +71,7 @@ Rectangle {
         border.color: closeHov.containsMouse ? Qt.rgba(1.0, 0.3, 0.3, 0.6) : BeeTheme.accent
         border.width: 1
         Behavior on color { ColorAnimation { duration: 150 } }
-        Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font { bold: true; pixelSize: 14 } }
+        Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font.bold: true; font.pixelSize: 14 }
         MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { controlRoot.visible = false } }
     }
 
@@ -96,7 +96,7 @@ Rectangle {
 
                 // Logo
                 Text { text: "🐝"; font.pixelSize: 28; Layout.alignment: Qt.AlignHCenter; bottomPadding: 4 }
-                Text { text: "The Hive"; color: BeeTheme.accent; font { bold: true; pixelSize: 13 }; Layout.alignment: Qt.AlignHCenter; bottomPadding: 8 }
+                Text { text: "The Hive"; color: BeeTheme.accent; font.bold: true; font.pixelSize: 13; Layout.alignment: Qt.AlignHCenter; bottomPadding: 8 }
 
                 // Search bar
                 Rectangle {
@@ -252,7 +252,7 @@ Rectangle {
                 Text {
                     text: model.label
                     color: controlRoot.currentTab === model.idx ? BeeTheme.accent : BeeTheme.textPrimary
-                    font { pixelSize: 12; bold: controlRoot.currentTab === model.idx }
+                    font.pixelSize: 12; font.bold: controlRoot.currentTab === model.idx
                     opacity: controlRoot.currentTab === model.idx ? 1.0 : 0.7
                     elide: Text.ElideRight
                     Layout.fillWidth: true

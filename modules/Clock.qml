@@ -194,12 +194,10 @@ Item {
         Text {
             text: Qt.formatDateTime(clockWidget.now, "hh:mm")
             color: BeeTheme.textPrimary
-            font {
-                pixelSize: 36
+            font.pixelSize: 36
                 weight: Font.Light
                 family: "monospace"
                 letterSpacing: 4
-            }
             anchors.horizontalCenter: parent.horizontalCenter
             Behavior on color { ColorAnimation { duration: 600 } }
 
@@ -208,11 +206,9 @@ Item {
                 text: ":" + Qt.formatDateTime(clockWidget.now, "ss")
                 color: BeeTheme.accent
                 Behavior on color { ColorAnimation { duration: 600 } }
-                font {
-                    pixelSize: 18
+                font.pixelSize: 18
                     weight: Font.Light
                     family: "monospace"
-                }
                 anchors.left: parent.right
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 4
@@ -230,7 +226,7 @@ Item {
             text: Qt.formatDateTime(clockWidget.now, "dddd d MMMM yyyy")
             color: BeeTheme.textSecondary
             Behavior on color { ColorAnimation { duration: 600 } }
-            font { pixelSize: 12; letterSpacing: 1 }
+            font.pixelSize: 12; font.letterSpacing: 1
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
@@ -246,7 +242,7 @@ Item {
             text: (BeeConfig.tr.common && BeeConfig.tr.common.bee_hive_time) || "🐝 Bee-Hive Time"
             color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
             Behavior on color { ColorAnimation { duration: 600 } }
-            font { pixelSize: 9; letterSpacing: 1.5 }
+            font.pixelSize: 9; font.letterSpacing: 1.5
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }

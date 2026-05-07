@@ -530,7 +530,7 @@ Rectangle {
                     ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b,
                         BeeTheme._progress < 0.5 ? 1.0 : 1.0)  // toujours lisible
                     : BeeTheme.textPrimary
-                font { bold: true; pixelSize: 14; letterSpacing: 0.5 }
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 0.5
                 anchors.horizontalCenter: parent.horizontalCenter
                 Behavior on color { ColorAnimation { duration: 600 } }
             }
@@ -761,7 +761,7 @@ Rectangle {
         Text {
             text: BeeConfig.dashTitle
             color: BeeTheme.accent
-            font { pixelSize: 22; bold: true; letterSpacing: 2 }
+            font.pixelSize: 22; font.bold: true; font.letterSpacing: 2
             anchors.horizontalCenter: parent.horizontalCenter
             Behavior on color { ColorAnimation { duration: 800 } }
 
@@ -819,7 +819,7 @@ Rectangle {
     Text {
         text: "Bee-Hive OS v0.9.1 · NectarSync2 · BeeAlarm · BeeFocus 🐝"
         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
-        font { pixelSize: 10; letterSpacing: 1 }
+        font.pixelSize: 10; font.letterSpacing: 1
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15
         anchors.horizontalCenter: parent.horizontalCenter
     }
@@ -880,7 +880,7 @@ Rectangle {
                         Text {
                             text: beeMon.tr("title")
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 18 }
+                            font.bold: true; font.pixelSize: 18
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
@@ -913,21 +913,21 @@ Rectangle {
                             Text {
                                 text: beeMon.tr("cpu")
                                 color: BeeTheme.textSecondary
-                                font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
                                 text: beeMon.cpuTemp.toFixed(0) + "°C"
                                 color: beeMon.cpuTempColor
-                                font { pixelSize: 28; bold: true; family: "monospace" }
+                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
                             Text {
                                 text: beeMon.cpuPct.toFixed(0) + "%"
                                 color: beeMon.cpuTempColor
-                                font { pixelSize: 12; family: "monospace" }
+                                font.pixelSize: 12; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -950,14 +950,14 @@ Rectangle {
                             Text {
                                 text: beeMon.gpuIsIgpu ? beeMon.tr("igpu") : beeMon.tr("gpu")
                                 color: BeeTheme.textSecondary
-                                font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
                                 text: beeMon.gpuTemp.toFixed(0) + "°C"
                                 color: beeMon.gpuTempColor
-                                font { pixelSize: 28; bold: true; family: "monospace" }
+                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -980,21 +980,21 @@ Rectangle {
                             Text {
                                 text: beeMon.tr("ram")
                                 color: BeeTheme.textSecondary
-                                font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
                                 text: beeMon.ramPct.toFixed(0) + "%"
                                 color: BeeTheme.accent
-                                font { pixelSize: 28; bold: true; family: "monospace" }
+                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
                                 text: beeMon.ramUsed + " / " + beeMon.ramTotal
                                 color: BeeTheme.textSecondary
-                                font { pixelSize: 9; family: "monospace" }
+                                font.pixelSize: 9; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
@@ -1025,7 +1025,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: beeMon.tr("ram") + "  " + beeMon.ramUsed + " / " + beeMon.ramTotal
                         color: BeeTheme.textPrimary
-                        font { pixelSize: 9; bold: true }
+                        font.pixelSize: 9; font.bold: true
                         Behavior on color { ColorAnimation { duration: 600 } }
                     }
                 }
@@ -1058,7 +1058,7 @@ Rectangle {
                             anchors.centerIn: parent
                             text: beeMon.tr("swap") + "  " + beeMon.swapUsed + " / " + beeMon.swapTotal
                             color: BeeTheme.textPrimary
-                            font { pixelSize: 9; bold: true }
+                            font.pixelSize: 9; font.bold: true
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                     }
@@ -1075,7 +1075,7 @@ Rectangle {
                             anchors.centerIn: parent
                             text: "⏱ " + beeMon.uptime
                             color: BeeTheme.textPrimary
-                            font { pixelSize: 9; bold: true; family: "monospace" }
+                            font.pixelSize: 9; font.bold: true; font.family: "monospace"
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                     }
@@ -1097,7 +1097,7 @@ Rectangle {
                             ? "🌀 " + beeMon.fans.map(function(f) { return f.label + ": " + f.rpm + " RPM" }).join("  ·  ")
                             : "🌀 " + beeMon.tr("no_fans")
                         color: BeeTheme.textSecondary
-                        font { pixelSize: 10 }
+                        font.pixelSize: 10
                         Behavior on color { ColorAnimation { duration: 600 } }
                     }
                 }
@@ -1122,19 +1122,19 @@ Rectangle {
                             Text {
                                 text: "🐝 " + beeMon.tr("process_memory")
                                 color: BeeTheme.textPrimary
-                                font { pixelSize: 11; bold: true }
+                                font.pixelSize: 11; font.bold: true
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
                                 text: beeMon.processRss.toFixed(1) + " " + beeMon.tr("rss_mb")
                                 color: beeMon.rssAlert ? Qt.rgba(1.0, 0.75, 0.2, 1.0) : BeeTheme.accent
-                                font { pixelSize: 11; bold: true; family: "monospace" }
+                                font.pixelSize: 11; font.bold: true; font.family: "monospace"
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
                             Text {
                                 text: beeMon.rssAlert ? beeMon.tr("rss_alert") : ""
                                 color: Qt.rgba(1.0, 0.75, 0.2, 1.0)
-                                font { pixelSize: 9; bold: true }
+                                font.pixelSize: 9; font.bold: true
                                 visible: beeMon.rssAlert
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -1143,7 +1143,7 @@ Rectangle {
                         Text {
                             text: beeMon.tr("rss_graph_label")
                             color: BeeTheme.textSecondary
-                            font { pixelSize: 8; letterSpacing: 1 }
+                            font.pixelSize: 8; font.letterSpacing: 1
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
 
@@ -1263,7 +1263,7 @@ Rectangle {
                         Text {
                             text: beeMon.tr("processes")
                             color: BeeTheme.textSecondary
-                            font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                            font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
 
@@ -1310,7 +1310,7 @@ Rectangle {
                                 Text {
                                     text: (proc.name || "—")
                                     color: BeeTheme.textPrimary
-                                    font { pixelSize: 10; family: "monospace" }
+                                    font.pixelSize: 10; font.family: "monospace"
                                     width: parent.width * 0.50
                                     elide: Text.ElideRight
                                     Behavior on color { ColorAnimation { duration: 600 } }
@@ -1318,7 +1318,7 @@ Rectangle {
                                 Text {
                                     text: (proc.cpu !== undefined ? proc.cpu.toFixed(1) : "—")
                                     color: proc.cpu > 10 ? Qt.rgba(1.0, 0.65, 0.2, 1.0) : BeeTheme.textPrimary
-                                    font { pixelSize: 10; family: "monospace"; bold: proc.cpu > 10 }
+                                    font.pixelSize: 10; font.family: "monospace"; font.bold: proc.cpu > 10
                                     width: parent.width * 0.18
                                     horizontalAlignment: Text.AlignRight
                                     Behavior on color { ColorAnimation { duration: 300 } }
@@ -1326,7 +1326,7 @@ Rectangle {
                                 Text {
                                     text: (proc.mem !== undefined ? proc.mem.toFixed(1) : "—")
                                     color: proc.mem > 10 ? Qt.rgba(1.0, 0.45, 0.1, 1.0) : BeeTheme.textSecondary
-                                    font { pixelSize: 10; family: "monospace" }
+                                    font.pixelSize: 10; font.family: "monospace"
                                     width: parent.width * 0.18
                                     horizontalAlignment: Text.AlignRight
                                     Behavior on color { ColorAnimation { duration: 300 } }
@@ -1392,7 +1392,7 @@ Rectangle {
                         Text {
                             text: beeNet.ssid
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 18 }
+                            font.bold: true; font.pixelSize: 18
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
@@ -1421,7 +1421,7 @@ Rectangle {
                         Text {
                             text: beeNet.tr("chart_label")
                             color: BeeTheme.textSecondary
-                            font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                            font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
 
@@ -1575,7 +1575,7 @@ Rectangle {
                         Text {
                             text: beeNet.tr("results")
                             color: BeeTheme.textSecondary
-                            font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                            font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
 
@@ -1628,7 +1628,7 @@ Rectangle {
                                 ? beeNet.speedTestStatus
                                 : beeNet.tr("speed_test")
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 13 }
+                            font.bold: true; font.pixelSize: 13
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                     }
@@ -1664,7 +1664,7 @@ Rectangle {
                     Text {
                         text: beeNet.tr("history")
                         color: BeeTheme.textSecondary
-                        font { pixelSize: 10; bold: true; letterSpacing: 1 }
+                        font.pixelSize: 10; font.bold: true; font.letterSpacing: 1
                         Behavior on color { ColorAnimation { duration: 600 } }
                     }
 
@@ -1754,7 +1754,7 @@ Rectangle {
                         Text {
                             text: BeeFocus.tr("title")
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 20 }
+                            font.bold: true; font.pixelSize: 20
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
@@ -1836,14 +1836,14 @@ Rectangle {
                         Text {
                             text: BeeFocus.timeDisplay
                             color: BeeTheme.textPrimary
-                            font { bold: true; pixelSize: 42; family: "monospace" }
+                            font.bold: true; font.pixelSize: 42; font.family: "monospace"
                             anchors.horizontalCenter: parent.horizontalCenter
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
                             text: BeeFocus.isBreakPhase ? BeeFocus.tr("break_label") : BeeFocus.tr("work")
                             color: BeeFocus.isBreakPhase ? "#27AE60" : BeeTheme.accent
-                            font { pixelSize: 12; bold: true }
+                            font.pixelSize: 12; font.bold: true
                             anchors.horizontalCenter: parent.horizontalCenter
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
@@ -1875,7 +1875,7 @@ Rectangle {
                                 Text {
                                     text: modelData.label
                                     color: BeeFocus.currentMode === modelData.idx ? BeeTheme.accent : BeeTheme.textSecondary
-                                    font { pixelSize: 11; bold: BeeFocus.currentMode === modelData.idx }
+                                    font.pixelSize: 11; font.bold: BeeFocus.currentMode === modelData.idx
                                     Behavior on color { ColorAnimation { duration: 200 } }
                                 }
                             }
@@ -1903,7 +1903,7 @@ Rectangle {
                             anchors.centerIn: parent
                             text: BeeFocus.isRunning ? "⏸" : (BeeFocus.isPaused ? "▶" : "▶")
                             color: BeeFocus.isRunning ? BeeTheme.accent : "#000000"
-                            font { pixelSize: 24; bold: true }
+                            font.pixelSize: 24; font.bold: true
                         }
                         MouseArea {
                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor
@@ -1954,7 +1954,7 @@ Rectangle {
                         Text {
                             text: BeeFocus.sessionsCompleted.toString()
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 22; family: "monospace" }
+                            font.bold: true; font.pixelSize: 22; font.family: "monospace"
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
@@ -1970,7 +1970,7 @@ Rectangle {
                         Text {
                             text: BeeFocus.totalFocusMinutes.toString()
                             color: BeeTheme.accent
-                            font { bold: true; pixelSize: 22; family: "monospace" }
+                            font.bold: true; font.pixelSize: 22; font.family: "monospace"
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Text {
@@ -1993,7 +1993,7 @@ Rectangle {
                 Text {
                     text: BeeFocus.tr("health_reminders")
                     color: BeeTheme.accent
-                    font { bold: true; pixelSize: 14 }
+                    font.bold: true; font.pixelSize: 14
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -2017,7 +2017,7 @@ Rectangle {
                                     ? Math.floor(BeeFocus.hydrationSeconds / 60) + ":" + (BeeFocus.hydrationSeconds % 60 < 10 ? "0" : "") + (BeeFocus.hydrationSeconds % 60).toString()
                                     : "—"
                                 color: BeeFocus.hydrationEnabled ? "#2980B9" : BeeTheme.textSecondary
-                                font { pixelSize: 13; family: "monospace"; bold: true }
+                                font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
                             Text {
                                 text: BeeFocus.tr("hydration")
@@ -2047,7 +2047,7 @@ Rectangle {
                                     ? Math.floor(BeeFocus.postureSeconds / 60) + ":" + (BeeFocus.postureSeconds % 60 < 10 ? "0" : "") + (BeeFocus.postureSeconds % 60).toString()
                                     : "—"
                                 color: BeeFocus.postureEnabled ? "#27AE60" : BeeTheme.textSecondary
-                                font { pixelSize: 13; family: "monospace"; bold: true }
+                                font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
                             Text {
                                 text: BeeFocus.tr("posture")
@@ -2077,7 +2077,7 @@ Rectangle {
                                     ? Math.floor(BeeFocus.eyesSeconds / 60) + ":" + (BeeFocus.eyesSeconds % 60 < 10 ? "0" : "") + (BeeFocus.eyesSeconds % 60).toString()
                                     : "—"
                                 color: BeeFocus.eyesEnabled ? "#9B59B6" : BeeTheme.textSecondary
-                                font { pixelSize: 13; family: "monospace"; bold: true }
+                                font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
                             Text {
                                 text: BeeFocus.tr("eyes")
@@ -2109,7 +2109,7 @@ Rectangle {
                     Text {
                         text: BeeFocus.tr("timer_settings")
                         color: BeeTheme.accent
-                        font { bold: true; pixelSize: 13 }
+                        font.bold: true; font.pixelSize: 13
                     }
 
                     // Work duration
@@ -2129,7 +2129,7 @@ Rectangle {
                                 id: customWorkInput
                                 anchors.centerIn: parent
                                 text: BeeFocus.customWork.toString()
-                                color: BeeTheme.textPrimary; font { pixelSize: 13; family: "monospace" }
+                                color: BeeTheme.textPrimary; font.pixelSize: 13; font.family: "monospace"
                                 validator: IntValidator { bottom: 1; top: 120 }
                                 onEditingFinished: {
                                     BeeFocus.customWork = parseInt(text) || 25
@@ -2157,7 +2157,7 @@ Rectangle {
                                 id: customBreakInput
                                 anchors.centerIn: parent
                                 text: BeeFocus.customBreak.toString()
-                                color: BeeTheme.textPrimary; font { pixelSize: 13; family: "monospace" }
+                                color: BeeTheme.textPrimary; font.pixelSize: 13; font.family: "monospace"
                                 validator: IntValidator { bottom: 1; top: 60 }
                                 onEditingFinished: {
                                     BeeFocus.customBreak = parseInt(text) || 5
@@ -2185,7 +2185,7 @@ Rectangle {
                                 id: customLongBreakInput
                                 anchors.centerIn: parent
                                 text: BeeFocus.customLongBreak.toString()
-                                color: BeeTheme.textPrimary; font { pixelSize: 13; family: "monospace" }
+                                color: BeeTheme.textPrimary; font.pixelSize: 13; font.family: "monospace"
                                 validator: IntValidator { bottom: 1; top: 60 }
                                 onEditingFinished: {
                                     BeeFocus.customLongBreak = parseInt(text) || 15

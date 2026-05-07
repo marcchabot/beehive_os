@@ -108,7 +108,7 @@ Item {
             Text {
                 text: "✕"; anchors.centerIn: parent
                 color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent
-                font { pixelSize: 14; bold: true }
+                font.pixelSize: 14; font.bold: true
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
             MouseArea {
