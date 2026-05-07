@@ -159,14 +159,14 @@ Rectangle {
             source: {
                 switch (controlRoot.currentTab) {
                     case 0: return "GeneralTab.qml"
-                    // case 1: return "AppearanceTab.qml"
-                    // case 2: return "WallpaperTab.qml"
-                    // case 3: return "BarWidgetsTab.qml"
-                    // case 4: return "ProductivityTab.qml"
-                    // case 5: return "ShortcutsTab.qml"
-                    // case 6: return "ExtensionsTab.qml"
-                    // case 7: return "AccessibilityTab.qml"
-                    // case 8: return "HistoryTab.qml"
+                    case 1: return "AppearanceTab.qml"
+                    case 2: return "WallpaperTab.qml"
+                    case 3: return "BarWidgetsTab.qml"
+                    case 4: return "ProductivityTab.qml"
+                    case 5: return "ShortcutsTab.qml"
+                    case 6: return "ExtensionsTab.qml"
+                    case 7: return "AccessibilityTab.qml"
+                    case 8: return "HistoryTab.qml"
                     default: return "GeneralTab.qml"
                 }
             }
