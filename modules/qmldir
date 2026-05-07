@@ -6,6 +6,10 @@ singleton BeeBarState 1.0 BeeBarState.qml
 singleton BeeApps     1.0 BeeApps.qml
 singleton BeeSound    1.0 BeeSound.qml
 singleton BeeModuleRegistry 1.0 BeeModuleRegistry.qml
+singleton BeePresets      1.0 BeePresets.qml
+singleton BeeProfiles     1.0 BeeProfiles.qml
+singleton BeeFocus        1.0 BeeFocus.qml
+singleton BeeAlarm        1.0 BeeAlarm.qml
 
 # Composants visuels
 BeeBar       1.0 BeeBar.qml
@@ -27,3 +31,7 @@ BeeMotion2D  1.0 BeeMotion2D.qml
 BeeNotes     1.0 BeeNotes.qml
 Clock        1.0 Clock.qml
 MayaDash     1.0 MayaDash.qml
+BeeNetwork   1.0 BeeNetwork.qml
+BeeMonitor   1.0 BeeMonitor.qml
+BeeVoice     1.0 BeeVoice.qml
+BeeCalendar  1.0 BeeCalendar.qml

@@ -71,26 +71,30 @@ QtObject {
 
     // ─── BeeHive static apps (always at the top) ──────────────
     readonly property var _staticApps: [
-        { icon: "🎨", name: "BeeStudio",          cmd: "__studio__",   cat: "BeeHive" }
+        { icon: "🍯", name: "The Hive",          cmd: "__studio__",   cat: "BeeHive" }
     ]
 
-    // ─── Python script: scan .desktop files ───────────
+    // ─── Python script: scan .desktop files + resolve icons ──────
     readonly property string _scanCmd:
         "python3 << 'PYEOF'\n" +
         "import os,json,glob,configparser,re\n" +
-        "def resolve_icon(name):\n" +
-        "    if not name: return None\n" +
-        "    if os.path.isabs(name): return name if os.path.exists(name) else None\n" +
-        "    dirs = ['/usr/share/icons/hicolor/48x48/apps', '/usr/share/icons/breeze/48x48/apps', '/usr/share/icons/papirus/48x48/apps']\n" +
-        "    for d in dirs:\n" +
-        "        for ext in ['.svg', '.png', '.xpm']:\n" +
-        "            p = os.path.join(d, name + ext)\n" +
-        "            if os.path.exists(p): return p\n" +
-        "    return None\n" +
         "apps=[]\n" +
         "seen=set()\n" +
         "dirs=['/usr/share/applications',os.path.expanduser('~/.local/share/applications')]\n" +
         "paths=[p for d in dirs for p in glob.glob(d+'/*.desktop')]\n" +
+        "\n" +
+        "def resolve_icon(name,size=48):\n" +
+        "  if not name: return ''\n" +
+        "  if name.startswith('/'): return name if os.path.isfile(name) else ''\n" +
+        "  for ext in ['.png','.svg','.xpm']:\n" +
+        "    p='/usr/share/pixmaps/'+name+ext\n" +
+        "    if os.path.isfile(p): return p\n" +
+        "  for sz in [str(size)+'x'+str(size),'scalable','128x128','96x96','64x64','48x48','32x32']:\n" +
+        "    for ext in ['.png','.svg']:\n" +
+        "      p='/usr/share/icons/hicolor/'+sz+'/apps/'+name+ext\n" +
+        "      if os.path.isfile(p): return p\n" +
+        "  return ''\n" +
+        "\n" +
         "for p in paths:\n" +
         "  try:\n" +
         "    c=configparser.ConfigParser(strict=False,interpolation=None)\n" +
@@ -106,11 +110,12 @@ QtObject {
         "    x=re.sub(r' [^ ]*=[uUfFdDnNickvm% ]+', '', x)\n" +
         "    x=re.sub(r' ?%[uUfFdDnNickvm]', '', x).strip()\n" +
         "    if 'spotify' in p.lower():\n" +
-        "        x = 'spotify --enable-features=UseOzonePlatform --ozone-platform=wayland'\n" +
+        "      x = 'spotify --enable-features=UseOzonePlatform --ozone-platform=wayland'\n" +
         "    cat=e.get('categories','').split(';')[0]\n" +
-        "    icon=resolve_icon(e.get('icon',''))\n" +
+        "    ic=e.get('icon','')\n" +
+        "    icon_path=resolve_icon(ic) if ic else ''\n" +
         "    if e.get('terminal','false').lower()=='true':x='kitty -e '+x\n" +
-        "    apps.append({'name':n,'cmd':x,'cat':cat,'icon':icon})\n" +
+        "    apps.append({'name':n,'cmd':x,'cat':cat,'iconPath':icon_path})\n" +
         "    seen.add(n.lower())\n" +
         "  except:pass\n" +
         "apps.sort(key=lambda a:a['name'].lower())\n" +
@@ -129,16 +134,14 @@ QtObject {
                 if (!s) return
                 try {
                     var o = JSON.parse(s)
-                    if (o && o.name && o.cmd) {
-                        // Priority: 1. .desktop icon -> 2. Emoji fallback
-                        var icon = o.icon || root._iconFor(o.cat)
+                    if (o && o.name && o.cmd)
                         root._scanned.push({
-                            icon: icon,
+                            icon: root._iconFor(o.cat),
                             name: o.name,
                             cmd:  o.cmd,
-                            cat:  o.cat || "Application"
+                            cat:  o.cat || "Application",
+                            iconPath: o.iconPath || ""
                         })
-                    }
                 } catch(e) {}
             }
         }
@@ -165,5 +168,31 @@ QtObject {
         scanning = true
         pool = _staticApps.slice() // Minimal pool available immediately
         _proc.running = true
+    }
+
+    // ─── Auto-rescan every 5 minutes ─────────────────────────
+    // Detects newly installed/removed apps automatically
+    property Timer _rescanTimer: Timer {
+        interval: 600000  // 10 min
+        running: true
+        repeat: true
+        onTriggered: {
+            if (!root.scanning) {
+                root.scanning = true
+                root._scanned = []
+                root._proc.running = true
+                console.log("BeeApps: auto-rescan triggered")
+            }
+        }
+    }
+
+    // ─── Manual rescan (IPC) ─────────────────────────────────
+    function rescan() {
+        if (!root.scanning) {
+            root.scanning = true
+            root._scanned = []
+            root._proc.running = true
+            console.log("BeeApps: manual rescan triggered")
+        }
     }
 }

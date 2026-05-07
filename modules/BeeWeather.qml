@@ -10,7 +10,7 @@ import QtQuick.Layouts
 Item {
     id: beeWeather
     clip: true
-    implicitWidth: mainLayout.implicitWidth
+    implicitWidth: Math.min(mainLayout.implicitWidth, 150)
     implicitHeight: 48
 
     // ─── Propriétés de configuration ──────────────────────
@@ -25,7 +25,9 @@ Item {
     property string condition: (BeeConfig.tr.weather && BeeConfig.tr.weather.loading) || "Loading…"
     property string icon: "🌡️"
     property bool loading: true
-    property int conditionMaxWidth: 170
+    property int conditionMaxWidth: 80
+    property int _retryCount: 0
+    property int _maxRetries: 5
 
     // ─── Mappage des codes WMO (depuis les traductions) ──
     function getWmoInfo(code) {
@@ -40,7 +42,7 @@ Item {
         var fallback = {
             0:  ["☀️", "Dégagé"],        1:  ["🌤️", "Plutôt dégagé"],
             2:  ["⛅", "Partiellement nuageux"], 3: ["☁️", "Couvert"],
-            45: ["🌫️", "Brouillard"],   48: ["🌫️", "Brouillard givrant"],
+            45: ["🌁", "Brouillard"],    48: ["🌁", "Brouillard givrant"],
             51: ["🌦️", "Bruine légère"], 53: ["🌦️", "Bruine modérée"], 55: ["🌦️", "Bruine dense"],
             61: ["🌧️", "Pluie légère"],  63: ["🌧️", "Pluie modérée"],  65: ["🌧️", "Pluie forte"],
             71: ["🌨️", "Neige légère"],  73: ["🌨️", "Neige modérée"],  75: ["🌨️", "Neige forte"],
@@ -68,14 +70,33 @@ Item {
                     const info = getWmoInfo(current.weather_code)
                     beeWeather.icon = info[0]
                     beeWeather.condition = info[1]
+                    beeWeather._retryCount = 0  // Reset retry counter on success
                 } else {
                     beeWeather.condition = (BeeConfig.tr.weather && BeeConfig.tr.weather.error) || "Weather unavailable"
+                    // Auto-retry with exponential backoff (15s, 30s, 60s, 120s, 240s)
+                    if (beeWeather._retryCount < beeWeather._maxRetries) {
+                        beeWeather._retryCount++
+                        var delay = 15000 * Math.pow(2, beeWeather._retryCount - 1)
+                        console.log("[BeeWeather] XHR failed (status " + xhr.status + "), retry #" + beeWeather._retryCount + " in " + (delay/1000) + "s")
+                        retryTimer.interval = delay
+                        retryTimer.start()
+                    } else {
+                        console.log("[BeeWeather] Max retries reached, giving up until next 30min refresh")
+                    }
                 }
                 loading = false
             }
         }
         xhr.open("GET", url)
         xhr.send()
+    }
+
+    // Retry timer — started dynamically on error, stopped on success
+    Timer {
+        id: retryTimer
+        interval: 15000
+        repeat: false
+        onTriggered: updateWeather()
     }
 
     // Reload weather when language changes (to update conditions)
@@ -89,8 +110,15 @@ Item {
         }
     }
 
-    // Initialisation & Timer
-    Component.onCompleted: updateWeather()
+    // Initialisation — delay first fetch by 3s to let network settle
+    Component.onCompleted: startupTimer.start()
+
+    Timer {
+        id: startupTimer
+        interval: 3000
+        repeat: false
+        onTriggered: updateWeather()
+    }
 
     MouseArea {
         anchors.fill: parent
@@ -115,7 +143,7 @@ Item {
 
         Text {
             text: beeWeather.icon
-            font.pixelSize: 18
+            font { pixelSize: 22; family: "Noto Color Emoji" }
             Layout.alignment: Qt.AlignVCenter
         }
 

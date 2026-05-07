@@ -17,7 +17,10 @@ Item {
     Connections {
         target: BeeBarState
         function onNotificationReceived(title, body, icon) {
-            notifyRoot.show(title, body, icon)
+            // 🐝 v0.8.21 — Detect reminder notifications and add snooze/dismiss
+            var isReminder = title.indexOf("Rappel") !== -1 || title.indexOf("rappel") !== -1
+            var type = isReminder ? "reminder" : "info"
+            notifyRoot.show(title, body, icon, type)
             BeeSound.playEvent("notify.info", {})
         }
     }
@@ -157,6 +160,73 @@ Item {
                 }
             }
 
+            // ─── Action buttons for reminder type ─────────
+            Row {
+                id: actionRow
+                visible: type === "reminder"
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 28
+                spacing: 6
+
+                // 🐝 Snooze button
+                Rectangle {
+                    width: 70; height: 22; radius: 4
+                    color: snoozeBtnHov.containsMouse
+                        ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "💤 Snooze"
+                        font.pixelSize: 9; color: BeeTheme.accent
+                    }
+                    MouseArea {
+                        id: snoozeBtnHov; anchors.fill: parent
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            // Find the BeeCalendar instance and trigger snooze
+                            if (typeof beeCalendar !== 'undefined' && beeCalendar.snoozeReminder) {
+                                beeCalendar.snoozeReminder(beeCalendar.snoozeDurationMin || 5)
+                            }
+                            notifyModel.remove(index)
+                        }
+                    }
+                }
+
+                // ✕ Dismiss button
+                Rectangle {
+                    width: 60; height: 22; radius: 4
+                    color: dismissBtnHov.containsMouse
+                        ? Qt.rgba(1.0, 0.3, 0.3, 0.2)
+                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+                    border.color: dismissBtnHov.containsMouse
+                        ? Qt.rgba(1.0, 0.3, 0.3, 0.4)
+                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "✕ Dismiss"
+                        font.pixelSize: 9
+                        color: dismissBtnHov.containsMouse ? "#ff5555" : BeeTheme.accent
+                    }
+                    MouseArea {
+                        id: dismissBtnHov; anchors.fill: parent
+                        hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (typeof beeCalendar !== 'undefined' && beeCalendar.dismissReminder) {
+                                beeCalendar.dismissReminder()
+                            }
+                            notifyModel.remove(index)
+                        }
+                    }
+                }
+            }
+
             // ─── Barre de durée (autodestruction) ───────────
             // ⚠️ On utilise un Item conteneur pour ne pas toucher aux bords du Rectangle parent
             Item {
@@ -176,7 +246,9 @@ Item {
                     color: BeeTheme.accent
 
                     PropertyAnimation on width {
-                        from: progressBar.parent.width; to: 0; duration: 6000
+                        from: progressBar.parent.width; to: 0
+                        // 🐝 v0.8.21 — Reminders stay longer (15s) vs info (6s)
+                        duration: type === "reminder" ? 15000 : 6000
                         onFinished: notifyModel.remove(index)
                     }
                 }

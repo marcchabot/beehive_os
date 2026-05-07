@@ -3,8 +3,8 @@ import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
 // BeeWallpaper.qml — Gestionnaire de fonds d'écran 🐝🖼️
-// v0.5 : Piloté par BeePalette Engine (BeeTheme.wallpaper)
-// Transition crossfade 1.5s — tracker booléen (robustesse)
+// v0.6 : Smooth crossfade 1.8s InOutSine + slight scale effect
+// Enhanced transition polish for BeeHive OS visual coherence
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -25,7 +25,8 @@ Item {
         fillMode: Image.PreserveAspectCrop
         cache: false                        // Évite l'accumulation en VRAM après transition
         opacity: 1.0
-        Behavior on opacity { NumberAnimation { duration: 1500; easing.type: Easing.InOutQuad } }
+        Behavior on opacity { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
+        Behavior on scale { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
     }
 
     // ─── Image de transition (crossfade) ─────────────────────
@@ -34,9 +35,11 @@ Item {
         anchors.fill: parent
         source: ""
         fillMode: Image.PreserveAspectCrop
-        cache: false                        // Évite l'accumulation en VRAM après transition
+        cache: false
         opacity: 0.0
-        Behavior on opacity { NumberAnimation { duration: 1500; easing.type: Easing.InOutQuad } }
+        scale: 1.02   // Slight zoom for entrance
+        Behavior on opacity { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
+        Behavior on scale { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
     }
 
     // ─── Timer de libération texture (2s après fin de crossfade) ─
@@ -66,20 +69,25 @@ Item {
         function onWallpaperChanged() { crossfadeTo(BeeTheme.wallpaper) }
     }
 
-    // ─── Crossfade robuste (tracker booléen) ──────────────────
-    // _usingImage1 indique laquelle est "dessus" indépendamment
-    // de l'opacité animée — fiable même en double-transition rapide.
+    // ─── Crossfade robuste avec léger zoom (polish visuel) ──────
+    // L'image sortante fait un léger zoom-out (1.0→1.02)
+    // L'image entrante fait un léger zoom-in (1.02→1.0)
+    // pour un effet plus cinématique que le simple fondu.
     function crossfadeTo(src) {
         freeTimer.stop()
         if (_usingImage1) {
             bgImage2.source  = src
             bgImage2.opacity = 1.0
+            bgImage2.scale   = 1.0
             bgImage1.opacity = 0.0
+            bgImage1.scale   = 1.02
             _usingImage1 = false
         } else {
             bgImage1.source  = src
             bgImage1.opacity = 1.0
+            bgImage1.scale   = 1.0
             bgImage2.opacity = 0.0
+            bgImage2.scale   = 1.02
             _usingImage1 = true
         }
         freeTimer.restart()

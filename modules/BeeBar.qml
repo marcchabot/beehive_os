@@ -8,7 +8,7 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeBar.qml — Bee-Hive OS Status Bar 🐝
-// v1.6.1 : Final anchor cleanup (Zero Warning Edition)
+// v1.7.0 : Contextual Bar — dynamic icons & labels per active app
 // ═══════════════════════════════════════════════════════════════
 
 Rectangle {
@@ -20,13 +20,32 @@ Rectangle {
     radius: 18
     anchors.horizontalCenter: parent.horizontalCenter
 
-    y: 12
-    opacity: 1.0
+    // ─── Stealth Mode v3 : Slide animation ────────────────
+    // When stealth is ON and barShown is false, slide the bar
+    // up above the screen edge. When visible, y = 1 (bar fits in 45px panel).
+    y: BeeBarState.barShown ? 1 : -50
+    opacity: BeeBarState.barShown ? 1.0 : 0.0
 
     Behavior on y       { NumberAnimation { duration: 400; easing.type: Easing.InOutCubic } }
-    Behavior on opacity { NumberAnimation { duration: 250 } }
+    Behavior on opacity { NumberAnimation { duration: 300 } }
 
-    Component.onCompleted: BeeBarState.barShown = true
+    // Removed: was breaking the barShown binding in BeeBarState.qml
+
+    // ─── Stealth Mode v3 : Whole-bar hover tracking ─────────
+    // When stealth is active, this MouseArea covers the ENTIRE bar
+    // and uses containsMouse (which respects child MouseAreas) to
+    // keep the bar visible as long as the mouse is anywhere inside it.
+    // The timer only triggers after the mouse truly leaves the bar.
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        z: -1  // Below all interactive elements
+        onContainsMouseChanged: {
+            if (BeeBarState.stealthEnabled) {
+                BeeBarState.barHovered = containsMouse
+            }
+        }
+    }
 
     function dispatchModuleAction(action) {
         if (!action || action === "none") return
@@ -106,13 +125,13 @@ Rectangle {
     // ─── Autostart Scripts ─────────────────────────────────
     property Process bootScanProc: Process {
         id: _bootScanProc
-        command: ["bash", "-c", "python3 /opt/maya/.openclaw/workspace/projects/beehive_os/scripts/update_icons.py"]
+        command: ["bash", "-c", "python3 /home/marc/beehive_os/scripts/update_icons.py"]
         running: false
         stdout: SplitParser { onRead: (line) => console.log("[BeeBar BootScan] " + line) }
         stderr: SplitParser { onRead: (line) => console.error("[BeeBar BootScan ERR] " + line) }
         onExited: {
             console.log("[BeeBar] Icon scan finished. Refreshing config...");
-            BeeConfig.reload(); // Force reload of user_config.json
+            BeeConfig.loadConfig(); // Force reload of user_config.json
         }
     }
 
@@ -174,7 +193,7 @@ Rectangle {
 
     property Process netProc: Process {
         id: _netProc
-        command: ["bash", "-c", "read t1 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); sleep 1; read t2 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); bps=$((t2-t1)); if [ $bps -lt 1024 ]; then echo \"${bps}B/s\"; elif [ $bps -lt 1048576 ]; then echo \"$((bps/1024))K/s\"; else echo \"$(awk \"BEGIN {printf \\\"%.1fM/s\\\", $bps/1048576}\")\"; fi"]
+        command: ["bash", "-c", "read t1 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); sleep 1; read t2 < <(awk '/eth0|wlan0|enp|wlp/{s+=$2+$10} END{print s}' /proc/net/dev); bps=$((t2-t1)); if [ $bps -lt 1024 ]; then echo \"${bps}B/s\"; elif [ $bps -lt 1048576 ]; then echo \"$((bps/1024))K/s\"; else awk \"BEGIN {printf \"%.1fM/s\", $bps/1048576}\"; fi"]
         running: true
         stdout: SplitParser {
             onRead: (line) => {
@@ -252,17 +271,33 @@ Rectangle {
     }
 
     // ─── Window Tracker (moved from BeeBarState singleton) ──────────
+    property string _pendingClass: ""
+    Timer {
+        id: _classDebounce
+        interval: 150  // 150ms debounce to let Hyprland stabilize
+        onTriggered: {
+            if (_pendingClass && BeeBarState.activeWindowClass !== _pendingClass) {
+                BeeBarState.activeWindowClass = _pendingClass
+                console.log("[BeeBar] Window class updated to:", _pendingClass)
+            }
+        }
+    }
     property Process windowTracker: Process {
         id: _windowTracker
-        command: ["python3", "/opt/maya/.openclaw/workspace/projects/beehive_os/scripts/get_active_window.py"]
+        command: ["python3", "/home/marc/beehive_os/scripts/get_active_window.py"]
         running: false  // <-- Démarré par le timer
         stdout: SplitParser {
             onRead: (line) => {
                 var newClass = line.trim();
-                if (BeeBarState.activeWindowClass !== newClass) {
-                    BeeBarState.activeWindowClass = newClass;
-                    console.log("[BeeBar] Window class updated to:", newClass);
+                // Filter out numeric/PID-like transient values during window transitions
+                if (newClass && /^\d+(\.\d+)?$/.test(newClass)) {
+                    _windowTracker.running = false
+                    _windowTrackerTimer.start()
+                    return
                 }
+                // Debounce: delay update to let Hyprland stabilize the class name
+                _pendingClass = newClass
+                _classDebounce.start()
                 // Arrêter le processus, timer le redémarrera
                 _windowTracker.running = false
                 _windowTrackerTimer.start()
@@ -305,9 +340,12 @@ Rectangle {
             RowLayout {
                 spacing: 10
                 
+                // ─── Contextual App Detection ───────────────────────────
+                property string activeClass: (BeeBarState.activeWindowClass || "").toLowerCase()
+
                 // Dynamic icon loader - handles both emojis and image paths
                 property string currentIcon: {
-                    var activeClass = (BeeBarState.activeWindowClass || "").toLowerCase();
+                    var cls = activeClass;
                     var icons = BeeConfig.window_icons || {};
                     
                     // Create a case-insensitive map for lookup
@@ -316,14 +354,14 @@ Rectangle {
                         caseInsensitiveIcons[key.toLowerCase()] = icons[key];
                     }
 
-                    // 1. If no window is focused or it's explicitly 'unknown', use the bee
-                    if (!activeClass || activeClass === "unknown") return "🐝";
+                    // 1. If no window is focused, it's unknown, or it's an error state, use the bee
+                    if (!cls || cls === "unknown" || cls === "none" || cls.startsWith("error:")) return "🐝";
                     
                     // 2. Get the icon for the current class, or the default icon
-                    var icon = caseInsensitiveIcons[activeClass] || caseInsensitiveIcons["default"];
+                    var icon = caseInsensitiveIcons[cls] || caseInsensitiveIcons["default"];
                     
-                    // 3. If the result is empty or whitespace, use the bee
-                    if (!icon || (typeof icon === 'string' && icon.trim() === "")) return "🐝";
+                    // 3. If the result is empty, whitespace, or error-like, use the bee
+                    if (!icon || (typeof icon === 'string' && (icon.trim() === "" || icon.startsWith("error:")))) return "🐝";
                     
                     return icon;
                 }
@@ -350,13 +388,38 @@ Rectangle {
                     font.pixelSize: 18
                 }
                 Text {
-                    text: BeeBarState.focusActive ? (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS' : (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
+                    // ─── Contextual Bar Label ───────────────────────────
+                    // Shows active app name when contextual_bar is enabled,
+                    // otherwise shows FOCUS or BEE-HIVE label
+                    text: {
+                        if (BeeBarState.focusActive)
+                            return (BeeConfig.tr.common && BeeConfig.tr.common.focus_label) || 'FOCUS'
+                        if (BeeConfig.contextualBar && parent.activeClass !== "unknown" && parent.activeClass !== "" && parent.activeClass !== "none") {
+                            // Map common window classes to friendly names
+                            var nameMap = ({
+                                "firefox": "Firefox", "zen-browser": "Zen", "zen": "Zen",
+                                "kitty": "Kitty", "alacritty": "Alacritty", "foot": "Foot",
+                                "discord": "Discord", "spotify": "Spotify",
+                                "steam": "Steam", "heroic": "Heroic", "lutris": "Lutris",
+                                "code": "VS Code", "zeditor": "Zed", "neovim": "Neovim",
+                                "dolphin": "Dolphin", "thunar": "Thunar",
+                                "obs": "OBS", "gimp": "GIMP",
+                                "pavucontrol": "Pavucontrol", "btop": "Btop",
+                                "enpass": "Enpass", "meld": "Meld",
+                                "thunderbird": "Thunderbird", "helium": "Helium"
+                            })
+                            var cls = parent.activeClass.toLowerCase()
+                            return nameMap[cls] || parent.activeClass.charAt(0).toUpperCase() + parent.activeClass.slice(1)
+                        }
+                        return (BeeConfig.tr.common && BeeConfig.tr.common.beehive_label) || 'BEE-HIVE'
+                    }
                     font { bold: true; pixelSize: 13; letterSpacing: 2 }
                     color: BeeBarState.focusActive ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7) : BeeTheme.accent
                 }
                 
                 MouseArea {
-                    anchors.fill: parent
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.toggleDash()
@@ -401,8 +464,9 @@ Rectangle {
 
         // ─── DROITE ───
         RowLayout {
-            spacing: 24
+            spacing: 16
             Layout.alignment: Qt.AlignVCenter
+            Layout.maximumWidth: beeBar.width - 40
 
             // Ressources Interactives
             Item {
@@ -415,6 +479,7 @@ Rectangle {
                     spacing: 24
                     anchors.fill: parent
                     
+                    // ─── CPU ────────────────────────────
                     RowLayout {
                         visible: BeeConfig.showCpu; spacing: 6
                         Rectangle {
@@ -426,9 +491,15 @@ Rectangle {
                             }
                         }
                         Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_cpu) || 'CPU'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
-                        Text { text: beeBar.cpuUsage; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
+                        Text {
+                            text: beeBar.cpuUsage; color: BeeTheme.accent
+                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            Layout.minimumWidth: 32; Layout.preferredWidth: 32
+                            horizontalAlignment: Text.AlignRight
+                        }
                     }
 
+                    // ─── RAM ────────────────────────────
                     RowLayout {
                         visible: BeeConfig.showRam; spacing: 6
                         Rectangle {
@@ -440,13 +511,24 @@ Rectangle {
                             }
                         }
                         Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_ram) || 'RAM'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
-                        Text { text: beeBar.ramUsed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
+                        Text {
+                            text: beeBar.ramUsed; color: BeeTheme.accent
+                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            Layout.minimumWidth: 38; Layout.preferredWidth: 38
+                            horizontalAlignment: Text.AlignRight
+                        }
                     }
 
+                    // ─── NET ────────────────────────────
                     RowLayout {
                         visible: BeeConfig.showNet; spacing: 6
                         Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_net) || 'NET'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
-                        Text { text: beeBar.netSpeed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
+                        Text {
+                            text: beeBar.netSpeed; color: BeeTheme.accent
+                            font { pixelSize: 12; bold: true; family: "monospace" }
+                            Layout.minimumWidth: 52; Layout.preferredWidth: 52
+                            horizontalAlignment: Text.AlignRight
+                        }
                     }
                 }
 
@@ -459,7 +541,7 @@ Rectangle {
                 }
             }
 
-            // DISK
+            // ─── DISK ────────────────────────────
             RowLayout {
                 visible: BeeConfig.showDisk; spacing: 6
                 Rectangle {
@@ -471,10 +553,15 @@ Rectangle {
                     }
                 }
                 Text { text: (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_disk) || 'DISK'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
-                Text { text: beeBar.diskUsed; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
+                Text {
+                    text: beeBar.diskUsed; color: BeeTheme.accent
+                    font { pixelSize: 12; bold: true; family: "monospace" }
+                    Layout.minimumWidth: 38; Layout.preferredWidth: 38
+                    horizontalAlignment: Text.AlignRight
+                }
             }
 
-            // BATTERY
+            // ─── BATTERY ────────────────────────────
             RowLayout {
                 visible: BeeConfig.showBattery; spacing: 6
                 Rectangle {
@@ -486,7 +573,12 @@ Rectangle {
                     }
                 }
                 Text { text: beeBar.batteryStatus === "Charging" ? '⚡' : (BeeConfig.tr.bar && BeeConfig.tr.bar.tooltip_battery) || 'BAT'; color: BeeTheme.textSecondary; font { pixelSize: 10; bold: true } }
-                Text { text: beeBar.batteryPercent + "%"; color: BeeTheme.accent; font { pixelSize: 12; bold: true; family: "monospace" } }
+                Text {
+                    text: beeBar.batteryPercent + "%"; color: BeeTheme.accent
+                    font { pixelSize: 12; bold: true; family: "monospace" }
+                    Layout.minimumWidth: 32; Layout.preferredWidth: 32
+                    horizontalAlignment: Text.AlignRight
+                }
             }
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
@@ -495,9 +587,10 @@ Rectangle {
                 city: BeeConfig.weatherCity
                 lat: BeeConfig.weatherLat
                 lon: BeeConfig.weatherLon
-                conditionMaxWidth: 110
+                conditionMaxWidth: 70
                 Layout.alignment: Qt.AlignVCenter
-                Layout.maximumWidth: 180
+                Layout.maximumWidth: 140
+                Layout.minimumWidth: 60
             }
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
@@ -517,14 +610,24 @@ Rectangle {
                         required property bool enabled
 
                         visible: enabled
+                        opacity: enabled ? 1.0 : 0.0
                         radius: 6
                         color: moduleHover.containsMouse
                             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
                             : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.04)
-                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.18)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, moduleHover.containsMouse ? 0.5 : 0.18)
                         border.width: 1
                         implicitWidth: moduleLabel.implicitWidth + 12
                         implicitHeight: 22
+
+                        // ─── Slide/fade entrance animation ────
+                        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
+
+                        // Scale animation on hover
+                        scale: moduleHover.containsMouse ? 1.05 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack; easing.overshoot: 0.3 } }
 
                         Text {
                             id: moduleLabel
@@ -572,6 +675,8 @@ Rectangle {
 
             Rectangle {
                 width: 28; height: 28; radius: 7; Layout.alignment: Qt.AlignVCenter
+                Layout.minimumWidth: 28
+                Layout.minimumHeight: 28
                 color: powerBtnHover.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.22) : "transparent"
                 border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.20); border.width: 1
                 Text { anchors.centerIn: parent; text: "⏻"; font.pixelSize: 16; color: BeeTheme.accent }

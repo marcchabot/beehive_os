@@ -5,23 +5,90 @@ import Quickshell
 import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════
-// BeeBarState.qml — Shared Stealth Mode state (MINIMAL TEST)
-// v2.1 : Minimal version to test Process API
+// BeeBarState.qml — Shared State & Stealth Mode Engine 🐝
+// v3.0 : Stealth Mode v2 — sentinel zone + smooth auto-hide
+//        When stealthMode is ON, the BeeBar slides out of view
+//        after a grace period. A thin sentinel strip at the top
+//        edge detects mouse hover and slides the bar back in.
 // ═══════════════════════════════════════════════════════════
 QtObject {
     id: root
 
-    // true  = sentinel detected mouse → force display
-    // false = normal state (handled by BeeBar)
+    // ─── Stealth Mode v2 ───────────────────────────────────
+    // stealthEnabled: bound from BeeConfig.stealthMode
+    property bool stealthEnabled: false
+
+    // sentinelHovered: true when mouse is in the top sentinel strip
+    property bool sentinelHovered: false
+
+    // barHovered: true when mouse is anywhere inside the BeeBar area
+    property bool barHovered: false
+
+    // forceVisible: true when mouse is in sentinel/bar or any panel is open
     property bool forceVisible: false
-    // Mirrors the current visual state of BeeBar to drive reserved top space.
-    property bool barShown: true
+
+    // barShown: the effective visibility of the BeeBar
+    //   - stealth OFF → always true
+    //   - stealth ON  → forceVisible (sentinel, bar hover, or panel open)
+    property bool barShown: !stealthEnabled || forceVisible
+
+    // ─── Stealth auto-hide timer ──────────────────────────
+    // After the mouse leaves BOTH the sentinel and the bar, wait
+    // 800ms before hiding. The timer is cancelled if the mouse
+    // re-enters either zone during the countdown.
+    property Timer _stealthHideTimer: Timer {
+        interval: 800
+        repeat: false
+        onTriggered: {
+            if (root.stealthEnabled && !root.sentinelHovered && !root.barHovered) {
+                root.forceVisible = false
+            }
+        }
+    }
+
+    // When sentinelHovered changes, update forceVisible and timer
+    onSentinelHoveredChanged: {
+        if (stealthEnabled) {
+            _stealthHideTimer.stop()
+            if (sentinelHovered) {
+                forceVisible = true
+            } else if (!barHovered) {
+                // Mouse left sentinel AND is not in the bar → start hide timer
+                _stealthHideTimer.start()
+            }
+        }
+    }
+
+    // When barHovered changes, update forceVisible and timer
+    onBarHoveredChanged: {
+        if (stealthEnabled) {
+            _stealthHideTimer.stop()
+            if (barHovered) {
+                forceVisible = true
+            } else if (!sentinelHovered) {
+                // Mouse left the bar AND is not in sentinel → start hide timer
+                _stealthHideTimer.start()
+            }
+        }
+    }
+
+    // When stealth is toggled OFF, ensure bar is shown
+    onStealthEnabledChanged: {
+        if (!stealthEnabled) {
+            forceVisible = false
+            _stealthHideTimer.stop()
+        } else {
+            // Stealth just enabled — show bar briefly, then auto-hide
+            forceVisible = true
+            _stealthHideTimer.start()
+        }
+    }
 
     // Inter-window signals to open Settings/Studio from BeeSearch
     property bool openSettingsRequested: false
     property bool openStudioRequested:   false
 
-    // Synchronized states between BeeSettings (Layer Top) and widgets (Background)
+    // Synchronized states between The Hive (Control Panel) and widgets (Background)
     property bool cornersActive: true
     property bool motionActive:  true
     property bool vibeActive:    false

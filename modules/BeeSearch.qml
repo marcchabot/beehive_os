@@ -148,7 +148,8 @@ Item {
                 appName:   e.app.name,
                 appCat:    e.app.cat,
                 appCmd:    e.app.cmd,
-                appPinned: isPinned(e.app.cmd)
+                appPinned: isPinned(e.app.cmd),
+                appIconPath: e.app.iconPath || ""
             })
         }
         selectedIndex = resultsModel.count > 0 ? 0 : -1
@@ -392,32 +393,38 @@ Item {
                         onClicked: beeSearch.launchApp(appCmd)
                     }
 
-                    // Icône (Image si chemin, Text si emoji)
+                    // Icône application (.desktop icon ou emoji fallback)
                     Item {
-                        id: _iconContainer
+                        id: _appIconBox
                         anchors { left: parent.left; leftMargin: 14; verticalCenter: parent.verticalCenter }
-                        width: 22; height: 22
+                        width: 28; height: 28
 
+                        // Vraie icône depuis .desktop
                         Image {
+                            id: _appRealIcon
                             anchors.fill: parent
-                            source: appIcon.startsWith('/') ? appIcon : ""
-                            visible: source !== ""
+                            source: appIconPath ? ("file://" + appIconPath) : ""
                             fillMode: Image.PreserveAspectFit
+                            smooth: true
+                            visible: appIconPath !== "" && status === Image.Ready
+                            cache: true
                         }
 
+                        // Emoji fallback (catégorie)
                         Text {
+                            id: _appEmojiIcon
                             anchors.fill: parent
+                            text: appIcon
+                            font.pixelSize: 22
+                            visible: !_appRealIcon.visible
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
-                            text: appIcon.startsWith('/') ? "" : appIcon
-                            font.pixelSize: 22
-                            visible: !appIcon.startsWith('/')
                         }
                     }
 
                     // Nom + catégorie
                     Column {
-                        anchors { left: _appIcon.right; leftMargin: 12; verticalCenter: parent.verticalCenter }
+                        anchors { left: _appIconBox.right; leftMargin: 12; verticalCenter: parent.verticalCenter }
                         spacing: 2
                         Text {
                             text: appName
