@@ -116,11 +116,19 @@ Rectangle {
                             color: BeeTheme.textPrimary; font.pixelSize: 11
                             verticalAlignment: Text.AlignVCenter
                             selectByMouse: true
-                            placeholderText: controlRoot._s.searchPlaceholder || "Search..."
-                            // placeholderTextColor not available in Qt6 TextField — using Text overlay
                             onTextChanged: controlRoot.filterTabs(text)
                             onAccepted: controlRoot.jumpToFirstMatch()
                             Keys.onEscapePressed: { text = ""; controlRoot.filterTabs("") }
+
+                            // Placeholder overlay (placeholderText not available on TextInput)
+                            Text {
+                                anchors.fill: parent
+                                text: controlRoot._s.searchPlaceholder || "Search..."
+                                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                font.pixelSize: 11
+                                verticalAlignment: Text.AlignVCenter
+                                visible: !searchInput.text && !searchInput.activeFocus
+                            }
                         }
                     }
                 }
