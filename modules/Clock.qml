@@ -195,9 +195,9 @@ Item {
             text: Qt.formatDateTime(clockWidget.now, "hh:mm")
             color: BeeTheme.textPrimary
             font.pixelSize: 36
-                weight: Font.Light
-                family: "monospace"
-                letterSpacing: 4
+                font.weight: Font.Light
+                font.family: "monospace"
+                font.letterSpacing: 4
             anchors.horizontalCenter: parent.horizontalCenter
             Behavior on color { ColorAnimation { duration: 600 } }
 
@@ -207,8 +207,8 @@ Item {
                 color: BeeTheme.accent
                 Behavior on color { ColorAnimation { duration: 600 } }
                 font.pixelSize: 18
-                    weight: Font.Light
-                    family: "monospace"
+                    font.weight: Font.Light
+                    font.family: "monospace"
                 anchors.left: parent.right
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 4
