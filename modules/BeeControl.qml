@@ -163,10 +163,9 @@ Rectangle {
                     case 2: return "WallpaperTab.qml"
                     case 3: return "BarWidgetsTab.qml"
                     case 4: return "ProductivityTab.qml"
-                    case 5: return "ShortcutsTab.qml"
-                    case 6: return "ExtensionsTab.qml"
-                    case 7: return "AccessibilityTab.qml"
-                    case 8: return "HistoryTab.qml"
+                    case 5: return "ExtensionsTab.qml"
+                    case 6: return "AccessibilityTab.qml"
+                    case 7: return "HistoryTab.qml"
                     default: return "GeneralTab.qml"
                 }
             }
@@ -180,10 +179,9 @@ Rectangle {
         { icon: "🖼️", label: qsTr("Wallpaper"),     idx: 2 },
         { icon: "📊", label: qsTr("Bar & Widgets"),  idx: 3 },
         { icon: "📅", label: qsTr("Productivity"),   idx: 4 },
-        { icon: "⌨️", label: qsTr("Shortcuts"),     idx: 5 },
-        { icon: "🧩", label: qsTr("Extensions"),    idx: 6 },
-        { icon: "♿", label: qsTr("Accessibility"),  idx: 7 },
-        { icon: "📜", label: qsTr("Journal"),       idx: 8 }
+        { icon: "🧩", label: qsTr("Extensions"),    idx: 5 },
+        { icon: "♿", label: qsTr("Accessibility"),  idx: 6 },
+        { icon: "📜", label: qsTr("Journal"),       idx: 7 }
     ]
 
     Component.onCompleted: rebuildNav()
