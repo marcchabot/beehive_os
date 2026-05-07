@@ -1864,7 +1864,7 @@ Rectangle {
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {
@@ -1896,7 +1896,7 @@ Rectangle {
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {
@@ -1922,7 +1922,7 @@ Rectangle {
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {

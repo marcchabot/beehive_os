@@ -729,7 +729,7 @@ Item {
                                                     enabled: beeStudio.editCustomizable
                                                     leftPadding: 10; rightPadding: 10
                                                     color: BeeTheme.textPrimary
-                                                    placeholderTextColor: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                                    // placeholderTextColor: removed (not available in Qt6 TextField)
                                                     font.pixelSize: 12
                                                     background: Rectangle {
                                                         radius: 7

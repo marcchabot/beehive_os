@@ -117,7 +117,7 @@ Rectangle {
                             verticalAlignment: Text.AlignVCenter
                             selectByMouse: true
                             placeholderText: controlRoot._s.searchPlaceholder || "Search..."
-                            placeholderTextColor: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                            // placeholderTextColor not available in Qt6 TextField — using Text overlay
                             onTextChanged: controlRoot.filterTabs(text)
                             onAccepted: controlRoot.jumpToFirstMatch()
                             Keys.onEscapePressed: { text = ""; controlRoot.filterTabs("") }
