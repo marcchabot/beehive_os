@@ -153,28 +153,28 @@ Rectangle {
             // GeneralTab {}  // removed for testing
 
             // Tab 1 : Appearance
-            AppearanceTab {}
+            // AppearanceTab {}
 
             // Tab 2 : Wallpaper
-            WallpaperTab {}
+            // WallpaperTab {}
 
             // Tab 3 : Bar & Widgets
-            BarWidgetsTab {}
+            // BarWidgetsTab {}
 
             // Tab 4 : Productivity
-            ProductivityTab {}
+            // ProductivityTab {}
 
             // Tab 5 : Shortcuts
-            ShortcutsTab {}
+            // ShortcutsTab {}
 
             // Tab 6 : Extensions
-            ExtensionsTab {}
+            // ExtensionsTab {}
 
             // Tab 7 : Accessibility
-            AccessibilityTab {}
+            // AccessibilityTab {}
 
             // Tab 8 : Journal
-            HistoryTab {}
+            // HistoryTab {}
         }
     }
 
