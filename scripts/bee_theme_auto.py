@@ -406,6 +406,11 @@ def main() -> int:
         default="auto",
         help="Theme mode strategy: auto-detect or force HoneyDark/HoneyLight",
     )
+    # 🐝 v0.8.21 — Nectar Sync 2.0 flags (passed by BeeConfig.qml)
+    parser.add_argument("--time-aware", action="store_true", help="Enable time-of-day awareness")
+    parser.add_argument("--timezone", type=str, default="America/Toronto", help="Timezone for time-aware mode")
+    parser.add_argument("--weather-aware", action="store_true", help="Enable weather-based awareness")
+    parser.add_argument("--weather-city", type=str, default="Blainville", help="City for weather-aware mode")
     args = parser.parse_args()
 
     wallpaper = args.wallpaper.resolve() if args.wallpaper else resolve_default_wallpaper().resolve()
@@ -426,8 +431,36 @@ def main() -> int:
         signature_mode = sig_map.get(wallpaper.name)
     
     forced_mode = None if args.mode == "auto" else args.mode
+
+    # 🐝 v0.8.21 — Time-aware mode override
+    if args.time_aware and not forced_mode:
+        import datetime as _dt
+        try:
+            import pytz
+            tz = pytz.timezone(args.timezone)
+        except Exception:
+            import zoneinfo
+            tz = zoneinfo.ZoneInfo(args.timezone)
+        hour = _dt.datetime.now(tz).hour
+        # Morning (6-18) = Light, Evening (18-6) = Dark
+        if 6 <= hour < 18:
+            forced_mode = "HoneyLight"
+        else:
+            forced_mode = "HoneyDark"
+        print(f"Time-aware: hour={hour} in {args.timezone} → mode={forced_mode}")
+
     palette = build_palette(colors, forced_mode=forced_mode, signature_mode=signature_mode)
-    overlay = build_overlay(wallpaper, palette, args.mode)
+    effective_mode = forced_mode or args.mode
+    overlay = build_overlay(wallpaper, palette, effective_mode)
+
+    # 🐝 v0.8.21 — Inject Nectar Sync flags into overlay metadata
+    if "auto_theme" not in overlay:
+        overlay["auto_theme"] = {}
+    nectar_meta = overlay["auto_theme"]
+    nectar_meta["time_aware"] = args.time_aware
+    nectar_meta["timezone"] = args.timezone if args.time_aware else None
+    nectar_meta["weather_aware"] = args.weather_aware
+    nectar_meta["weather_city"] = args.weather_city if args.weather_aware else None
 
     output = args.output.resolve() if not args.output.is_absolute() else args.output
     output.parent.mkdir(parents=True, exist_ok=True)

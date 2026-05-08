@@ -128,19 +128,23 @@ QtObject {
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
     // Test: Comment out saveProc too
-    /*
     Process {
         id: _saveProc
         running: false
         stdout: SplitParser {
             onRead: (line) => {
                 // Ignore output, just process completion
-                console.log("[BeeBarState] History saved")
             }
         }
         stderr: SplitParser {}
+        onExited: (code, status) => {
+            if (code === 0) {
+                console.log("[BeeBarState] History saved")
+            } else {
+                console.warn("[BeeBarState] History save failed, code", code)
+            }
+        }
     }
-    */
 
     function loadHistory() {
         var xhr = new XMLHttpRequest()
@@ -162,24 +166,12 @@ QtObject {
 
     function saveHistory() {
         var jsonStr = JSON.stringify(historyModel, null, 2)
-        
-        // Créer le dossier parent d'abord (via signal à BeeBar)
-        var dir = historyPath.substring(0, historyPath.lastIndexOf("/"))
-        historySaveNeeded(dir)
-        
-        // Sauvegarder le fichier avec XMLHttpRequest
-        var xhr = new XMLHttpRequest()
-        xhr.open("PUT", "file://" + historyPath)
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 0 || xhr.status === 200) {
-                    console.log("[BeeBarState] History saved to", historyPath)
-                } else {
-                    console.warn("[BeeBarState] Failed to save history:", xhr.status)
-                }
-            }
-        }
-        xhr.send(jsonStr)
+
+        // Use Process like BeeConfig does (avoids QML_XHR_ALLOW_FILE_WRITE warning)
+        var filepath = historyPath
+        _saveProc.running = false
+        _saveProc.command = ["bash", "-c", "mkdir -p " + filepath.substring(0, filepath.lastIndexOf("/")) + " && cat << 'BEEEOF' > " + filepath + "\n" + jsonStr + "\nBEEEOF"]
+        _saveProc.running = true
     }
 
     Component.onCompleted: loadHistory()

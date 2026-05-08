@@ -154,12 +154,8 @@ Item {
                 Layout.fillWidth: true; spacing: 10
                 WallCard { src: "../assets/wallpaper.png";               label: qsTr("Mysterious");      mode: "HoneyDark" }
                 WallCard { src: "../assets/wallpaper_dark_bee.png";      label: qsTr("Dark Bee");        mode: "HoneyDark" }
-                WallCard { src: "../assets/wallpaper_dark_minimal.png";   label: qsTr("Dark Minimal");    mode: "HoneyDark" }
-                WallCard { src: "../assets/wallpaper_dark_cyber.png";     label: qsTr("Dark Cyber");      mode: "HoneyDark" }
                 WallCard { src: "../assets/wallpaper_light_bee.png";     label: qsTr("Light Bee");       mode: "HoneyLight" }
                 WallCard { src: "../assets/wallpaper_light.png";          label: qsTr("Soft Light");      mode: "HoneyLight" }
-                WallCard { src: "../assets/wallpaper_light_minimal.png";  label: qsTr("Light Minimal");   mode: "HoneyLight" }
-                WallCard { src: "../assets/wallpaper_light_serene.png";  label: qsTr("Light Serene");    mode: "HoneyLight" }
             }
 
             Rectangle { height: 1; Layout.fillWidth: true; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08) }
