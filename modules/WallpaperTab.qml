@@ -97,29 +97,6 @@ Item {
             width: wallpaperTab.width - 32
             spacing: 16
 
-            // ─── Nectar Sync Toggle ───
-            Text {
-                text: "🍯 " + (BeeConfig.uiLang === "fr" ? "Synchronisation Nectar" : "Nectar Sync")
-                color: BeeTheme.accent
-                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
-            }
-            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
-
-            RowLayout {
-                Layout.fillWidth: true; spacing: 12
-                Text {
-                    text: (BeeConfig.uiLang === "fr" ? "Ajuster le thème automatiquement selon le fond d'écran" : "Auto-adjust theme based on wallpaper")
-                    color: BeeTheme.textPrimary; font.pixelSize: 13
-                    Layout.fillWidth: true; wrapMode: Text.WordWrap
-                }
-                Switch {
-                    checked: BeeTheme.nectarSync
-                    onToggled: { BeeTheme.nectarSync = checked; BeeConfig.saveConfig() }
-                }
-            }
-
-            Item { height: 4 }
-
             // ─── Folder Path ───
             Text {
                 text: "📁 " + (BeeConfig.uiLang === "fr" ? "Dossier personnel" : "Personal folder")
