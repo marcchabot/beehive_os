@@ -4,7 +4,7 @@ import QtQuick.Controls
 import "."
 
 // ═══════════════════════════════════════════════════════════════
-// AppearanceTab.qml — 🎨 Appearance Settings
+// AppearanceTab.qml — 🎨 Appearance & Theme Settings
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -20,7 +20,7 @@ Item {
             width: appearanceTab.width - 32
             spacing: 16
 
-            // Section: Theme
+            // ─── Theme Mode ───
             Text {
                 text: "🎨 " + (BeeConfig.uiLang === "fr" ? "Thème" : "Theme")
                 color: BeeTheme.accent
@@ -32,33 +32,43 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 Repeater {
                     model: [
-                        { key: "HoneyDark", label: "🌙 Dark", labelFr: "🌙 Sombre" },
-                        { key: "HoneyLight", label: "☀️ Light", labelFr: "☀️ Clair" }
+                        { key: "HoneyDark", icon: "🌙", label: "Dark", labelFr: "Sombre" },
+                        { key: "HoneyLight", icon: "☀️", label: "Light", labelFr: "Clair" }
                     ]
                     delegate: Rectangle {
-                        width: 110; height: 36; radius: 8
+                        width: 130; height: 70; radius: 12
                         color: BeeConfig.mode === modelData.key
                             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
-                            : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.1)
-                        border.color: BeeConfig.mode === modelData.key ? BeeTheme.accent : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.2)
-                        border.width: BeeConfig.mode === modelData.key ? 1.5 : 1
-                        Text {
-                            anchors.centerIn: parent
-                            text: BeeConfig.uiLang === "fr" ? modelData.labelFr : modelData.label
-                            color: BeeConfig.mode === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
-                            font.pixelSize: 13; font.bold: BeeConfig.mode === modelData.key
+                            : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.08)
+                        border.color: BeeConfig.mode === modelData.key ? BeeTheme.accent : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.15)
+                        border.width: BeeConfig.mode === modelData.key ? 2 : 1
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                        Behavior on border.width { NumberAnimation { duration: 200 } }
+
+                        ColumnLayout {
+                            anchors.centerIn: parent; spacing: 4
+                            Text {
+                                text: modelData.icon; font.pixelSize: 24
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+                            Text {
+                                text: BeeConfig.uiLang === "fr" ? modelData.labelFr : modelData.label
+                                color: BeeConfig.mode === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 12; font.bold: BeeConfig.mode === modelData.key
+                                Layout.alignment: Qt.AlignHCenter
+                            }
                         }
                         MouseArea {
-                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                            onClicked: { BeeConfig.mode = modelData.key; BeeConfig.saveConfig() }
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                            onClicked: { BeeTheme.setMode(modelData.key); BeeConfig.mode = modelData.key; BeeConfig.saveConfig() }
                         }
                     }
                 }
             }
 
-            Item { height: 8 }
+            Item { height: 4 }
 
-            // Section: Adaptive
+            // ─── Adaptive Mode (Nectar Sync) ───
             Text {
                 text: "🌅 " + (BeeConfig.uiLang === "fr" ? "Mode adaptatif" : "Adaptive mode")
                 color: BeeTheme.accent
@@ -68,16 +78,87 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text {
-                    text: (BeeConfig.uiLang === "fr" ? "Ajuster le thème selon l'heure" : "Adjust theme based on time of day")
-                    color: BeeTheme.textPrimary; font.pixelSize: 13
-                    Layout.fillWidth: true
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "Ajuster automatiquement le thème selon l'heure" : "Auto-adjust theme based on time of day")
+                        color: BeeTheme.textPrimary; font.pixelSize: 13
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "🌙 Sombre le soir → ☀️ Clair le matin" : "🌙 Dark at night → ☀️ Light in the morning")
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
+                        font.pixelSize: 10; font.italic: true
+                    }
                 }
                 Switch {
-                    checked: BeeConfig.adaptiveEnabled
-                    onToggled: { BeeConfig.adaptiveEnabled = checked; BeeConfig.saveConfig() }
+                    checked: BeeConfig.nectarAutoSchedule
+                    onToggled: { BeeConfig.nectarAutoSchedule = checked; BeeConfig.saveConfig() }
                 }
             }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "Synchroniser les couleurs avec le fond d'écran" : "Sync colors with wallpaper")
+                        color: BeeTheme.textPrimary; font.pixelSize: 13
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "Extrait les couleurs dominantes du wallpaper" : "Extract dominant colors from wallpaper")
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
+                        font.pixelSize: 10; font.italic: true
+                    }
+                }
+                Switch {
+                    checked: BeeConfig.nectarSync
+                    onToggled: { BeeConfig.nectarSync = checked; BeeConfig.saveConfig() }
+                }
+            }
+
+            Item { height: 4 }
+
+            // ─── Bar Style ───
+            Text {
+                text: "📊 " + (BeeConfig.uiLang === "fr" ? "Style de la barre" : "Bar style")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text { text: (BeeConfig.uiLang === "fr" ? "Barre contextuelle" : "Contextual bar"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.contextualBar; onToggled: { BeeConfig.contextualBar = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text { text: (BeeConfig.uiLang === "fr" ? "Mode furtif (minimal)" : "Stealth mode (minimal)"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.stealthMode; onToggled: { BeeConfig.stealthMode = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text { text: (BeeConfig.uiLang === "fr" ? "Mode concentration" : "Focus mode"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.focusMode; onToggled: { BeeConfig.focusMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            Item { height: 4 }
+
+            // ─── Indicators ───
+            Text {
+                text: "📟 " + (BeeConfig.uiLang === "fr" ? "Indicateurs système" : "System indicators")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout { Layout.fillWidth: true; spacing: 12; Text { text: "CPU"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true } Switch { checked: BeeConfig.showCpu; onToggled: { BeeConfig.showCpu = checked; BeeConfig.saveConfig() } } }
+            RowLayout { Layout.fillWidth: true; spacing: 12; Text { text: "RAM"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true } Switch { checked: BeeConfig.showRam; onToggled: { BeeConfig.showRam = checked; BeeConfig.saveConfig() } } }
+            RowLayout { Layout.fillWidth: true; spacing: 12; Text { text: "DISK"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true } Switch { checked: BeeConfig.showDisk; onToggled: { BeeConfig.showDisk = checked; BeeConfig.saveConfig() } } }
+            RowLayout { Layout.fillWidth: true; spacing: 12; Text { text: "NET"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true } Switch { checked: BeeConfig.showNet; onToggled: { BeeConfig.showNet = checked; BeeConfig.saveConfig() } } }
+            RowLayout { Layout.fillWidth: true; spacing: 12; Text { text: "BAT"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true } Switch { checked: BeeConfig.showBattery; onToggled: { BeeConfig.showBattery = checked; BeeConfig.saveConfig() } } }
         }
     }
 }
