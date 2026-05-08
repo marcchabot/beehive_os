@@ -128,7 +128,7 @@ QtObject {
     readonly property string historyPath: StandardPaths.writableLocation(StandardPaths.CacheLocation) + "/beehive_os/history.json"
     
     // Test: Comment out saveProc too
-    Process {
+    property Process _saveProc: Process {
         id: _saveProc
         running: false
         stdout: SplitParser {
