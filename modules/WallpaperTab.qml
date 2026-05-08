@@ -113,8 +113,8 @@ Item {
                     Layout.fillWidth: true; wrapMode: Text.WordWrap
                 }
                 Switch {
-                    checked: BeeConfig.nectarAutoSchedule
-                    onToggled: { BeeConfig.nectarAutoSchedule = checked; BeeConfig.saveConfig() }
+                    checked: BeeTheme.nectarSync
+                    onToggled: { BeeTheme.nectarSync = checked; BeeConfig.saveConfig() }
                 }
             }
 
