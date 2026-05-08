@@ -128,7 +128,7 @@ Item {
 
     Process {
         id: saveProcess
-        onExited: function(code, status) {
+        onExited: (code, status) => {
             if (code === 0) {
                 console.log("BeeNotes: Saved " + notesModel.count + " notes successfully")
             } else {
@@ -343,7 +343,7 @@ Item {
                                 editing = false
                             }
                         }
-                        Keys.onReturnPressed: function(event) {
+                        Keys.onReturnPressed: (event) => {
                             if (event.modifiers & Qt.ShiftModifier) {
                                 // Shift+Enter: new line
                                 return

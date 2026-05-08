@@ -1860,11 +1860,9 @@ Rectangle {
                     TextField {
                         id: createTitle
                         width: parent.width
-                        placeholderText: t("title_placeholder", "Ex: Rendez-vous dentiste")
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {
@@ -1874,6 +1872,15 @@ Rectangle {
                             border.width: createTitle.activeFocus ? 1.5 : 1
                             Behavior on border.color { ColorAnimation { duration: 150 } }
                             Behavior on border.width { NumberAnimation { duration: 150 } }
+                        }
+                        Text {
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: t("title_placeholder", "Ex: Rendez-vous dentiste")
+                            font.pixelSize: 13
+                            color: BeeTheme.textSecondary
+                            visible: !createTitle.text && !createTitle.activeFocus
                         }
                     }
                 }
@@ -1892,11 +1899,9 @@ Rectangle {
                                 + String(d.getMonth()+1).padStart(2,'0') + "-"
                                 + String(d.getDate()).padStart(2,'0')
                         }
-                        placeholderText: "YYYY-MM-DD"
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {
@@ -1906,6 +1911,15 @@ Rectangle {
                             border.width: createDate.activeFocus ? 1.5 : 1
                             Behavior on border.color { ColorAnimation { duration: 150 } }
                             Behavior on border.width { NumberAnimation { duration: 150 } }
+                        }
+                        Text {
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "YYYY-MM-DD"
+                            font.pixelSize: 13
+                            color: BeeTheme.textSecondary
+                            visible: !createDate.text && !createDate.activeFocus
                         }
                     }
                 }
@@ -1918,11 +1932,9 @@ Rectangle {
                     TextField {
                         id: createTime
                         width: parent.width
-                        placeholderText: "14:00"
                         color: BeeTheme.textPrimary
                         font.pixelSize: 13
                         focus: beeCalendar.createVisible
-                        // placeholderTextColor: removed (not available in Qt6 TextField)
                         selectedTextColor: BeeTheme.textPrimary
                         selectionColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                         background: Rectangle {
@@ -1932,6 +1944,15 @@ Rectangle {
                             border.width: createTime.activeFocus ? 1.5 : 1
                             Behavior on border.color { ColorAnimation { duration: 150 } }
                             Behavior on border.width { NumberAnimation { duration: 150 } }
+                        }
+                        Text {
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "14:00"
+                            font.pixelSize: 13
+                            color: BeeTheme.textSecondary
+                            visible: !createTime.text && !createTime.activeFocus
                         }
                     }
                 }

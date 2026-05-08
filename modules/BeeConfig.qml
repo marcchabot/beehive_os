@@ -418,7 +418,9 @@ QtObject {
 
     // ─── UI language (i18n) ────────────────────────────────────
     property string uiLang: "fr"
+    property bool   launchAtStartup: false
     property var    tr:     ({})
+    onLaunchAtStartupChanged: { if (root._loaded) saveConfig() }
 
     function loadI18n(lang) {
         var xhr = new XMLHttpRequest()
@@ -1162,9 +1164,10 @@ QtObject {
         if (cfg.lang !== undefined && cfg.lang !== uiLang) {
             uiLang = cfg.lang
             loadI18n(uiLang)
-        } else if (cfg.lang === undefined) {
-            // Preserve current language when overlay doesn't specify it
-            // (prevents resetting to default on every therapy cycle)
+        }
+        if (cfg.launch_at_startup !== undefined) launchAtStartup = cfg.launch_at_startup === true
+        // Preserve current language when overlay doesn't specify it
+        // (prevents resetting to default on every therapy cycle)
         }
 
         if (cfg.weather) {
@@ -1381,6 +1384,7 @@ QtObject {
         
         // Update only dynamically managed fields
         cfg.lang         = uiLang
+        cfg.launch_at_startup = launchAtStartup
         cfg.stealth_mode = stealthMode
         cfg.vibe_mode    = vibeMode
         cfg.vibe_backend  = vibeBackend
