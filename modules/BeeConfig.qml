@@ -1166,9 +1166,6 @@ QtObject {
             loadI18n(uiLang)
         }
         if (cfg.launch_at_startup !== undefined) launchAtStartup = cfg.launch_at_startup === true
-        // Preserve current language when overlay doesn't specify it
-        // (prevents resetting to default on every therapy cycle)
-        }
 
         if (cfg.weather) {
             weatherCity = cfg.weather.city || weatherCity
