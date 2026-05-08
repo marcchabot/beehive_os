@@ -47,7 +47,7 @@ Item {
                         }
                         MouseArea {
                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                            onClicked: { BeeConfig.uiLang = modelData.key; BeeConfig.saveConfig() }
+                            onClicked: { BeeConfig.setLang(modelData.key); BeeConfig.saveConfig() }
                         }
                     }
                 }

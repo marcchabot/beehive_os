@@ -40,8 +40,10 @@ Item {
                         color: BeeConfig.mode === modelData.key
                             ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
                             : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.08)
-                        border.color: BeeConfig.mode === modelData.key ? BeeTheme.accent : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.15)
-                        border.width: BeeConfig.mode === modelData.key ? 2 : 1
+                        border.color: BeeConfig.mode === modelData.key
+                            ? BeeTheme.accent
+                            : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        border.width: BeeConfig.mode === modelData.key ? 2 : 1.5
                         Behavior on border.color { ColorAnimation { duration: 200 } }
                         Behavior on border.width { NumberAnimation { duration: 200 } }
 
@@ -66,29 +68,21 @@ Item {
                 }
             }
 
-            Item { height: 4 }
-
-            // ─── Adaptive Mode (Nectar Sync) ───
-            Text {
-                text: "🌅 " + (BeeConfig.uiLang === "fr" ? "Mode adaptatif" : "Adaptive mode")
-                color: BeeTheme.accent
-                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
-            }
-            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
-
+            // ─── Nectar Sync (Auto-adjust theme) ───
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Ajuster automatiquement le thème selon l'heure" : "Auto-adjust theme based on time of day")
-                        color: BeeTheme.textPrimary; font.pixelSize: 13
+                        text: (BeeConfig.uiLang === "fr" ? "Synchronisation Nectar" : "Nectar Sync")
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "🌙 Sombre le soir → ☀️ Clair le matin" : "🌙 Dark at night → ☀️ Light in the morning")
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
+                        text: (BeeConfig.uiLang === "fr" ? "Ajuster automatiquement le thème selon l'heure et le fond d'écran" : "Auto-adjust theme based on time of day and wallpaper")
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                 }
                 Switch {
@@ -102,14 +96,15 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Synchroniser les couleurs avec le fond d'écran" : "Sync colors with wallpaper")
-                        color: BeeTheme.textPrimary; font.pixelSize: 13
+                        text: (BeeConfig.uiLang === "fr" ? "Couleurs du fond d'écran" : "Wallpaper colors")
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Extrait les couleurs dominantes du wallpaper" : "Extract dominant colors from wallpaper")
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
+                        text: (BeeConfig.uiLang === "fr" ? "Extrait les couleurs dominantes du fond d'écran" : "Extract dominant colors from wallpaper")
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                 }
                 Switch {
