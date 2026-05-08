@@ -71,7 +71,8 @@ Item {
                         property bool isDefault: modelData.name === "Travail" || modelData.name === "Gaming" || modelData.name === "Weekend"
 
                         ColumnLayout {
-                            anchors { fill: parent; margins: 12; topMargin: 14 }; spacing: 4
+                            anchors { fill: parent; margins: 12; topMargin: 14 }
+                            spacing: 4
                             RowLayout {
                                 spacing: 6
                                 Text { text: modelData.icon || "🍯"; font.pixelSize: 20 }
@@ -91,7 +92,8 @@ Item {
                                 Layout.fillWidth: true; Layout.preferredHeight: 50; radius: 8
                                 color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.4)
                                 Grid {
-                                    anchors { fill: parent; margins: 4 }; columns: 4; spacing: 2
+                                    anchors { fill: parent; margins: 4 }
+                                    columns: 4; spacing: 2
                                     Repeater {
                                         model: modelData.cells ? modelData.cells.slice(0, 8) : []
                                         delegate: Rectangle {
