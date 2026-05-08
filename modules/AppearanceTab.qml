@@ -68,18 +68,41 @@ Item {
                 }
             }
 
-            // ─── Nectar Sync (Auto-adjust theme) ───
+            // ─── Nectar Sync (Wallpaper color adaptation) ───
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Synchronisation Nectar" : "Nectar Sync")
+                        text: (BeeConfig.uiLang === "fr" ? "Nectar Sync 🍯" : "Nectar Sync 🍯")
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Ajuster automatiquement le thème selon l'heure et le fond d'écran" : "Auto-adjust theme based on time of day and wallpaper")
+                        text: (BeeConfig.uiLang === "fr" ? "Adaptation automatique du thème au fond d'écran choisi" : "Automatic theme adaptation to the chosen wallpaper")
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch {
+                    checked: BeeTheme.nectarSync
+                    onToggled: { BeeTheme.nectarSync = checked; BeeConfig.saveConfig() }
+                }
+            }
+
+            // ─── Auto day/night schedule ───
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "Mode jour/nuit automatique" : "Auto day/night schedule")
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: (BeeConfig.uiLang === "fr" ? "🌙 Sombre le soir → ☀️ Clair le matin" : "🌙 Dark at night → ☀️ Light in the morning")
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -88,28 +111,6 @@ Item {
                 Switch {
                     checked: BeeConfig.nectarAutoSchedule
                     onToggled: { BeeConfig.nectarAutoSchedule = checked; BeeConfig.saveConfig() }
-                }
-            }
-
-            RowLayout {
-                Layout.fillWidth: true; spacing: 12
-                ColumnLayout {
-                    Layout.fillWidth: true; spacing: 2
-                    Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Couleurs du fond d'écran" : "Wallpaper colors")
-                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                    Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Extrait les couleurs dominantes du fond d'écran" : "Extract dominant colors from wallpaper")
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
-                        font.pixelSize: 10; font.italic: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                }
-                Switch {
-                    checked: BeeConfig.nectarSync
-                    onToggled: { BeeConfig.nectarSync = checked; BeeConfig.saveConfig() }
                 }
             }
 
