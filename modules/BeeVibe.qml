@@ -3,12 +3,14 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeVibe.qml — Moteur de visualisation audio 🐝🎵
-// v2.0 : cava-bg integration — Native Wayland audio visualizer
+// v2.1 : cava-bg integration — Native Wayland audio visualizer
+//   - Respects BeeConfig.vibeBackend choice ("auto" | "cava-bg" | "cava")
 //   - Detects and launches cava-bg as a Wayland overlay layer
 //   - Falls back to cava raw ASCII if cava-bg is unavailable
 //   - Simulation fallback if neither is available
 //   - Dynamic colors extracted from wallpaper via cava-bg config
 //   - Hyprland layerrule for proper overlay positioning
+//   - X-Ray hot-reload when settings change
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -70,22 +72,82 @@ Item {
     }
 
     // ─── Start appropriate backend ──────────────────────────────
+    // v2.1: Respects BeeConfig.vibeBackend ("auto" | "cava-bg" | "cava")
+    // "auto" = detect best available, "cava-bg" = force cava-bg, "cava" = force cava
     function _startBackend() {
         if (!active) {
             backend = "inactive"
             return
         }
-        if (_cavaBgAvailable) {
-            _startCavaBg()
-        } else if (_cavaAvailable) {
-            backend = "cava"
-            // cavaProc auto-starts via: running: beeVibe.active && beeVibe.backend === "cava"
-            console.log("[BeeVibe] Using cava (raw ASCII) backend")
+
+        var choice = BeeConfig.vibeBackend || "auto"
+        console.log("[BeeVibe] Backend choice: " + choice + " (cava-bg=" + _cavaBgAvailable + " cava=" + _cavaAvailable + ")")
+
+        if (choice === "cava-bg") {
+            // User explicitly wants cava-bg
+            if (_cavaBgAvailable) {
+                _startCavaBg()
+            } else {
+                console.warn("[BeeVibe] cava-bg requested but not found, trying detection anyway...")
+                // Try anyway — might be installed but not in sandbox PATH
+                _cavaBgAvailable = true  // Optimistic: let _startCavaBg try
+                _startCavaBg()
+            }
+        } else if (choice === "cava") {
+            // User explicitly wants cava
+            if (_cavaAvailable) {
+                backend = "cava"
+                console.log("[BeeVibe] Using cava (raw ASCII) backend (forced)")
+            } else {
+                console.warn("[BeeVibe] cava requested but not found, trying anyway...")
+                backend = "cava"
+            }
         } else {
-            // Fallback to simulation
-            backend = "simulation"
-            console.log("[BeeVibe] Neither cava-bg nor cava found, using simulation")
+            // "auto" — detect best available
+            if (_cavaBgAvailable) {
+                _startCavaBg()
+            } else if (_cavaAvailable) {
+                backend = "cava"
+                console.log("[BeeVibe] Using cava (raw ASCII) backend")
+            } else {
+                // Fallback to simulation
+                backend = "simulation"
+                console.log("[BeeVibe] Neither cava-bg nor cava found, using simulation")
+            }
         }
+    }
+
+    // ─── Backend change handler ─────────────────────────────────
+    // When user changes backend in settings, restart with new choice
+    Connections {
+        target: BeeConfig
+        function onVibeBackendChanged() {
+            if (beeVibe.active) {
+                console.log("[BeeVibe] Backend preference changed to: " + BeeConfig.vibeBackend + ", restarting...")
+                // Stop current backend
+                _stopAll()
+                // Restart with new choice
+                _startBackend()
+            }
+        }
+    }
+
+    function _stopAll() {
+        _cavaProc.running = false
+        _cavaBgLauncher.running = false
+        _daemonMonitor.running = false
+        _cavaReader.running = false
+        _monitorTimer.stop()
+        _restartTimer.stop()
+        _cavaReaderRestart.stop()
+        _cavaBgDaemonRunning = false
+
+        if (backend === "cava-bg") {
+            _stopCavaBg()
+        }
+
+        _cavaLive = false
+        barValues = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -175,7 +237,6 @@ Item {
 
     function _startCavaBg() {
         backend = "cava-bg"
-        _cavaBgAvailable = true
 
         // Write config and launch daemon
         _writeCavaBgConfig()
@@ -256,13 +317,14 @@ Item {
             + "[advanced]\n"
             + "verbose_logging = false\n"
 
-        console.log("[BeeVibe] cava-bg config: xray=" + enableXray + " blend=" + xrayBlend + " intensity=" + xrayIntensity)
+        console.log("[BeeVibe] Writing cava-bg config: xray=" + enableXray + " blend=" + xrayBlend + " intensity=" + xrayIntensity)
 
         // Write config file — cava-bg hot-reloads when it changes
         _writeConfigProc.command = ["bash", "-c",
             "mkdir -p ~/.config/cava-bg && cat > ~/.config/cava-bg/config.toml << 'BEEVIBE_EOF'\n"
             + configContent
             + "BEEVIBE_EOF\n"
+            + "echo 'CONFIG_WRITTEN'"
         ]
         _writeConfigProc.running = true
     }
@@ -281,7 +343,7 @@ Item {
         _hyprRuleRemoveProc.running = true
     }
 
-    Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => {} } stderr: SplitParser {} }
+    Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => { if (line.trim() === "CONFIG_WRITTEN") console.log("[BeeVibe] config.toml written ✓") } } stderr: SplitParser {} }
     Process { id: _hyprRuleProc; running: false; stdout: SplitParser { onRead: (line) => console.log("[BeeVibe] layerrule:", line) } stderr: SplitParser {} }
     Process { id: _stopCavaBgProc; running: false; stdout: SplitParser {} stderr: SplitParser {} }
     Process { id: _hyprRuleRemoveProc; running: false; command: ["bash", "-c", "hyprctl layerrule remove cava-bg 2>/dev/null; echo 'removed'"]; stdout: SplitParser { onRead: (line) => {} } stderr: SplitParser {} }
@@ -315,6 +377,7 @@ Item {
                 beeVibe._cavaLive = true
             }
         }
+
         onExited: (code, status) => {
             beeVibe._cavaLive = false
             if (active && backend === "cava-bg") {
@@ -402,22 +465,8 @@ Item {
             _detectCavaBg.running = true
         } else {
             // Stop everything
-            _cavaProc.running = false
-            _cavaBgLauncher.running = false
-            _daemonMonitor.running = false
-            _cavaReader.running = false
-            _monitorTimer.stop()
-            _restartTimer.stop()
-            _cavaReaderRestart.stop()
-            _cavaBgDaemonRunning = false
-
-            if (backend === "cava-bg") {
-                _stopCavaBg()
-            }
-
+            _stopAll()
             backend = "inactive"
-            _cavaLive = false
-            barValues = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         }
     }
 
@@ -425,29 +474,31 @@ Item {
     // When X-Ray settings change, rewrite the config file.
     // cava-bg has hot-reload: it watches config.toml and applies
     // changes automatically without restarting.
+    // v2.1: Always write config on change (even if not yet active),
+    // so settings are ready when cava-bg starts.
     Connections {
         target: BeeConfig
         function onVibeXrayChanged() {
-            if (beeVibe.active && beeVibe.backend === "cava-bg") {
-                console.log("[BeeVibe] X-Ray changed → rewriting config (hot-reload)")
+            console.log("[BeeVibe] X-Ray changed → " + (beeVibe.backend === "cava-bg" ? "rewriting config (hot-reload)" : "queued for next start"))
+            if (beeVibe.backend === "cava-bg") {
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayIntensityChanged() {
-            if (beeVibe.active && beeVibe.backend === "cava-bg") {
-                console.log("[BeeVibe] X-Ray intensity changed → rewriting config (hot-reload)")
+            console.log("[BeeVibe] X-Ray intensity changed → " + (beeVibe.backend === "cava-bg" ? "rewriting config (hot-reload)" : "queued"))
+            if (beeVibe.backend === "cava-bg") {
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayBlendChanged() {
-            if (beeVibe.active && beeVibe.backend === "cava-bg") {
-                console.log("[BeeVibe] X-Ray blend changed → rewriting config (hot-reload)")
+            console.log("[BeeVibe] X-Ray blend changed")
+            if (beeVibe.backend === "cava-bg") {
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayDirChanged() {
-            if (beeVibe.active && beeVibe.backend === "cava-bg") {
-                console.log("[BeeVibe] X-Ray dir changed → rewriting config (hot-reload)")
+            console.log("[BeeVibe] X-Ray dir changed → " + (beeVibe.backend === "cava-bg" ? "rewriting config (hot-reload)" : "queued"))
+            if (beeVibe.backend === "cava-bg") {
                 beeVibe._writeCavaBgConfig()
             }
         }
