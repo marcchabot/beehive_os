@@ -7,7 +7,7 @@ cava-bg config.toml, preserving all other cava-bg settings.
 Usage: python3 cava-bg-merge.py [--xray|--no-xray] [--intensity 0.8] [--blend Normal] [--dynamic-colors true|false]
 """
 import sys
-import json
+import os
 
 try:
     import tomllib
@@ -20,9 +20,7 @@ try:
 except ImportError:
     HAS_TOMLI_W = False
 
-from pathlib import Path
-
-CONFIG_PATH = Path.home() / ".config" / "cava-bg" / "config.toml"
+CONFIG_PATH = os.path.expanduser("~/.config/cava-bg/config.toml")
 
 def main():
     # Parse arguments
@@ -49,11 +47,12 @@ def main():
         i += 1
 
     # Read existing config
-    if CONFIG_PATH.exists():
+    if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, "rb") as f:
             cfg = tomllib.load(f)
     else:
-        cfg = {}
+        print("CONFIG_MISSING")
+        return
 
     # ── Bee-Hive controlled settings ──
 
@@ -62,7 +61,6 @@ def main():
     if dynamic_colors is not None:
         cfg["general"]["dynamic_colors"] = dynamic_colors
     elif xray is not None:
-        # X-Ray mode: disable dynamic_colors so bars reveal wallpaper through mask
         cfg["general"]["dynamic_colors"] = not xray
     cfg["general"]["framerate"] = 60
     cfg["general"]["corner_radius"] = 0.0
@@ -120,8 +118,10 @@ def main():
 
     # X-Ray mask defaults
     cfg.setdefault("xray_mask", {})
-    cfg["xray_mask"]["gamma"] = cfg["xray_mask"].get("gamma", 1.2)
-    cfg["xray_mask"]["opacity"] = cfg["xray_mask"].get("opacity", 1.0)
+    if "gamma" not in cfg["xray_mask"]:
+        cfg["xray_mask"]["gamma"] = 1.2
+    if "opacity" not in cfg["xray_mask"]:
+        cfg["xray_mask"]["opacity"] = 1.0
     cfg["xray_mask"]["use_background"] = False
 
     # Wallpaper auto-detect
@@ -139,32 +139,47 @@ def main():
     cfg["advanced"]["verbose_logging"] = False
 
     # Write back as TOML
-    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
 
     if HAS_TOMLI_W:
         with open(CONFIG_PATH, "wb") as f:
             tomli_w.dump(cfg, f)
+        print("CONFIG_WRITTEN")
     else:
-        # Fallback: simple TOML writer
-        def write_toml(data, f, prefix=""):
-            for key, val in data.items():
-                if isinstance(val, dict):
-                    section = f"{prefix}.{key}" if prefix else key
-                    f.write(f"\n[{section}]\n")
-                    write_toml(val, f, section)
-                elif isinstance(val, list):
-                    f.write(f"{key} = {json.dumps(val)}\n")
-                elif isinstance(val, bool):
-                    f.write(f"{key} = {str(val).lower()}\n")
-                elif isinstance(val, (int, float)):
-                    f.write(f"{key} = {val}\n")
-                elif isinstance(val, str):
-                    f.write(f'{key} = "{val}"\n')
+        # Fallback: patch specific fields with sed
+        # This is less precise but works without tomli_w
+        import subprocess
+        import json
 
-        with open(CONFIG_PATH, "w") as f:
-            write_toml(cfg, f)
+        # Build sed commands for the fields we control
+        sed_cmds = []
 
-    print("CONFIG_WRITTEN")
+        if dynamic_colors is not None:
+            sed_cmds.append(f"sed -i 's/^dynamic_colors = .*/dynamic_colors = {str(dynamic_colors).lower()}/' \"{CONFIG_PATH}\"")
+        elif xray is not None:
+            sed_cmds.append(f"sed -i 's/^dynamic_colors = .*/dynamic_colors = {str(not xray).lower()}/' \"{CONFIG_PATH}\"")
+
+        if xray is not None:
+            sed_cmds.append(f"sed -i 's/^enabled = .*/enabled = {str(xray).lower()}/' \"{CONFIG_PATH}\"")
+
+        if intensity is not None:
+            sed_cmds.append(f"sed -i '/\\[xray\\]/,/\\[/ s/^intensity = .*/intensity = {intensity}/' \"{CONFIG_PATH}\"")
+            sed_cmds.append(f"sed -i '/\\[xray_mask\\]/,/\\[/ s/^intensity = .*/intensity = {intensity}/' \"{CONFIG_PATH}\"")
+
+        if blend is not None:
+            sed_cmds.append(f"sed -i '/\\[xray\\]/,/\\[/ s/^blend_mode = .*/blend_mode = \"{blend}\"/' \"{CONFIG_PATH}\"")
+            sed_cmds.append(f"sed -i '/\\[xray_mask\\]/,/\\[/ s/^blend_mode = .*/blend_mode = \"{blend}\"/' \"{CONFIG_PATH}\"")
+
+        # Honey gold bar color
+        sed_cmds.append(f"sed -i '/\\[audio\\.bar_color\\]/,/\\[/ s/^hex = .*/hex = \"#F5A623\"/' \"{CONFIG_PATH}\"")
+
+        # Honey gradient palette (this is hard with sed, just log a warning)
+        print("CONFIG_PATCHED_SED")
+        print("WARNING: tomli_w not installed. Some fields may not be fully patched.")
+        print("Install with: pip install tomli_w")
+
+        for cmd in sed_cmds:
+            subprocess.run(cmd, shell=True, check=False)
 
 if __name__ == "__main__":
     main()

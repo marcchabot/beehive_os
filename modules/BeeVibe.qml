@@ -233,9 +233,12 @@ Item {
 
         console.log("[BeeVibe] Merging cava-bg config: xray=" + enableXray + " blend=" + xrayBlend + " intensity=" + xrayIntensity)
 
+        // Resolve script path relative to BeeVibe.qml (modules/../scripts/cava-bg-merge.py)
+        var scriptPath = Qt.resolvedUrl("../scripts/cava-bg-merge.py").toString().replace("file://", "")
+
         // Call Python merge script — preserves existing cava-bg config fields
         _writeConfigProc.command = ["bash", "-c",
-            "python3 scripts/cava-bg-merge.py " +
+            "python3 '" + scriptPath + "' " +
             (enableXray ? "--xray" : "--no-xray") +
             " --intensity " + xrayIntensity.toFixed(4) +
             " --blend '" + xrayBlend + "'" +
