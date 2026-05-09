@@ -401,7 +401,7 @@ QtObject {
     property string activeProfileId: "marc"
 
     // ─── Plugin System v2 🐝🧩 ────────────────────────────────
-    property bool   pluginsEnabled: true
+    property bool   pluginsEnabled: false   // Disabled until plugin manager script is implemented
     property var    pluginList: []        // list of enabled plugin ids
     property bool   pluginAutoUpdate: false
     property string pluginStatus: "idle"  // "idle" | "loading" | "ready" | "error"
