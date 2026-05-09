@@ -124,49 +124,8 @@ Item {
                 }
             }
 
-            RowLayout {
-                Layout.fillWidth: true; spacing: 12
-                ColumnLayout {
-                    Layout.fillWidth: true; spacing: 2
-                    Text {
-                        text: _fr ? "Thème selon l'heure" : "Time-of-day theming"
-                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                    Text {
-                        text: _fr ? "Ajuste les couleurs automatiquement selon le moment de la journée" : "Automatically adjust colors based on time of day"
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
-                        font.pixelSize: 10; font.italic: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                }
-                Switch {
-                    checked: BeeConfig.timeOfDayEnabled
-                    onToggled: { BeeConfig.timeOfDayEnabled = checked; BeeConfig.saveConfig() }
-                }
-            }
 
-            RowLayout {
-                Layout.fillWidth: true; spacing: 12
-                ColumnLayout {
-                    Layout.fillWidth: true; spacing: 2
-                    Text {
-                        text: _fr ? "Ambiance météo" : "Weather ambient"
-                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                    Text {
-                        text: _fr ? "Adapte le thème aux conditions météorologiques locales" : "Adapt theme to local weather conditions"
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
-                        font.pixelSize: 10; font.italic: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                }
-                Switch {
-                    checked: BeeConfig.weatherAmbientEnabled
-                    onToggled: { BeeConfig.weatherAmbientEnabled = checked; BeeConfig.saveConfig() }
-                }
-            }
+
 
             Item { height: 4 }
 
