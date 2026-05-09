@@ -1354,10 +1354,10 @@ QtObject {
 
     // ─── Sauvegarde vers user_config.json ────────────────────
     function saveConfig() {
-        // CRITICAL PROTECTION: NEVER save if cells are not loaded!
+        // CRITICAL PROTECTION: Only warn about empty cells, but still save
+        // all other settings (toggles, preferences, etc.)
         if (_cells.count === 0) {
-            console.warn("BeeConfig: REFUSING to save — empty cells! Protection enabled. 🐝🛡️")
-            return
+            console.warn("BeeConfig: Saving with empty cells model — cells may not be loaded yet. 🐝⚠️")
         }
         
         // Rebuild cells array from live model
