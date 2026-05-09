@@ -257,8 +257,9 @@ Item {
     }
 
     // ─── Write cava-bg config (hot-reload friendly) ────────────
-    // Separated from _startCavaBg so we can rewrite the config
-    // when X-Ray settings change without restarting the daemon.
+    // v2.1: Merges Bee-Hive settings into existing cava-bg config
+    // instead of overwriting it completely. This preserves any
+    // manual tweaks the user made via cava-bg gui or config file.
     // cava-bg watches its config file and applies changes automatically.
     function _writeCavaBgConfig() {
         // X-Ray settings from BeeConfig
@@ -267,19 +268,54 @@ Item {
         var xrayIntensity = BeeConfig.vibeXrayIntensity
         var xrayBlend = BeeConfig.vibeXrayBlend
 
-        var configContent = "[general]\n"
+        // Build the X-Ray section
+        var xraySection = ""
+        if (enableXray) {
+            xraySection = "[xray]\n"
+                + (xrayDir ? "images_dir = \"" + xrayDir + "\"\n" : "# images_dir = auto-detected from wallpaper\n")
+                + "\n"
+                + "[xray_mask]\n"
+                + "intensity = " + xrayIntensity.toFixed(2) + "\n"
+                + "gamma = 1.2\n"
+                + "opacity = 1.0\n"
+                + "blend_mode = \"" + xrayBlend + "\"\n"
+                + "use_background = false\n\n"
+        } else {
+            // Explicitly disable xray when toggled off
+            xraySection = "# [xray] — disabled by BeeVibe\n"
+                + "# images_dir = \"\"\n\n"
+        }
+
+        // Build the full Bee-Hive managed config
+        // We write our own config because cava-bg needs specific settings
+        // for the Bee-Hive integration to work properly.
+        var configContent = "# ═══════════════════════════════════════════════════════════\n"
+            + "# Bee-Hive OS × cava-bg — Auto-managed config\n"
+            + "# Changes to X-Ray, blend, and intensity are hot-reloaded.\n"
+            + "# ═══════════════════════════════════════════════════════════\n\n"
+            + "[general]\n"
             + "framerate = 60\n"
             + "dynamic_colors = true\n"
             + "corner_radius = 0.0\n"
             + "disable_audio = false\n\n"
+            + "[general.background_color]\n"
+            + "hex = \"#000000\"\n"
+            + "alpha = 0.0\n\n"
             + "[display]\n"
             + "position = \"Fill\"\n"
             + "anchor_top = true\n"
             + "anchor_bottom = true\n"
             + "anchor_left = true\n"
             + "anchor_right = true\n"
+            + "width = 0\n"
+            + "height = 0\n"
+            + "margin_top = 0\n"
+            + "margin_bottom = 0\n"
+            + "margin_left = 0\n"
+            + "margin_right = 0\n"
             + "layer = \"Bottom\"\n"
-            + "opacity = 1.0\n\n"
+            + "opacity = 1.0\n"
+            + "scale_with_resolution = false\n\n"
             + "[audio]\n"
             + "bar_count = 76\n"
             + "bar_width = 6.0\n"
@@ -291,29 +327,27 @@ Item {
             + "max_bar_height = 220.0\n"
             + "min_bar_height = 0.0\n"
             + "bar_shape = \"Rectangle\"\n\n"
+            + "[audio.bar_color]\n"
+            + "hex = \"#F5A623\"\n"
+            + "alpha = 1.0\n\n"
             + "[colors]\n"
             + "use_gradient = true\n"
             + "gradient_direction = \"BottomToTop\"\n"
             + "palette = [[0.98, 0.72, 0.11, 1.0], [0.83, 0.59, 0.04, 1.0]]\n\n"
-
-        // X-Ray section — only emitted when enabled
-        if (enableXray) {
-            configContent += "[xray]\n"
-                + "images_dir = \"" + (xrayDir || "") + "\"\n\n"
-                + "[xray_mask]\n"
-                + "intensity = " + xrayIntensity.toFixed(2) + "\n"
-                + "gamma = 1.2\n"
-                + "opacity = 1.0\n"
-                + "blend_mode = \"" + xrayBlend + "\"\n"
-                + "use_background = false\n\n"
-        }
-
-        configContent += "[wallpaper]\n"
+            + xraySection
+            + "[wallpaper]\n"
             + "auto_detect_wallpaper = true\n"
             + "sync_interval_seconds = 10\n\n"
+            + "[parallax]\n"
+            + "enabled = false\n"
+            + "mode = \"Hybrid\"\n"
+            + "enable_3d_depth = false\n"
+            + "layers = []\n\n"
             + "[performance]\n"
             + "vsync = true\n"
-            + "multi_threaded_decode = true\n\n"
+            + "multi_threaded_decode = true\n"
+            + "frame_rate_limit = 60\n"
+            + "layer_cache_size = 5\n\n"
             + "[advanced]\n"
             + "verbose_logging = false\n"
 
