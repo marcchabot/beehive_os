@@ -4,11 +4,14 @@ import QtQuick.Controls
 import "."
 
 // ═══════════════════════════════════════════════════════════════
-// BarWidgetsTab.qml — 🍯 Presets & Alvéoles (Dashboard Layout)
+// BarWidgetsTab.qml — 📊 Bar & Widgets Settings
+// Toggles pour la BeeBar, horloge, motion, vibe, corners
 // ═══════════════════════════════════════════════════════════════
 
 Item {
     id: barWidgetsTab
+
+    property string _fr: BeeConfig.uiLang === "fr"
 
     ScrollView {
         anchors.fill: parent
@@ -20,144 +23,417 @@ Item {
             width: barWidgetsTab.width - 32
             spacing: 16
 
-            // ─── Presets ───
+            // ═══════════════════════════════════════════════════
+            // Section: Horloge
+            // ═══════════════════════════════════════════════════
             Text {
-                text: "🎯 " + (BeeConfig.uiLang === "fr" ? "Préréglages" : "Presets")
+                text: "🕐 " + (_fr ? "Horloge" : "Clock")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
             Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
 
-            // Restore button
-            Rectangle {
-                Layout.fillWidth: true; height: 36; radius: 10
-                color: restHov.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
-                border.color: BeePresets && BeePresets.hasAutoSave && BeePresets.hasAutoSave() ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.30) : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.10)
-                border.width: 1
-                opacity: BeePresets && BeePresets.hasAutoSave && BeePresets.hasAutoSave() ? 1.0 : 0.4
-                RowLayout {
-                    anchors.centerIn: parent; spacing: 6
-                    Text { text: "↩️"; font.pixelSize: 14 }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: (BeeConfig.uiLang === "fr" ? "Restaurer la dernière grille" : "Restore last layout")
-                        color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
+                        text: _fr ? "Horloge analogique" : "Analog clock"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Afficher l'horloge analogique au centre du tableau de bord" : "Show analog clock in the center of the dashboard"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                 }
-                MouseArea {
-                    id: restHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                    onClicked: if (BeePresets && BeePresets.restoreAutoSave) BeePresets.restoreAutoSave()
+                Switch {
+                    checked: BeeConfig.analogClock
+                    onToggled: { BeeConfig.analogClock = checked; BeeConfig.saveConfig() }
                 }
             }
 
-            Item { height: 8 }
+            Item { height: 4 }
 
-            // Preset cards
+            // ═══════════════════════════════════════════════════
+            // Section: Indicateurs système
+            // ═══════════════════════════════════════════════════
             Text {
-                text: (BeeConfig.uiLang === "fr" ? "PRÉRÉGLAGES SAUVEGARDÉS" : "SAVED PRESETS")
-                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
+                text: "📟 " + (_fr ? "Indicateurs système" : "System indicators")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout { Layout.fillWidth: true; spacing: 12
+                Text { text: "CPU"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.showCpu; onToggled: { BeeConfig.showCpu = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout { Layout.fillWidth: true; spacing: 12
+                Text { text: "RAM"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.showRam; onToggled: { BeeConfig.showRam = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout { Layout.fillWidth: true; spacing: 12
+                Text { text: _fr ? "Disque" : "Disk"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.showDisk; onToggled: { BeeConfig.showDisk = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout { Layout.fillWidth: true; spacing: 12
+                Text { text: _fr ? "Réseau" : "Network"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.showNet; onToggled: { BeeConfig.showNet = checked; BeeConfig.saveConfig() } }
+            }
+            RowLayout { Layout.fillWidth: true; spacing: 12
+                Text { text: _fr ? "Batterie" : "Battery"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Switch { checked: BeeConfig.showBattery; onToggled: { BeeConfig.showBattery = checked; BeeConfig.saveConfig() } }
             }
 
-            Flow {
-                Layout.fillWidth: true; spacing: 14
-                Repeater {
-                    model: BeePresets && BeePresets.presets ? BeePresets.presets : []
-                    delegate: Rectangle {
-                        width: 170; height: 140; radius: 14
-                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
-                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15); border.width: 1
+            Item { height: 4 }
 
-                        property bool hovered: false
-                        property bool isDefault: modelData.name === "Travail" || modelData.name === "Gaming" || modelData.name === "Weekend"
+            // ═══════════════════════════════════════════════════
+            // Section: Comportement de la barre
+            // ═══════════════════════════════════════════════════
+            Text {
+                text: "🎛️ " + (_fr ? "Comportement de la barre" : "Bar behavior")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
 
-                        ColumnLayout {
-                            anchors { fill: parent; margins: 12; topMargin: 14 }
-                            spacing: 4
-                            RowLayout {
-                                spacing: 6
-                                Text { text: modelData.icon || "🍯"; font.pixelSize: 20 }
-                                Text {
-                                    text: modelData.name || ""
-                                    color: BeeTheme.accent; font.pixelSize: 13; font.bold: true
-                                    Layout.fillWidth: true; elide: Text.ElideRight
-                                }
-                            }
-                            Text {
-                                text: (modelData.cells ? modelData.cells.length : 0) + (BeeConfig.uiLang === "fr" ? " alvéoles" : " cells")
-                                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.35)
-                                font.pixelSize: 9
-                            }
-                            // Mini grid preview
-                            Rectangle {
-                                Layout.fillWidth: true; Layout.preferredHeight: 50; radius: 8
-                                color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.4)
-                                Grid {
-                                    anchors { fill: parent; margins: 4 }
-                                    columns: 4; spacing: 2
-                                    Repeater {
-                                        model: modelData.cells ? modelData.cells.slice(0, 8) : []
-                                        delegate: Rectangle {
-                                            width: 32; height: 20; radius: 4
-                                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
-                                            Text { text: modelData.icon || "📦"; font.pixelSize: 8; anchors.centerIn: parent }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            onEntered: parent.hovered = true; onExited: parent.hovered = false
-                            onClicked: if (BeePresets && BeePresets.applyPreset) BeePresets.applyPreset(modelData.name)
-                        }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Barre contextuelle" : "Contextual bar"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "La barre s'adapte au contexte de l'app active" : "Bar adapts to the active app context"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                 }
-            }
-
-            Item { height: 8 }
-
-            // ─── Save Current ───
-            Text {
-                text: (BeeConfig.uiLang === "fr" ? "SAUVEGARDER LA GRILLE ACTUELLE" : "SAVE CURRENT LAYOUT")
-                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
-                font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
+                Switch { checked: BeeConfig.contextualBar; onToggled: { BeeConfig.contextualBar = checked; BeeConfig.saveConfig() } }
             }
 
             RowLayout {
-                Layout.fillWidth: true; spacing: 10
-                TextField {
-                    id: presetNameField
-                    Layout.fillWidth: true; height: 36
-                    placeholderText: (BeeConfig.uiLang === "fr" ? "Nom du préréglage" : "Preset name")
-                    color: BeeTheme.textPrimary; font.pixelSize: 12
-                    leftPadding: 10; rightPadding: 10
-                    background: Rectangle {
-                        radius: 7
-                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.07)
-                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, presetNameField.activeFocus ? 0.5 : 0.15)
-                        border.width: 1
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Mode furtif" : "Stealth mode"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Barre minimale, icônes uniquement" : "Minimal bar, icons only"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                 }
-                Rectangle {
-                    width: 100; height: 36; radius: 10
-                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.16)
-                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
+                Switch { checked: BeeConfig.stealthMode; onToggled: { BeeConfig.stealthMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
                     Text {
-                        anchors.centerIn: parent
-                        text: (BeeConfig.uiLang === "fr" ? "Sauvegarder" : "Save")
-                        color: BeeTheme.accent; font.pixelSize: 12; font.bold: true
+                        text: _fr ? "Mode concentration" : "Focus mode"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
                     }
-                    MouseArea {
-                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            var name = presetNameField.text.trim()
-                            if (name.length > 0 && BeePresets && BeePresets.saveCurrentAsPreset) {
-                                BeePresets.saveCurrentAsPreset(name, "🍯")
-                                presetNameField.text = ""
+                    Text {
+                        text: _fr ? "Masque les distractions, notifications minimales" : "Hide distractions, minimal notifications"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.focusMode; onToggled: { BeeConfig.focusMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            Item { height: 4 }
+
+            // ═══════════════════════════════════════════════════
+            // Section: Motion
+            // ═══════════════════════════════════════════════════
+            Text {
+                text: "🏃 " + (_fr ? "Motion" : "Motion")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Effets de mouvement" : "Motion effects"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Parallaxe et animations de la MayaDash" : "Parallax and MayaDash animations"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.motionMode; onToggled: { BeeConfig.motionMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            Item { height: 4 }
+
+            // ═══════════════════════════════════════════════════
+            // Section: Vibe (Audio Visualizer)
+            // ═══════════════════════════════════════════════════
+            Text {
+                text: "🎵 " + (_fr ? "Vibe (Visualiseur audio)" : "Vibe (Audio Visualizer)")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Visualiseur audio" : "Audio visualizer"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Visualiseur de spectre audio en arrière-plan" : "Audio spectrum visualizer in background"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.vibeMode; onToggled: { BeeConfig.vibeMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            // Vibe backend selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: _fr ? "Backend" : "Backend"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: ["auto", "cava-bg", "cava"]
+                        delegate: Rectangle {
+                            width: 72; height: 30; radius: 8
+                            color: BeeConfig.vibeBackend === modelData
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.vibeBackend === modelData
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.vibeBackend === modelData ? 2 : 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData
+                                color: BeeConfig.vibeBackend === modelData ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.vibeBackend === modelData
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.vibeBackend = modelData; BeeConfig.saveConfig() }
                             }
                         }
                     }
                 }
+            }
+
+            // X-Ray mode
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Mode X-Ray" : "X-Ray mode"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Révèle les couleurs du fond d'écran à travers le visualiseur" : "Reveal wallpaper colors through the visualizer"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.vibeXray; onToggled: { BeeConfig.vibeXray = checked; BeeConfig.saveConfig() } }
+            }
+
+            // X-Ray intensity
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.vibeXray
+                Text {
+                    text: _fr ? "Intensité X-Ray" : "X-Ray intensity"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: Math.round(BeeConfig.vibeXrayIntensity * 100) + "%"
+                    color: BeeTheme.accent; font.pixelSize: 13; font.bold: true
+                    Layout.minimumWidth: 45; horizontalAlignment: Text.AlignRight
+                }
+            }
+            Slider {
+                Layout.fillWidth: true
+                visible: BeeConfig.vibeXray
+                from: 0.1; to: 1.0; stepSize: 0.05
+                value: BeeConfig.vibeXrayIntensity
+                onMoved: { BeeConfig.vibeXrayIntensity = value; BeeConfig.saveConfig() }
+            }
+
+            // X-Ray blend mode
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.vibeXray
+                Text {
+                    text: _fr ? "Fusion X-Ray" : "X-Ray blend"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: ["Normal", "Screen", "Multiply", "Overlay"]
+                        delegate: Rectangle {
+                            width: 72; height: 28; radius: 7
+                            color: BeeConfig.vibeXrayBlend === modelData
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.vibeXrayBlend === modelData
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.vibeXrayBlend === modelData ? 2 : 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData
+                                color: BeeConfig.vibeXrayBlend === modelData ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 10; font.bold: BeeConfig.vibeXrayBlend === modelData
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.vibeXrayBlend = modelData; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item { height: 4 }
+
+            // ═══════════════════════════════════════════════════
+            // Section: Batterie
+            // ═══════════════════════════════════════════════════
+            Text {
+                text: "🔋 " + (_fr ? "Batterie & Économie d'énergie" : "Battery & Power Saver")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Mode économie d'énergie" : "Power saver mode"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Réduit les animations et les effets visuels" : "Reduces animations and visual effects"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.batteryMode; onToggled: { BeeConfig.batteryMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Détection automatique" : "Auto-detect"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Détecte automatiquement si sur batterie ou secteur" : "Auto-detect battery vs AC power status"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.batteryModeAuto; onToggled: { BeeConfig.batteryModeAuto = checked; BeeConfig.saveConfig() } }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: !BeeConfig.batteryModeAuto
+                Text {
+                    text: _fr ? "Seuil d'économie (%)" : "Saver threshold (%)"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeeConfig.batteryThreshold + "%"
+                    color: BeeTheme.accent; font.pixelSize: 13; font.bold: true
+                    Layout.minimumWidth: 45; horizontalAlignment: Text.AlignRight
+                }
+            }
+            Slider {
+                Layout.fillWidth: true
+                visible: !BeeConfig.batteryModeAuto
+                from: 5; to: 50; stepSize: 5
+                value: BeeConfig.batteryThreshold
+                onMoved: { BeeConfig.batteryThreshold = value; BeeConfig.saveConfig() }
+            }
+
+            Item { height: 4 }
+
+            // ═══════════════════════════════════════════════════
+            // Section: Hot Corners
+            // ═══════════════════════════════════════════════════
+            Text {
+                text: "🔲 " + (_fr ? "Coins actifs" : "Hot Corners")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: _fr ? "Coins actifs (Hot Corners)" : "Hot Corners"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true
+                    }
+                    Text {
+                        text: _fr ? "Actions rapides en pointant les coins de l'écran" : "Quick actions by pointing at screen corners"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch { checked: BeeConfig.cornersMode; onToggled: { BeeConfig.cornersMode = checked; BeeConfig.saveConfig() } }
             }
         }
     }
