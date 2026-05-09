@@ -262,7 +262,54 @@ Item {
         _hyprRuleRemoveProc.running = true
     }
 
-    Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => { if (line.trim() === "CONFIG_WRITTEN") console.log("[BeeVibe] config.toml merged ✓"); else console.log("[BeeVibe] merge:", line) } } stderr: SplitParser { onRead: (line) => console.warn("[BeeVibe] merge error:", line) } }
+    Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => {
+        if (line.trim() === "CONFIG_WRITTEN") {
+            console.log("[BeeVibe] config.toml merged ✓")
+            // Signal cava-bg daemon to reload config (SIGHUP)
+            _cavaBgReload.running = true
+        } else if (line.trim() === "CONFIG_PATCHED_SED") {
+            console.log("[BeeVibe] config.toml patched (sed fallback) ✓")
+            _cavaBgReload.running = true
+        } else {
+            console.log("[BeeVibe] merge:", line)
+        }
+    } } stderr: SplitParser { onRead: (line) => console.warn("[BeeVibe] merge error:", line) } }
+
+    // ─── Reload cava-bg after config change ───────────────────
+    // Sends SIGHUP to the daemon (PID from pidfile) to hot-reload config.
+    // Falls back to full restart if SIGHUP is not supported.
+    Process {
+        id: _cavaBgReload
+        running: false
+        command: ["bash", "-c",
+            "pidfile=\"$HOME/.config/cava-bg/daemon.pid\"; " +
+            "if [ -f \"$pidfile\" ]; then " +
+            "  pid=$(cat \"$pidfile\"); " +
+            "  if kill -0 \"$pid\" 2>/dev/null; then " +
+            "    kill -HUP \"$pid\" 2>/dev/null && echo 'SIGHUP_SENT' || echo 'SIGHUP_FAILED'; " +
+            "  else echo 'DAEMON_DEAD'; fi; " +
+            "else echo 'NO_PID_FILE'; fi"
+        ]
+        stdout: SplitParser {
+            onRead: (line) => {
+                var status = line.trim()
+                if (status === "SIGHUP_SENT") {
+                    console.log("[BeeVibe] cava-bg hot-reload (SIGHUP) ✓")
+                } else if (status === "SIGHUP_FAILED") {
+                    console.warn("[BeeVibe] SIGHUP failed, restarting cava-bg daemon...")
+                    // Fallback: restart cava-bg daemon entirely
+                    _stopCavaBg()
+                    _restartTimer.interval = 1000
+                    _restartTimer.start()
+                } else if (status === "DAEMON_DEAD" || status === "NO_PID_FILE") {
+                    console.warn("[BeeVibe] cava-bg daemon not running, restarting...")
+                    _restartTimer.start()
+                } else {
+                    console.log("[BeeVibe] cava-bg reload:", status)
+                }
+            }
+        }
+    }
     Process { id: _hyprRuleProc; running: false; stdout: SplitParser { onRead: (line) => console.log("[BeeVibe] layerrule:", line) } stderr: SplitParser {} }
     Process { id: _stopCavaBgProc; running: false; stdout: SplitParser {} stderr: SplitParser {} }
     Process { id: _hyprRuleRemoveProc; running: false; command: ["bash", "-c", "hyprctl layerrule remove cava-bg 2>/dev/null; echo 'removed'"]; stdout: SplitParser { onRead: (line) => {} } stderr: SplitParser {} }
