@@ -5,7 +5,7 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BarWidgetsTab.qml — 📊 Bar & Widgets Settings
-// Toggles pour la BeeBar, horloge, motion, vibe, corners
+// Toggles pour la BeeBar, horloge, vibe, corners, batterie
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -157,40 +157,7 @@ Item {
                 Switch { checked: BeeConfig.focusMode; onToggled: { BeeConfig.focusMode = checked; BeeConfig.saveConfig() } }
             }
 
-            Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Motion
-            // ═══════════════════════════════════════════════════
-            Text {
-                text: "🏃 " + (_fr ? "Motion" : "Motion")
-                color: BeeTheme.accent
-                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
-            }
-            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
-
-            RowLayout {
-                Layout.fillWidth: true; spacing: 12
-                ColumnLayout {
-                    Layout.fillWidth: true; spacing: 2
-                    Text {
-                        text: _fr ? "Effets de mouvement" : "Motion effects"
-                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
-                        Layout.fillWidth: true
-                    }
-                    Text {
-                        text: _fr ? "Parallaxe et animations de la MayaDash" : "Parallax and MayaDash animations"
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
-                        font.pixelSize: 10; font.italic: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                }
-                Switch { checked: BeeConfig.motionMode; onToggled: { BeeConfig.motionMode = checked; BeeConfig.saveConfig() } }
-            }
-
-            Item { height: 4 }
-
-            // ═══════════════════════════════════════════════════
             // Section: Vibe (Audio Visualizer)
             // ═══════════════════════════════════════════════════
             Text {
