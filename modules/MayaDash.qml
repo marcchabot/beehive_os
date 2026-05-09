@@ -219,6 +219,9 @@ Rectangle {
     // ─── BeeVibe ───────────────────────────────────────────────
     property bool beeVibeEnabled: false
 
+    // ─── MayaDashConfig panel ──────────────────────────────────
+    property bool configVisible: false
+
     BeeVibe {
         id: beeVibe
         active: mayaDash.beeVibeEnabled
@@ -757,18 +760,54 @@ Rectangle {
             return null
         }
 
-        // ─── Titre du dashboard ───────────────────────────────
-        Text {
-            text: BeeConfig.dashTitle
-            color: BeeTheme.accent
-            font.pixelSize: 22; font.bold: true; font.letterSpacing: 2
+        // ─── Title + Config button ────────────────────────────────
+        Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            Behavior on color { ColorAnimation { duration: 800 } }
+            spacing: 10
 
-            SequentialAnimation on opacity {
-                loops: Animation.Infinite
-                NumberAnimation { to: 0.7; duration: 3000; easing.type: Easing.InOutSine }
-                NumberAnimation { to: 1.0; duration: 3000; easing.type: Easing.InOutSine }
+            Text {
+                text: BeeConfig.dashTitle
+                color: BeeTheme.accent
+                font.pixelSize: 22; font.bold: true; font.letterSpacing: 2
+                Behavior on color { ColorAnimation { duration: 800 } }
+
+                SequentialAnimation on opacity {
+                    loops: Animation.Infinite
+                    NumberAnimation { to: 0.7; duration: 3000; easing.type: Easing.InOutSine }
+                    NumberAnimation { to: 1.0; duration: 3000; easing.type: Easing.InOutSine }
+                }
+            }
+
+            // ⚙️ Config button
+            Rectangle {
+                width: 32; height: 32; radius: 16
+                color: configBtnHover.containsMouse
+                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                border.color: configBtnHover.containsMouse
+                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.6)
+                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                border.width: 1
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "⚙️"; font.pixelSize: 16
+                    opacity: configBtnHover.containsMouse ? 1.0 : 0.6
+                    Behavior on opacity { NumberAnimation { duration: 150 } }
+                }
+
+                MouseArea {
+                    id: configBtnHover
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        mayaDash.configVisible = !mayaDash.configVisible
+                        BeeSound.playEvent("dash.open")
+                    }
+                }
             }
         }
 
@@ -798,6 +837,32 @@ Rectangle {
             HexCell { cellIndex: 5; Component.onCompleted: hexGrid.cellRefs[5] = this }
             HexCell { cellIndex: 6; Component.onCompleted: hexGrid.cellRefs[6] = this }
             HexCell { cellIndex: 7; Component.onCompleted: hexGrid.cellRefs[7] = this }
+        }
+    }
+
+    // ─── MayaDashConfig overlay ────────────────────────────────
+    Rectangle {
+        id: dashConfigOverlay
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.5)
+        visible: mayaDash.configVisible
+        opacity: mayaDash.configVisible ? 1.0 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                mayaDash.configVisible = false
+                BeeSound.playEvent("dash.close")
+            }
+        }
+
+        MayaDashConfig {
+            anchors.centerIn: parent
+            visible: mayaDash.configVisible
+            onVisibleChanged: {
+                if (!visible) mayaDash.configVisible = false
+            }
         }
     }
 
