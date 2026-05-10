@@ -145,8 +145,8 @@
       "icon": "🖥️",
       "title": "Système",
       "subtitle": "CachyOS",
-      "detail": "Hyprland\nQuickshell",
-      "action": "app:terminal"
+      "detail": "CPU/GPU/RAM\nTempératures",
+      "action": "detail:sysmon"
     },
     "analytics": {
       "icon": "📊",
@@ -254,5 +254,17 @@
     "beehive_label": "BEE-HIVE",
     "focus_label": "FOCUS",
     "beebar_stats_title": "Affichage BeeBar 📊"
+  },
+
+  "sysmon": {
+    "title": "Moniteur Système",
+    "cpu": "CPU",
+    "memory": "Mémoire",
+    "temperatures": "Températures",
+    "fans": "Ventilateurs",
+    "no_fans": "Aucune donnée ventilateur",
+    "top_processes": "Processus Top",
+    "process": "Processus",
+    "uptime": "Disponibilité"
   }
 }

@@ -38,6 +38,8 @@ Rectangle {
     signal openSettings()
     signal openStudio()
     signal openNotes()
+    signal openCalendar()
+    signal openSysmon()
     signal cellsNeedRefresh()  // Emitted after drag & drop swap
 
     // ─── Drag & Drop state ──────────────────────────────────────
@@ -206,6 +208,16 @@ Rectangle {
             mayaDash.monitorDetailVisible = false
             mayaDash.focusDetailVisible = !mayaDash.focusDetailVisible
             BeeSound.playEvent(mayaDash.focusDetailVisible ? "dash.open" : "dash.close")
+            return
+        }
+
+        // detail:sysmon → BeeSystemMonitor panel (own PanelWindow via BeeHiveShell)
+        if (action === "detail:sysmon") {
+            mayaDash.networkDetailVisible = false
+            mayaDash.monitorDetailVisible = false
+            mayaDash.focusDetailVisible = false
+            mayaDash.openSysmon()
+            BeeSound.playEvent("dash.open")
             return
         }
 

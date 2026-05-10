@@ -374,6 +374,7 @@ ShellRoot {
                 onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
                 onOpenNotes:    { root.notesVisible = !root.notesVisible; BeeSound.playEvent(root.notesVisible ? "dash.open" : "dash.close") }
                 onOpenCalendar: { root.calendarVisible = !root.calendarVisible; BeeSound.playEvent(root.calendarVisible ? "dash.open" : "dash.close") }
+                onOpenSysmon:   { root.sysmonVisible = !root.sysmonVisible; BeeSound.playEvent(root.sysmonVisible ? "dash.open" : "dash.close") }
             }
 
             Clock {
@@ -635,6 +636,49 @@ ShellRoot {
                     anchors.centerIn: parent
                     onCloseRequested: {
                         root.calendarVisible = false
+                        BeeSound.playEvent("dash.close")
+                    }
+                }
+            }
+        }
+    }
+
+    // ─── BeeSystemMonitor Panel (focusable, own PanelWindow) 🐝📊 ──────
+    property bool sysmonVisible: false
+
+    Loader {
+        active: root.sysmonVisible
+        sourceComponent: Variants {
+            model: Quickshell.screens
+            delegate: PanelWindow {
+                required property var modelData
+                screen: modelData
+                WlrLayershell.layer: WlrLayer.Top
+                WlrLayershell.namespace: "beehive-sysmon"
+                WlrLayershell.keyboardFocus: WlrLayershell.OnDemand
+                focusable: true
+                anchors { top: true; bottom: true; left: true; right: true }
+                color: "transparent"
+
+                // Overlay semi-transparent (clic dehors → fermer)
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(0, 0, 0, 0.5)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.sysmonVisible = false
+                            BeeSound.playEvent("dash.close")
+                        }
+                    }
+                }
+
+                // BeeSystemMonitor centré dans le panel
+                BeeSystemMonitor {
+                    anchors.centerIn: parent
+                    onCloseRequested: {
+                        root.sysmonVisible = false
                         BeeSound.playEvent("dash.close")
                     }
                 }

@@ -1572,8 +1572,8 @@ QtObject {
             _cells.append({ icon: "📧",  title: "Email",           subtitle: "Inbox",                detail: "5 unread messages\n2 drafts",              action: "app:thunderbird",    highlighted: false, customizable: true })
             _cells.append({ icon: "🐝",  title: "Bee-Hive OS",     subtitle: "Online",               detail: "Framework Active\nAll systems go",         action: "none",            highlighted: true,  customizable: true })
             _cells.append({ icon: "🌤️", title: "Weather",         subtitle: "Forecast",             detail: "Sunny, 22°C\nLight breeze",                action: "none",            highlighted: false, customizable: true })
-            _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "CPU/GPU/RAM",                     action: "detail:monitor",    highlighted: false, customizable: true })
-            _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "none",            highlighted: false, customizable: true })
+            _cells.append({ icon: "🖥️", title: "System",          subtitle: "CachyOS",              detail: "CPU/GPU/RAM\nTemperatures",                    action: "detail:sysmon",    highlighted: false, customizable: true })
+            _cells.append({ icon: "📊",  title: "Analytics",       subtitle: "Dashboard",            detail: "CPU: 15%\nRAM: 4.2 GB",                    action: "detail:sysmon",  highlighted: false, customizable: true })
             _cells.append({ icon: "🌐",  title: "Network",          subtitle: "Connected",           detail: "Real-time stats\n& Speed Test",             action: "detail:network",  highlighted: true,  customizable: true })
             _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
         }
