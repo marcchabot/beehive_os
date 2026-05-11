@@ -278,8 +278,8 @@ Item {
     // Called by _firstMonitorTimer when daemon status is confirmed ALIVE.
     // This avoids the race where SIGHUP is sent before the daemon exists.
     function _onDaemonAlive() {
-        console.log("[BeeVibe] cava-bg daemon alive, writing config and sending SIGHUP...")
-        _writeCavaBgConfig()
+        console.log("[BeeVibe] cava-bg daemon alive, writing config...")
+        _writeCavaBgConfig(true)  // skipSIGHUP = true: daemon just started with current config
     }
 
     // ─── Write cava-bg config via Python merge script ────────────
@@ -287,11 +287,13 @@ Item {
     // cava-bg config.toml instead of overwriting it completely.
     // This preserves ALL cava-bg fields (parallax, idle_mode, etc.)
     // that cava-bg requires and would otherwise reject.
-    function _writeCavaBgConfig() {
+    function _writeCavaBgConfig(skipSIGHUP) {
         var enableXray = BeeConfig.vibeXray
         var xrayIntensity = BeeConfig.vibeXrayIntensity
         var xrayBlend = BeeConfig.vibeXrayBlend
         var dynamicColors = enableXray ? "false" : "true"
+
+        _cavaBgSkipSIGHUP = (skipSIGHUP === true)
 
         console.log("[BeeVibe] Merging cava-bg config: xray=" + enableXray + " blend=" + xrayBlend + " intensity=" + xrayIntensity)
 
@@ -324,14 +326,22 @@ Item {
         _hyprRuleRemoveProc.running = true
     }
 
+    property bool _cavaBgSkipSIGHUP: false
+
     Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => {
         if (line.trim() === "CONFIG_WRITTEN") {
             console.log("[BeeVibe] config.toml merged ✓")
-            // Signal cava-bg daemon to reload config (SIGHUP)
-            _cavaBgReload.running = true
+            if (!_cavaBgSkipSIGHUP) {
+                // Signal cava-bg daemon to reload config (SIGHUP)
+                _cavaBgReload.running = true
+            } else {
+                console.log("[BeeVibe] SIGHUP skipped (daemon just started with fresh config)")
+            }
         } else if (line.trim() === "CONFIG_PATCHED_SED") {
             console.log("[BeeVibe] config.toml patched (sed fallback) ✓")
-            _cavaBgReload.running = true
+            if (!_cavaBgSkipSIGHUP) {
+                _cavaBgReload.running = true
+            }
         } else {
             console.log("[BeeVibe] merge:", line)
         }
