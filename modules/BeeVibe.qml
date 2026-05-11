@@ -153,10 +153,15 @@ Item {
         }
         onExited: (code, status) => {
             if (active && backend === "cava-bg") {
-                console.log("[BeeVibe] cava-bg launcher exited (code:" + code + "), starting daemon monitor...")
-                _daemonMonitor.running = true
+                console.log("[BeeVibe] cava-bg launcher exited (code:" + code + "), waiting 2s before first daemon check...")
+                _firstMonitorTimer.start()
             }
         }
+    }
+
+    // Delay before first daemon check — gives cava-bg time to write PID and start
+    Timer { id: _firstMonitorTimer; interval: 2000; repeat: false
+        onTriggered: { if (active && backend === "cava-bg") _daemonMonitor.running = true }
     }
 
     // Daemon monitor — checks PID file periodically, captures error log on failure
@@ -167,23 +172,30 @@ Item {
         command: ["bash", "-c",
             "pidfile=\"$HOME/.config/cava-bg/daemon.pid\"; " +
             "logfile=\"$HOME/.config/cava-bg/daemon.log\"; " +
+            "# Check by PID file first\n" +
             "if [ -f \"$pidfile\" ]; then " +
             "  pid=$(cat \"$pidfile\"); " +
             "  if kill -0 \"$pid\" 2>/dev/null; then " +
-            "    # Daemon alive — check for surface errors in last 10s of log\n" +
+            "    # Daemon alive — check for surface errors in recent log\n" +
             "    surface_errors=$(tail -30 \"$logfile\" 2>/dev/null | grep -c 'Surface error: Timeout' || true); " +
-            "    if [ \"$surface_errors\" -ge 3 ]; then " +
+            "    if [ \"$surface_errors\" -ge 5 ]; then " +
             "      echo 'SURFACE_ERRORS'; " +
             "    else echo 'ALIVE'; fi; " +
             "  else echo 'DEAD'; tail -20 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
+            "# Fallback: check if any cava-bg process is running\n" +
+            "elif pgrep -x cava-bg >/dev/null 2>&1; then " +
+            "  echo 'ALIVE_NO_PIDFILE'; " +
             "else echo 'NO_PID_FILE'; fi"
         ]
         stdout: SplitParser {
             onRead: (line) => {
                 var trimmed = line.trim()
-                if (trimmed === "ALIVE") {
+                if (trimmed === "ALIVE" || trimmed === "ALIVE_NO_PIDFILE") {
                     _cavaBgDaemonRunning = true
                     _cavaBgRestartAttempts = 0  // Reset on success
+                    if (trimmed === "ALIVE_NO_PIDFILE") {
+                        console.log("[BeeVibe] cava-bg daemon alive (no PID file, process found via pgrep)")
+                    }
                 } else if (trimmed === "SURFACE_ERRORS") {
                     // Daemon PID is alive but surface keeps timing out — Wayland issue
                     _cavaBgDaemonRunning = false
