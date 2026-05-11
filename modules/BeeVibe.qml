@@ -128,6 +128,7 @@ Item {
         _cavaReaderRestart.stop()
         _cavaBgDaemonRunning = false
         _cavaBgRestartAttempts = 0
+        _cavaBgNeedConfigWrite = false
 
         if (backend === "cava-bg") {
             _stopCavaBg()
@@ -196,6 +197,11 @@ Item {
                     if (trimmed === "ALIVE_NO_PIDFILE") {
                         console.log("[BeeVibe] cava-bg daemon alive (no PID file, process found via pgrep)")
                     }
+                    // First time daemon is alive after start — write config and SIGHUP
+                    if (_cavaBgNeedConfigWrite) {
+                        _cavaBgNeedConfigWrite = false
+                        _onDaemonAlive()
+                    }
                 } else if (trimmed === "SURFACE_ERRORS") {
                     // Daemon PID is alive but surface keeps timing out — Wayland issue
                     _cavaBgDaemonRunning = false
@@ -226,6 +232,7 @@ Item {
     property bool _cavaBgDaemonRunning: false
     property int _cavaBgRestartAttempts: 0
     readonly property int _cavaBgMaxRestarts: 3
+    property bool _cavaBgNeedConfigWrite: false  // Set true on start, triggers config write when daemon goes ALIVE
 
     Timer { id: _monitorTimer; interval: 5000; repeat: false
         onTriggered: { if (active && backend === "cava-bg") _daemonMonitor.running = true }
@@ -250,9 +257,7 @@ Item {
     function _startCavaBg() {
         backend = "cava-bg"
         _cavaBgRestartAttempts = 0  // Reset on fresh start
-
-        // Write config and launch daemon
-        _writeCavaBgConfig()
+        _cavaBgNeedConfigWrite = true  // Will write config once daemon is confirmed alive
 
         // Add Hyprland layerrule for cava-bg
         _hyprRuleProc.command = ["bash", "-c",
@@ -260,13 +265,21 @@ Item {
         ]
         _hyprRuleProc.running = true
 
-        // Start cava-bg daemon (fire-and-forget)
+        // Start cava-bg daemon FIRST (clean kill + launch)
         _cavaBgLauncher.running = true
 
         // Start the bar value reader (for MayaDash equalizer display)
         _cavaReader.running = true
 
-        console.log("[BeeVibe] cava-bg started with xray=" + BeeConfig.vibeXray)
+        console.log("[BeeVibe] cava-bg starting with xray=" + BeeConfig.vibeXray)
+    }
+
+    // ─── Write config AFTER daemon is alive ───────────────────────
+    // Called by _firstMonitorTimer when daemon status is confirmed ALIVE.
+    // This avoids the race where SIGHUP is sent before the daemon exists.
+    function _onDaemonAlive() {
+        console.log("[BeeVibe] cava-bg daemon alive, writing config and sending SIGHUP...")
+        _writeCavaBgConfig()
     }
 
     // ─── Write cava-bg config via Python merge script ────────────
