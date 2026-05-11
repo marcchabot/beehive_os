@@ -144,7 +144,7 @@ Item {
     Process {
         id: _cavaBgLauncher
         running: false
-        command: ["bash", "-c", "cava-bg on 2>&1"]
+        command: ["bash", "-c", "cava-bg off 2>/dev/null; cava-bg kill 2>/dev/null; sleep 0.5; cava-bg on 2>&1"]
         stdout: SplitParser {
             onRead: (line) => { console.log("[BeeVibe] cava-bg launch:", line) }
         }
@@ -160,6 +160,7 @@ Item {
     }
 
     // Daemon monitor — checks PID file periodically, captures error log on failure
+    // Also detects persistent Wayland surface errors (Timeout) to break the cycle early
     Process {
         id: _daemonMonitor
         running: false
@@ -168,7 +169,13 @@ Item {
             "logfile=\"$HOME/.config/cava-bg/daemon.log\"; " +
             "if [ -f \"$pidfile\" ]; then " +
             "  pid=$(cat \"$pidfile\"); " +
-            "  if kill -0 \"$pid\" 2>/dev/null; then echo 'ALIVE'; else echo 'DEAD'; tail -20 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
+            "  if kill -0 \"$pid\" 2>/dev/null; then " +
+            "    # Daemon alive — check for surface errors in last 10s of log\n" +
+            "    surface_errors=$(tail -30 \"$logfile\" 2>/dev/null | grep -c 'Surface error: Timeout' || true); " +
+            "    if [ \"$surface_errors\" -ge 3 ]; then " +
+            "      echo 'SURFACE_ERRORS'; " +
+            "    else echo 'ALIVE'; fi; " +
+            "  else echo 'DEAD'; tail -20 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
             "else echo 'NO_PID_FILE'; fi"
         ]
         stdout: SplitParser {
@@ -177,6 +184,13 @@ Item {
                 if (trimmed === "ALIVE") {
                     _cavaBgDaemonRunning = true
                     _cavaBgRestartAttempts = 0  // Reset on success
+                } else if (trimmed === "SURFACE_ERRORS") {
+                    // Daemon PID is alive but surface keeps timing out — Wayland issue
+                    _cavaBgDaemonRunning = false
+                    if (active && backend === "cava-bg") {
+                        console.warn("[BeeVibe] cava-bg daemon alive but Wayland surface errors detected, restarting...")
+                        _restartTimer.start()
+                    }
                 } else if (trimmed.startsWith("DAEMON_LOG: ")) {
                     console.warn("[BeeVibe] cava-bg log: " + trimmed.substring(12))
                 } else if (trimmed === "DEAD" || trimmed === "NO_PID_FILE") {
@@ -278,8 +292,8 @@ Item {
         _restartTimer.stop()
         _cavaBgDaemonRunning = false
         _cavaReader.running = false
-        // Stop cava-bg daemon
-        _stopCavaBgProc.command = ["bash", "-c", "cava-bg off 2>/dev/null; cava-bg kill 2>/dev/null; echo 'stopped'"]
+        // Stop cava-bg daemon — use both off/kill and pkill for robustness
+        _stopCavaBgProc.command = ["bash", "-c", "cava-bg off 2>/dev/null; cava-bg kill 2>/dev/null; pkill -f 'cava-bg' 2>/dev/null; sleep 0.3; echo 'stopped'"]
         _stopCavaBgProc.running = true
         // Remove Hyprland layerrule
         _hyprRuleRemoveProc.running = true
