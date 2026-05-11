@@ -259,6 +259,25 @@ QtObject {
     // ─── Window Icons Configuration ──────────────────────────
     property var window_icons: ({})
 
+    // ─── Contextual Bar Rules 🐝🧭 ──────────────────────────
+    // Per-app contextual shortcuts shown in BeeBar when that app is active.
+    // Format: { "kitty": [{icon: "📊", label: "CPU", action: "shell:btop"}], ... }
+    property var context_rules: ({
+        "kitty":        [{ icon: "📊", label: "CPU",  action: "shell:btop" }],
+        "alacritty":    [{ icon: "📊", label: "CPU",  action: "shell:btop" }],
+        "foot":         [{ icon: "📊", label: "CPU",  action: "shell:btop" }],
+        "firefox":      [{ icon: "📁", label: "DLs",  action: "shell:dolphin ~/Downloads" }],
+        "zen-browser":  [{ icon: "📁", label: "DLs",  action: "shell:dolphin ~/Downloads" }],
+        "zen":          [{ icon: "📁", label: "DLs",  action: "shell:dolphin ~/Downloads" }],
+        "code":         [{ icon: "🧠", label: "RAM",  action: "shell:btop" }],
+        "zeditor":       [{ icon: "🧠", label: "RAM",  action: "shell:btop" }],
+        "discord":      [{ icon: "🌐", label: "NET",  action: "detail:network" }],
+        "spotify":       [{ icon: "🔊", label: "VOL",  action: "shell:pavucontrol" }],
+        "steam":        [{ icon: "🎮", label: "LIB",  action: "shell:steam" }],
+        "dolphin":       [{ icon: "💿", label: "DISK", action: "shell:btop" }],
+        "thunar":        [{ icon: "💿", label: "DISK", action: "shell:btop" }]
+    })
+
     // ─── BeeVoice — Maya AI Assistant 🐝🎤 ─────────────────────
     property bool voiceEnabled: true
     property string voiceOllamaModel: "gemma4:31b-cloud"
@@ -1046,6 +1065,9 @@ QtObject {
         if (cfg.window_icons !== undefined)
             window_icons = cfg.window_icons
 
+        if (cfg.context_rules !== undefined)
+            context_rules = cfg.context_rules
+
         // ─── BeeVoice config ──────────────────────────────────
         if (cfg.bee_voice !== undefined) {
             var bv = cfg.bee_voice
@@ -1411,6 +1433,7 @@ QtObject {
             night_gain: soundNightGain
         }
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
+        cfg.context_rules = context_rules
         cfg.events_enabled = eventsEnabled
         cfg.events_live_path = eventsLivePath
         

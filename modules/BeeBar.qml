@@ -439,6 +439,69 @@ Rectangle {
 
             Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter }
 
+            // ─── Contextual Shortcuts per App 🐝🧭 ─────────────────
+            RowLayout {
+                id: contextShortcuts
+                spacing: 4
+                Layout.alignment: Qt.AlignVCenter
+
+                // Compute which shortcuts to show based on active app
+                property var activeShortcuts: {
+                    var cls = (BeeBarState.activeWindowClass || "").toLowerCase()
+                    if (!cls || cls === "unknown" || cls === "none" || !BeeConfig.contextualBar) return []
+                    var rules = BeeConfig.context_rules || {}
+                    // Case-insensitive lookup
+                    for (var key in rules) {
+                        if (key.toLowerCase() === cls) return rules[key]
+                    }
+                    return []
+                }
+
+                visible: activeShortcuts.length > 0
+                opacity: activeShortcuts.length > 0 ? 1.0 : 0.0
+                Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+                Repeater {
+                    model: contextShortcuts.activeShortcuts
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+
+                        width: ctxLabel.implicitWidth + 14
+                        height: 22
+                        radius: 6
+                        color: ctxHover.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.18)
+                            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, ctxHover.containsMouse ? 0.5 : 0.15)
+                        border.width: 1
+
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+                        scale: ctxHover.containsMouse ? 1.05 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack; easing.overshoot: 0.3 } }
+
+                        Row {
+                            id: ctxLabel
+                            anchors.centerIn: parent
+                            spacing: 3
+                            Text { text: modelData.icon; font.pixelSize: 10; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: modelData.label; color: BeeTheme.textPrimary; font.pixelSize: 9; font.bold: true; font.letterSpacing: 0.5; anchors.verticalCenter: parent.verticalCenter }
+                        }
+
+                        MouseArea {
+                            id: ctxHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: beeBar.dispatchModuleAction(modelData.action)
+                        }
+                    }
+                }
+            }
+
+            Rectangle { width: 1; height: 20; color: BeeTheme.separator; Layout.alignment: Qt.AlignVCenter; visible: contextShortcuts.visible }
+
             RowLayout {
                 spacing: 8
                 Repeater {
