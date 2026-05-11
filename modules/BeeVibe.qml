@@ -168,7 +168,7 @@ Item {
             "logfile=\"$HOME/.config/cava-bg/daemon.log\"; " +
             "if [ -f \"$pidfile\" ]; then " +
             "  pid=$(cat \"$pidfile\"); " +
-            "  if kill -0 \"$pid\" 2>/dev/null; then echo 'ALIVE'; else echo 'DEAD'; tail -5 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
+            "  if kill -0 \"$pid\" 2>/dev/null; then echo 'ALIVE'; else echo 'DEAD'; tail -20 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
             "else echo 'NO_PID_FILE'; fi"
         ]
         stdout: SplitParser {
