@@ -203,11 +203,14 @@ Item {
                         _onDaemonAlive()
                     }
                 } else if (trimmed === "SURFACE_ERRORS") {
-                    // Daemon PID is alive but surface keeps timing out — Wayland issue
-                    _cavaBgDaemonRunning = false
-                    if (active && backend === "cava-bg") {
-                        console.warn("[BeeVibe] cava-bg daemon alive but Wayland surface errors detected, restarting...")
-                        _restartTimer.start()
+                    // Daemon alive but has surface timeout errors — this is TRANSIENT (wgpu::SurfaceError::Timeout)
+                    // cava-bg handles these internally with continue/retry, NOT a reason to restart.
+                    _cavaBgDaemonRunning = true
+                    _cavaBgRestartAttempts = 0
+                    console.warn("[BeeVibe] cava-bg daemon alive but has Wayland surface timeout errors — monitoring (transient, not restarting)")
+                    if (_cavaBgNeedConfigWrite) {
+                        _cavaBgNeedConfigWrite = false
+                        _onDaemonAlive()
                     }
                 } else if (trimmed.startsWith("DAEMON_LOG: ")) {
                     console.warn("[BeeVibe] cava-bg log: " + trimmed.substring(12))
