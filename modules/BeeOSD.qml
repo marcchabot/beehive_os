@@ -3,10 +3,10 @@ import QtQuick.Effects
 
 // ═══════════════════════════════════════════════════════════════
 // BeeOSD.qml — On-Screen Display BeeAura 🐝🎚️
-// v0.9.0 : Premium OSD Redesign — macOS-style bars, animated icons
-//   volume     → coloré barre + icône animée
-//   brightness → cercle lumineux
-//   mute       → icône barrée animée
+// v0.10.0 : Premium OSD Redesign — 4-level dynamic icons, real-time preview
+//   volume     → 4-level icon (mute/low/medium/high) + colored bar
+//   brightness → 4-level icon (off/dim/medium/full) + luminous circle
+//   mute       → barrée animée
 //   kbd        → barre colorée clavier
 //
 // Glassmorphism BeeHive cohérent, animations fluides type macOS
@@ -35,12 +35,20 @@ Item {
         }
     }
 
-    // ─── Résolution icône selon type ET valeur ────────────────
+    // ─── Résolution icône selon type ET valeur (4 niveaux) ────
     function iconFor(t, v) {
         switch (t) {
             case "mute":       return "🔇"
-            case "volume":     return v === 0 ? "🔈" : (v < 33 ? "🔉" : (v < 66 ? "🔉" : "🔊"))
-            case "brightness": return v < 33 ? "🌙" : (v < 66 ? "🌤️" : "☀️")
+            case "volume":
+                if (v === 0) return "🔈"          // Mute / off
+                if (v <= 33) return "🔉"         // Low
+                if (v <= 66) return "🔊"         // Medium
+                return "🔊"                      // High
+            case "brightness":
+                if (v === 0) return "🌑"         // Off / very dim
+                if (v <= 33) return "🌙"         // Low
+                if (v <= 66) return "🌤️"        // Medium
+                return "☀️"                       // High / full
             case "kbd":        return "⌨️"
             default:           return "◈"
         }
@@ -226,6 +234,30 @@ Item {
                         color: BeeTheme.textPrimary
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
+
+                    // Brightness level label (OFF/DIM/MED/FULL)
+                    Text {
+                        text: {
+                            var v = osd.currentValue
+                            if (v === 0) return "OFF"
+                            if (v <= 33) return "DIM"
+                            if (v <= 66) return "MED"
+                            return "FULL"
+                        }
+                        font.pixelSize: 8
+                        font.weight: Font.Bold
+                        font.letterSpacing: 1.5
+                        color: Qt.rgba(osdAccent.r, osdAccent.g, osdAccent.b, 0.7)
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: osd.currentType === "brightness"
+
+                        SequentialAnimation on opacity {
+                            running: osd.currentType === "brightness" && osdAnim.running
+                            loops: Animation.Infinite
+                            NumberAnimation { to: 0.4; duration: 800; easing.type: Easing.InOutSine }
+                            NumberAnimation { to: 1.0; duration: 800; easing.type: Easing.InOutSine }
+                        }
+                    }
                 }
             }
 
@@ -273,6 +305,34 @@ Item {
                             NumberAnimation { to: 1.15; duration: 150; easing.type: Easing.OutCubic }
                             NumberAnimation { to: 1.0; duration: 200; easing.type: Easing.OutElastic; easing.amplitude: 0.5 }
                         }
+                    }
+                }
+
+                // Volume/Brightness level label (Low/Med/High)
+                Text {
+                    id: levelLabel
+                    text: {
+                        if (osd.currentType === "mute") return ""
+                        var v = osd.currentValue
+                        if (v === 0) return "OFF"
+                        if (v <= 33) return "LOW"
+                        if (v <= 66) return "MED"
+                        return "HIGH"
+                    }
+                    font.pixelSize: 9
+                    font.weight: Font.Bold
+                    font.letterSpacing: 1.5
+                    color: Qt.rgba(osdAccent.r, osdAccent.g, osdAccent.b, 0.6)
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: osd.currentType !== "mute"
+
+                    // Fade in with the OSD
+                    opacity: osdAnim.running ? 1.0 : 1.0
+                    SequentialAnimation on opacity {
+                        running: osdAnim.running
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.5; duration: 800; easing.type: Easing.InOutSine }
+                        NumberAnimation { to: 1.0; duration: 800; easing.type: Easing.InOutSine }
                     }
                 }
 
