@@ -127,6 +127,7 @@ Item {
         _restartTimer.stop()
         _cavaReaderRestart.stop()
         _cavaBgDaemonRunning = false
+        _cavaBgRestartAttempts = 0
 
         if (backend === "cava-bg") {
             _stopCavaBg()
@@ -158,28 +159,34 @@ Item {
         }
     }
 
-    // Daemon monitor — checks PID file periodically
+    // Daemon monitor — checks PID file periodically, captures error log on failure
     Process {
         id: _daemonMonitor
         running: false
         command: ["bash", "-c",
             "pidfile=\"$HOME/.config/cava-bg/daemon.pid\"; " +
+            "logfile=\"$HOME/.config/cava-bg/daemon.log\"; " +
             "if [ -f \"$pidfile\" ]; then " +
             "  pid=$(cat \"$pidfile\"); " +
-            "  if kill -0 \"$pid\" 2>/dev/null; then echo 'ALIVE'; else echo 'DEAD'; fi; " +
+            "  if kill -0 \"$pid\" 2>/dev/null; then echo 'ALIVE'; else echo 'DEAD'; tail -5 \"$logfile\" 2>/dev/null | sed 's/^/DAEMON_LOG: /'; fi; " +
             "else echo 'NO_PID_FILE'; fi"
         ]
         stdout: SplitParser {
             onRead: (line) => {
-                var status = line.trim()
-                if (status === "ALIVE") {
+                var trimmed = line.trim()
+                if (trimmed === "ALIVE") {
                     _cavaBgDaemonRunning = true
-                } else {
+                    _cavaBgRestartAttempts = 0  // Reset on success
+                } else if (trimmed.startsWith("DAEMON_LOG: ")) {
+                    console.warn("[BeeVibe] cava-bg log: " + trimmed.substring(12))
+                } else if (trimmed === "DEAD" || trimmed === "NO_PID_FILE") {
                     _cavaBgDaemonRunning = false
                     if (active && backend === "cava-bg") {
-                        console.log("[BeeVibe] cava-bg daemon not running (" + status + "), restarting in 5s...")
+                        console.log("[BeeVibe] cava-bg daemon not running (" + trimmed + "), restarting in 5s...")
                         _restartTimer.start()
                     }
+                } else {
+                    // Other output from tail, skip
                 }
             }
         }
@@ -191,16 +198,32 @@ Item {
     }
 
     property bool _cavaBgDaemonRunning: false
+    property int _cavaBgRestartAttempts: 0
+    readonly property int _cavaBgMaxRestarts: 3
 
     Timer { id: _monitorTimer; interval: 5000; repeat: false
         onTriggered: { if (active && backend === "cava-bg") _daemonMonitor.running = true }
     }
     Timer { id: _restartTimer; interval: 5000
-        onTriggered: { if (active && backend === "cava-bg") { console.log("[BeeVibe] Restarting cava-bg daemon..."); _cavaBgLauncher.running = true } }
+        onTriggered: {
+            if (active && backend === "cava-bg") {
+                if (_cavaBgRestartAttempts < _cavaBgMaxRestarts) {
+                    _cavaBgRestartAttempts++
+                    console.log("[BeeVibe] Restarting cava-bg daemon (attempt " + _cavaBgRestartAttempts + "/" + _cavaBgMaxRestarts + ")...")
+                    _cavaBgLauncher.running = true
+                } else {
+                    console.warn("[BeeVibe] cava-bg daemon failed " + _cavaBgMaxRestarts + " times, falling back to simulation mode")
+                    _stopCavaBg()
+                    backend = "simulation"
+                    _cavaLive = false
+                }
+            }
+        }
     }
 
     function _startCavaBg() {
         backend = "cava-bg"
+        _cavaBgRestartAttempts = 0  // Reset on fresh start
 
         // Write config and launch daemon
         _writeCavaBgConfig()
