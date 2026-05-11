@@ -3,11 +3,11 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeVibe.qml — Moteur de visualisation audio 🐝🎵
-// v2.2 : cava-bg integration — Native Wayland audio visualizer
-//   - Respects BeeConfig.vibeBackend choice ("auto" | "cava-bg" | "cava")
-//   - Uses Python merge script to patch cava-bg config (preserves all fields)
-//   - X-Ray hot-reload when settings change
-//   - cava-bg daemon management with PID monitoring
+// v2.3 : cava-bg integration — Native Wayland audio visualizer
+//   - cava-bg does NOT support SIGHUP — config must be written before daemon start
+//   - Live config changes (X-Ray toggle) restart the daemon entirely
+//   - Surface Timeout errors are transient (wgpu), not a reason to restart
+//   - Restart limit (3 attempts) with simulation fallback
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -197,7 +197,7 @@ Item {
                     if (trimmed === "ALIVE_NO_PIDFILE") {
                         console.log("[BeeVibe] cava-bg daemon alive (no PID file, process found via pgrep)")
                     }
-                    // First time daemon is alive after start — write config and SIGHUP
+                    // Daemon alive — confirmed (config was written before start)
                     if (_cavaBgNeedConfigWrite) {
                         _cavaBgNeedConfigWrite = false
                         _onDaemonAlive()
@@ -260,7 +260,10 @@ Item {
     function _startCavaBg() {
         backend = "cava-bg"
         _cavaBgRestartAttempts = 0  // Reset on fresh start
-        _cavaBgNeedConfigWrite = true  // Will write config once daemon is confirmed alive
+        _cavaBgNeedConfigWrite = false  // Config written before daemon start
+
+        // Write config BEFORE starting daemon (cava-bg reads config at startup, no hot-reload)
+        _writeCavaBgConfig(true)  // skipSIGHUP = true: daemon not started yet
 
         // Add Hyprland layerrule for cava-bg
         _hyprRuleProc.command = ["bash", "-c",
@@ -268,8 +271,9 @@ Item {
         ]
         _hyprRuleProc.running = true
 
-        // Start cava-bg daemon FIRST (clean kill + launch)
-        _cavaBgLauncher.running = true
+        // Start cava-bg daemon AFTER config is written
+        // Delay slightly to ensure config file is flushed to disk
+        _cavaBgStartTimer.start()
 
         // Start the bar value reader (for MayaDash equalizer display)
         _cavaReader.running = true
@@ -277,12 +281,20 @@ Item {
         console.log("[BeeVibe] cava-bg starting with xray=" + BeeConfig.vibeXray)
     }
 
+    // ─── Timer to start daemon after config write ────────────────
+    Timer { id: _cavaBgStartTimer; interval: 500; repeat: false
+        onTriggered: { _cavaBgLauncher.running = true }
+    }
+
     // ─── Write config AFTER daemon is alive ───────────────────────
     // Called by _firstMonitorTimer when daemon status is confirmed ALIVE.
     // This avoids the race where SIGHUP is sent before the daemon exists.
     function _onDaemonAlive() {
-        console.log("[BeeVibe] cava-bg daemon alive, writing config...")
-        _writeCavaBgConfig(true)  // skipSIGHUP = true: daemon just started with current config
+        // NOTE: cava-bg does NOT support SIGHUP for config reload.
+        // SIGHUP kills the daemon (default Linux behavior) since there's no handler.
+        // Config must be written BEFORE daemon start. This function is called
+        // only to confirm the daemon is alive — no config write needed here.
+        console.log("[BeeVibe] cava-bg daemon alive ✓")
     }
 
     // ─── Write cava-bg config via Python merge script ────────────
@@ -330,61 +342,31 @@ Item {
     }
 
     property bool _cavaBgSkipSIGHUP: false
+    property bool _cavaBgRestartAfterConfig: false  // Set true for live config changes that need daemon restart
 
     Process { id: _writeConfigProc; running: false; stdout: SplitParser { onRead: (line) => {
         if (line.trim() === "CONFIG_WRITTEN") {
             console.log("[BeeVibe] config.toml merged ✓")
-            if (!_cavaBgSkipSIGHUP) {
-                // Signal cava-bg daemon to reload config (SIGHUP)
-                _cavaBgReload.running = true
-            } else {
-                console.log("[BeeVibe] SIGHUP skipped (daemon just started with fresh config)")
+            if (_cavaBgSkipSIGHUP) {
+                console.log("[BeeVibe] SIGHUP skipped (daemon not running yet or just started)")
+            } else if (_cavaBgRestartAfterConfig) {
+                // cava-bg does NOT support SIGHUP — must restart daemon for live changes
+                console.log("[BeeVibe] Config changed, restarting cava-bg daemon...")
+                _cavaBgRestartAfterConfig = false
+                _cavaBgLauncher.running = true
             }
         } else if (line.trim() === "CONFIG_PATCHED_SED") {
             console.log("[BeeVibe] config.toml patched (sed fallback) ✓")
-            if (!_cavaBgSkipSIGHUP) {
-                _cavaBgReload.running = true
+            if (!_cavaBgSkipSIGHUP && _cavaBgRestartAfterConfig) {
+                console.log("[BeeVibe] Config changed, restarting cava-bg daemon...")
+                _cavaBgRestartAfterConfig = false
+                _cavaBgLauncher.running = true
             }
         } else {
             console.log("[BeeVibe] merge:", line)
         }
     } } stderr: SplitParser { onRead: (line) => console.warn("[BeeVibe] merge error:", line) } }
 
-    // ─── Reload cava-bg after config change ───────────────────
-    // Sends SIGHUP to the daemon (PID from pidfile) to hot-reload config.
-    // Falls back to full restart if SIGHUP is not supported.
-    Process {
-        id: _cavaBgReload
-        running: false
-        command: ["bash", "-c",
-            "pidfile=\"$HOME/.config/cava-bg/daemon.pid\"; " +
-            "if [ -f \"$pidfile\" ]; then " +
-            "  pid=$(cat \"$pidfile\"); " +
-            "  if kill -0 \"$pid\" 2>/dev/null; then " +
-            "    kill -HUP \"$pid\" 2>/dev/null && echo 'SIGHUP_SENT' || echo 'SIGHUP_FAILED'; " +
-            "  else echo 'DAEMON_DEAD'; fi; " +
-            "else echo 'NO_PID_FILE'; fi"
-        ]
-        stdout: SplitParser {
-            onRead: (line) => {
-                var status = line.trim()
-                if (status === "SIGHUP_SENT") {
-                    console.log("[BeeVibe] cava-bg hot-reload (SIGHUP) ✓")
-                } else if (status === "SIGHUP_FAILED") {
-                    console.warn("[BeeVibe] SIGHUP failed, restarting cava-bg daemon...")
-                    // Fallback: restart cava-bg daemon entirely
-                    _stopCavaBg()
-                    _restartTimer.interval = 1000
-                    _restartTimer.start()
-                } else if (status === "DAEMON_DEAD" || status === "NO_PID_FILE") {
-                    console.warn("[BeeVibe] cava-bg daemon not running, restarting...")
-                    _restartTimer.start()
-                } else {
-                    console.log("[BeeVibe] cava-bg reload:", status)
-                }
-            }
-        }
-    }
     Process { id: _hyprRuleProc; running: false; stdout: SplitParser { onRead: (line) => console.log("[BeeVibe] layerrule:", line) } stderr: SplitParser {} }
     Process { id: _stopCavaBgProc; running: false; stdout: SplitParser {} stderr: SplitParser {} }
     Process { id: _hyprRuleRemoveProc; running: false; command: ["bash", "-c", "hyprctl layerrule remove cava-bg 2>/dev/null; echo 'removed'"]; stdout: SplitParser { onRead: (line) => {} } stderr: SplitParser {} }
@@ -507,29 +489,35 @@ Item {
     }
 
     // ─── X-Ray settings change handler ───────────────────────────
+    // NOTE: cava-bg does NOT support SIGHUP. For live config changes,
+    // we must write the config and restart the daemon.
     Connections {
         target: BeeConfig
         function onVibeXrayChanged() {
-            console.log("[BeeVibe] X-Ray changed → " + (beeVibe.backend === "cava-bg" ? "merging config (hot-reload)" : "queued"))
+            console.log("[BeeVibe] X-Ray changed → " + (beeVibe.backend === "cava-bg" ? "write config + restart daemon" : "queued"))
             if (beeVibe.backend === "cava-bg") {
+                _cavaBgRestartAfterConfig = true
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayIntensityChanged() {
-            console.log("[BeeVibe] X-Ray intensity changed → " + (beeVibe.backend === "cava-bg" ? "merging config" : "queued"))
+            console.log("[BeeVibe] X-Ray intensity changed → " + (beeVibe.backend === "cava-bg" ? "write config + restart daemon" : "queued"))
             if (beeVibe.backend === "cava-bg") {
+                _cavaBgRestartAfterConfig = true
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayBlendChanged() {
-            console.log("[BeeVibe] X-Ray blend changed → " + (beeVibe.backend === "cava-bg" ? "merging config" : "queued"))
+            console.log("[BeeVibe] X-Ray blend changed → " + (beeVibe.backend === "cava-bg" ? "write config + restart daemon" : "queued"))
             if (beeVibe.backend === "cava-bg") {
+                _cavaBgRestartAfterConfig = true
                 beeVibe._writeCavaBgConfig()
             }
         }
         function onVibeXrayDirChanged() {
-            console.log("[BeeVibe] X-Ray dir changed → " + (beeVibe.backend === "cava-bg" ? "merging config" : "queued"))
+            console.log("[BeeVibe] X-Ray dir changed → " + (beeVibe.backend === "cava-bg" ? "write config + restart daemon" : "queued"))
             if (beeVibe.backend === "cava-bg") {
+                _cavaBgRestartAfterConfig = true
                 beeVibe._writeCavaBgConfig()
             }
         }
