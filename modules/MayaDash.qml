@@ -61,7 +61,6 @@ Rectangle {
     property bool monitorDetailVisible: false
 
     // ─── BeeCalendar: opened via BeeHiveShell.calendarVisible ────
-    signal openCalendar()
 
     BeeMonitor {
         id: beeMon
