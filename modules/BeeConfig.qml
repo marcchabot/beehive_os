@@ -5,12 +5,16 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeConfig.qml — BeeConfig System 🐝📋  (Global Singleton)
+// v0.8.25 — CalDAV sync, Nectar Auto-Theme (time/weather)
 // Loads user_config.json and exposes dashboard data
 // Access: BeeConfig.cells, BeeConfig.weatherCity, etc.
 // ═══════════════════════════════════════════════════════════════
 
 QtObject {
     id: root
+
+    // ─── Version 🐝 ──────────────────────────────────────────────
+    property string appVersion: "0.8.25"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -306,6 +310,10 @@ QtObject {
     property bool weatherAmbientEnabled: false  // Weather-based ambient theming
     property bool adaptiveEnabled: true         // Adaptive mode (Nectar Sync master)
     property string adaptiveMode: "auto"       // "auto" | "manual"
+    // ─── Nectar Auto-Theme Mode 🐝🎨☀️🌧️ v0.8.25 ─────────────
+    // "off" = no auto theme, "timeOfDay" = day/night auto-switch,
+    // "weather" = weather-based accent, "combined" = both
+    property string autoThemeMode: "off"   // "off" | "timeOfDay" | "weather" | "combined"
     onNectarAutoScheduleChanged: { if (root._loaded) saveConfig() }
     onColorTherapyEnabledChanged: {
         if (root._loaded) saveConfig()
@@ -316,6 +324,7 @@ QtObject {
     onWeatherAmbientEnabledChanged: { if (root._loaded) saveConfig() }
     onAdaptiveEnabledChanged: { if (root._loaded) saveConfig() }
     onAdaptiveModeChanged: { if (root._loaded) saveConfig() }
+    onAutoThemeModeChanged: { if (root._loaded) saveConfig() }
 
     // ─── BeeSound: Mode Nuit ─────────────────────────────────
     property bool soundNightMode: true
@@ -1047,6 +1056,8 @@ QtObject {
             colorTherapyEnabled = cfg.color_therapy_enabled === true
             BeeTheme.colorTherapyEnabled = colorTherapyEnabled
         }
+        // ─── Nectar Auto-Theme Mode 🐝🎨☀️🌧️ v0.8.25 ─────────
+        if (cfg.auto_theme_mode !== undefined) autoThemeMode = cfg.auto_theme_mode
 
         if (cfg.sound) {
             if (cfg.sound.night_mode !== undefined) soundNightMode = cfg.sound.night_mode === true
@@ -1480,6 +1491,7 @@ QtObject {
         cfg.alarm_snooze_min = alarmSnoozeMin
         cfg.nectar_auto_schedule = nectarAutoSchedule
         cfg.color_therapy_enabled = colorTherapyEnabled
+        cfg.auto_theme_mode = autoThemeMode
         cfg.theme = BeeTheme.mode
         cfg.nectar_sync = {
             enabled: BeeTheme.nectarSync,

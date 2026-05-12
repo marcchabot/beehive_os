@@ -3,7 +3,7 @@ import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
 // BeeTheme.qml — BeePalette Engine 🐝🎨  (Singleton global)
-// v0.6.1: Nectar Sync 🍯 — wallpaperOverride (The Hive selection)
+// v0.8.25: Nectar Auto-Theme (time/weather) + weather accent
 //
 // ─── Architecture ─────────────────────────────────────────────
 //   • _progress (0.0 → 1.0) : animation de transition Dark↔Light
@@ -442,6 +442,180 @@ QtObject {
             if (typeof BeeBarState !== 'undefined') {
                 BeeBarState.dispatchNotification(title, label, "🍯")
             }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Nectar Auto-Theme 🐝🎨☀️🌧️ v0.8.25
+    // ═══════════════════════════════════════════════════════════
+    // Mode: "off" | "timeOfDay" | "weather" | "combined"
+    // Time-of-day: HoneyLight 6h-18h, HoneyDark 18h-6h,
+    //   dawn/dusk transitions for smooth switching.
+    // Weather: adjusts accent warmth based on condition.
+    //   Sunny → warmer amber, Cloudy → cooler muted,
+    //   Rainy → blue-grey undertones, Snowy → icy white-blue
+    // ═══════════════════════════════════════════════════════════
+
+    // ─── Weather condition for accent adaptation 🐝🌦️ ────────
+    property string _weatherCondition: "clear"  // clear | cloudy | rainy | snowy
+    property int _weatherCode: 0
+    property real _weatherAccentBlend: 0.0     // 0.0 = base accent, 1.0 = fully weather-adjusted
+    property string _timeOfDaySuggestion: ""    // "HoneyLight" or "HoneyDark"
+
+    // ─── Weather accent colors 🐝🎨 ─────────────────────────
+    readonly property color _sunnyAccent:    "#FFB81C"   // Warm amber (base)
+    readonly property color _cloudyAccent:   "#8B9DAF"   // Cool muted blue-grey
+    readonly property color _rainyAccent:    "#5B7E9A"   // Blue-grey undertone
+    readonly property color _snowyAccent:   "#B8D4E3"   // Icy white-blue
+    readonly property color _sunnyAccentLight:  "#FFD666"  // Warm amber (light)
+    readonly property color _cloudyAccentLight: "#A0B0C0"  // Cool muted (light)
+    readonly property color _rainyAccentLight:  "#7BA0BD"  // Blue-grey (light)
+    readonly property color _snowyAccentLight:  "#D0E8F5"  // Icy (light)
+
+    // ─── Computed weather accent 🐝 ─────────────────────────
+    readonly property color weatherAccent: {
+        var base = (_progress >= 0.5) ? _light.accent : _dark.accent
+        if (BeeConfig.autoThemeMode === "off") return base
+        if (BeeConfig.autoThemeMode !== "weather" && BeeConfig.autoThemeMode !== "combined") return base
+        var t = _weatherAccentBlend
+        var target = base
+        if (_weatherCondition === "sunny") {
+            target = (_progress >= 0.5) ? _sunnyAccentLight : _sunnyAccent
+        } else if (_weatherCondition === "cloudy") {
+            target = (_progress >= 0.5) ? _cloudyAccentLight : _cloudyAccent
+        } else if (_weatherCondition === "rainy") {
+            target = (_progress >= 0.5) ? _rainyAccentLight : _rainyAccent
+        } else if (_weatherCondition === "snowy") {
+            target = (_progress >= 0.5) ? _snowyAccentLight : _snowyAccent
+        }
+        return lerpColor(base, target, t)
+    }
+
+    // ─── Update weather condition from WMO code 🐝 ──────────
+    function updateWeatherCondition(wmoCode) {
+        _weatherCode = wmoCode
+        if (wmoCode <= 1) {
+            _weatherCondition = "sunny"
+        } else if (wmoCode <= 3) {
+            _weatherCondition = "cloudy"
+        } else if (wmoCode <= 48) {
+            _weatherCondition = "cloudy"
+        } else if (wmoCode <= 67) {
+            _weatherCondition = "rainy"
+        } else if (wmoCode <= 77) {
+            _weatherCondition = "snowy"
+        } else if (wmoCode <= 82) {
+            _weatherCondition = "rainy"
+        } else if (wmoCode <= 86) {
+            _weatherCondition = "snowy"
+        } else {
+            _weatherCondition = "rainy"
+        }
+        _weatherAccentBlendTarget = 1.0
+        _weatherBlendAnim.start()
+    }
+
+    property real _weatherAccentBlendTarget: 0.0
+    property NumberAnimation _weatherBlendAnim: NumberAnimation {
+        target: root
+        property: "_weatherAccentBlend"
+        to: root._weatherAccentBlendTarget
+        duration: root.reducedMotion ? 50 : 2000
+        easing.type: Easing.InOutSine
+    }
+
+    // ─── Time-of-day auto theme timer 🐝☀️🌙 ────────────────
+    property Timer _autoThemeTimer: Timer {
+        interval: 300000  // 5 minutes
+        running: BeeConfig.autoThemeMode === "timeOfDay" || BeeConfig.autoThemeMode === "combined"
+        repeat: true
+        onTriggered: root._checkTimeOfDay()
+    }
+
+    property string autoThemeMode: BeeConfig.autoThemeMode
+
+    function _checkTimeOfDay() {
+        if (BeeConfig.autoThemeMode !== "timeOfDay" && BeeConfig.autoThemeMode !== "combined") return
+
+        var hour = new Date().getHours()
+        var suggestedMode = ""
+
+        // Dawn: 6h-7h → HoneyLight, Day: 7h-17h → HoneyLight
+        // Dusk: 17h-18h → HoneyDark, Night: 18h-6h → HoneyDark
+        if (hour >= 7 && hour < 17) {
+            suggestedMode = "HoneyLight"
+        } else if (hour >= 18 || hour < 6) {
+            suggestedMode = "HoneyDark"
+        } else if (hour >= 6 && hour < 7) {
+            suggestedMode = "HoneyLight"
+        } else {
+            suggestedMode = "HoneyDark"
+        }
+
+        if (suggestedMode !== _timeOfDaySuggestion && suggestedMode !== mode) {
+            _timeOfDaySuggestion = suggestedMode
+            var isFr = (typeof BeeConfig !== 'undefined' && BeeConfig.uiLang === 'fr')
+            var label = suggestedMode === 'HoneyLight'
+                ? (isFr ? 'Mode Lumineux (HoneyLight)' : 'Light Mode (HoneyLight)')
+                : (isFr ? 'Mode Sombre (HoneyDark)' : 'Dark Mode (HoneyDark)')
+            console.log("BeeTheme: Nectar Auto-Theme →", label)
+
+            // Auto-apply the theme change
+            setMode(suggestedMode)
+            BeeConfig.mode = suggestedMode
+
+            if (typeof BeeBarState !== 'undefined') {
+                var title = isFr ? '🐝 Thème automatique' : '🐝 Auto Theme'
+                BeeBarState.dispatchNotification(title, label, "🎨")
+            }
+        }
+        _timeOfDaySuggestion = suggestedMode
+    }
+
+    // ─── Weather accent auto-fetch timer 🐝🌧️ ────────────────
+    property Timer _weatherAccentTimer: Timer {
+        interval: 1800000  // 30 minutes
+        running: BeeConfig.autoThemeMode === "weather" || BeeConfig.autoThemeMode === "combined"
+        repeat: true
+        onTriggered: root._fetchWeatherAccent()
+    }
+
+    function _fetchWeatherAccent() {
+        if (BeeConfig.autoThemeMode !== "weather" && BeeConfig.autoThemeMode !== "combined") return
+
+        var lat = BeeConfig.weatherLat
+        var lon = BeeConfig.weatherLon
+        if (lat === 0 && lon === 0) { lat = 45.67; lon = -73.88 }
+
+        var url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=weather_code&timezone=auto"
+        var xhr = new XMLHttpRequest()
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText)
+                        var wmo = data.current ? data.current.weather_code : 0
+                        updateWeatherCondition(wmo)
+                        console.log("BeeTheme: Weather accent updated, WMO=" + wmo + " → " + _weatherCondition)
+                    } catch (e) {
+                        console.log("BeeTheme: Weather accent parse error: " + e)
+                    }
+                } else {
+                    console.log("BeeTheme: Weather accent fetch failed, status=" + xhr.status)
+                }
+            }
+        }
+        xhr.open("GET", url)
+        xhr.send()
+    }
+
+    // ─── Apply auto-theme on startup 🐝 ──────────────────────
+    Component.onCompleted: {
+        if (BeeConfig.autoThemeMode === "timeOfDay" || BeeConfig.autoThemeMode === "combined") {
+            _checkTimeOfDay()
+        }
+        if (BeeConfig.autoThemeMode === "weather" || BeeConfig.autoThemeMode === "combined") {
+            _fetchWeatherAccent()
         }
     }
 

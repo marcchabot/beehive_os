@@ -124,6 +124,74 @@ Item {
                 }
             }
 
+            Item { height: 4 }
+
+            // ─── Nectar Auto-Theme (Time/Weather) 🐝🎨☀️🌧️ v0.8.25 ───
+            Text {
+                text: "🎨☀️🌧️ " + (_fr ? "Thème automatique Nectar" : "Nectar Auto-Theme")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // Auto-theme mode selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 8
+                Text {
+                    text: _fr ? "Mode :" : "Mode:"
+                    color: BeeTheme.textSecondary; font.pixelSize: 12
+                    Layout.alignment: Qt.AlignVCenter
+                }
+                Repeater {
+                    model: [
+                        { key: "off", icon: "⛔", label: "Off", labelFr: "Désactivé" },
+                        { key: "timeOfDay", icon: "☀️🌙", label: "Time of Day", labelFr: "Heure du jour" },
+                        { key: "weather", icon: "🌧️", label: "Weather", labelFr: "Météo" },
+                        { key: "combined", icon: "🎨", label: "Combined", labelFr: "Combiné" }
+                    ]
+                    delegate: Rectangle {
+                        width: 90; height: 50; radius: 8
+                        color: BeeConfig.autoThemeMode === modelData.key
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.08)
+                        border.color: BeeConfig.autoThemeMode === modelData.key
+                            ? BeeTheme.accent
+                            : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        border.width: BeeConfig.autoThemeMode === modelData.key ? 2 : 1
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                        Behavior on border.width { NumberAnimation { duration: 200 } }
+
+                        RowLayout {
+                            anchors.centerIn: parent; spacing: 3
+                            Text { text: modelData.icon; font.pixelSize: 14 }
+                            Text {
+                                text: _fr ? modelData.labelFr : modelData.label
+                                color: BeeConfig.autoThemeMode === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 9; font.bold: BeeConfig.autoThemeMode === modelData.key
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                            onClicked: { BeeConfig.autoThemeMode = modelData.key; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                text: {
+                    var mode = BeeConfig.autoThemeMode
+                    if (mode === "off") return _fr ? "Auto-thème désactivé" : "Auto-theme disabled"
+                    if (mode === "timeOfDay") return _fr ? "Thème adapté à l'heure (clair le jour, sombre la nuit)" : "Theme follows time of day (light by day, dark by night)"
+                    if (mode === "weather") return _fr ? "Accent adapté à la météo (soleil=ambre, pluie=bleu-gris)" : "Accent follows weather (sunny=amber, rain=blue-grey)"
+                    if (mode === "combined") return _fr ? "Heure du jour + accent météo combinés" : "Time of day + weather accent combined"
+                    return ""
+                }
+                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                font.pixelSize: 10; font.italic: true
+                Layout.fillWidth: true; wrapMode: Text.WordWrap
+            }
+
 
 
 
