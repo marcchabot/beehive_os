@@ -15,11 +15,11 @@ Item {
     ScrollView {
         anchors.fill: parent
         anchors.margins: 16
-        contentWidth: availableWidth
         clip: true
 
         ColumnLayout {
-            width: appearanceTab.width - 32
+            Layout.fillWidth: true
+            Layout.rightMargin: 12
             spacing: 16
 
             // ─── Theme Mode ───

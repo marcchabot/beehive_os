@@ -13,11 +13,11 @@ Item {
     ScrollView {
         anchors.fill: parent
         anchors.margins: 16
-        contentWidth: availableWidth
         clip: true
 
         ColumnLayout {
-            width: historyTab.width - 32
+            Layout.fillWidth: true
+            Layout.rightMargin: 12
             spacing: 16
 
             // Header
