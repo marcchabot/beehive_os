@@ -11,13 +11,13 @@ Item {
     id: extensionsTab
 
     ScrollView {
+        id: extensionsScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: extensionsScroll.availableWidth
             spacing: 16
 
             Text {

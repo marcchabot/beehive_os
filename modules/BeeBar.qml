@@ -84,15 +84,13 @@ Rectangle {
         if (action.startsWith("app:")) {
             var appName = action.substring(4).trim()
             if (!appName) return
-            var appProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"] }', beeBar, "BeeBarModuleApp")
-            appProc.start()
+            var appProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"]; running: true }', beeBar, "BeeBarModuleApp")
             return
         }
 
         if (action.startsWith("shell:")) {
             var shellCmd = action.substring(6)
-            var shellProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"] }', beeBar, "BeeBarModuleShell")
-            shellProc.start()
+            var shellProc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"]; running: true }', beeBar, "BeeBarModuleShell")
             return
         }
 

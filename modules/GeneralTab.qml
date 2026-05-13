@@ -11,13 +11,13 @@ Item {
     id: generalTab
 
     ScrollView {
+        id: generalScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: generalScroll.availableWidth
             spacing: 16
 
             // ─── Language ───

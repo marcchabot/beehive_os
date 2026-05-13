@@ -14,13 +14,13 @@ Item {
     property string _fr: BeeConfig.uiLang === "fr"
 
     ScrollView {
+        id: productivityScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: productivityScroll.availableWidth
             spacing: 16
 
             // ═══════════════════════════════════════════════════

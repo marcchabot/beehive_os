@@ -13,13 +13,13 @@ Item {
     property string _fr: BeeConfig.uiLang === "fr"
 
     ScrollView {
+        id: appearanceScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: appearanceScroll.availableWidth
             spacing: 16
 
             // ─── Theme Mode ───

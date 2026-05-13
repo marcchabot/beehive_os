@@ -88,13 +88,13 @@ Item {
 
     // ─── Main Layout ───
     ScrollView {
+        id: wallpaperScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: wallpaperScroll.availableWidth
             spacing: 16
 
             // ─── Folder Path ───

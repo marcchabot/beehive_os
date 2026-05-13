@@ -11,13 +11,13 @@ Item {
     id: accessibilityTab
 
     ScrollView {
+        id: accessibilityScroll
         anchors.fill: parent
         anchors.margins: 16
         clip: true
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.rightMargin: 12
+            width: accessibilityScroll.availableWidth
             spacing: 16
 
             Text {
