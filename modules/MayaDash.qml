@@ -6,11 +6,11 @@ import QtQuick.Effects
 import "."
 
 // ═══════════════════════════════════════════════════════════════
-// MayaDash.qml — Tableau de bord Maya (Bee-Hive OS) 🐝
-// v0.7 : BeeNetwork — Network monitor & speed test (detail:network action)
-// v0.6 : BeeVibe — Visualiseur audio intégré aux alvéoles (Phase 3)
+// MayaDash.qml - Tableau de bord Maya (Bee-Hive OS) 🐝
+// v0.7 : BeeNetwork - Network monitor & speed test (detail:network action)
+// v0.6 : BeeVibe - Visualiseur audio intégré aux alvéoles (Phase 3)
 //        Subtle equalizer bars, reactive to system audio
-// v0.5 : BeeMotion — Effet de parallaxe 3D
+// v0.5 : BeeMotion - Effet de parallaxe 3D
 // ═══════════════════════════════════════════════════════════════
 
 Rectangle {
@@ -54,7 +54,7 @@ Rectangle {
         id: beeNet
     }
 
-    // ─── BeeFocus (singleton — accessed via BeeFocus.xxx) ──
+    // ─── BeeFocus (singleton - accessed via BeeFocus.xxx) ──
     property bool focusDetailVisible: false
 
     // ─── BeeMonitor instance ────────────────────────────────
@@ -66,17 +66,15 @@ Rectangle {
         id: beeMon
     }
 
+    // ─── Cell data cache (avoids binding loop) ────────────
+    // resolveCellData() returns a NEW object every time, which causes
+    // a QML binding loop (var comparison is by reference). Instead,
+    // we update cellData imperatively only when cellsRevision changes,
+    // and reuse the same object reference if data hasn't changed.
+    property var _cellCache: ({})
     function resolveCellData(slot) {
-        // cellsRevision is evaluated first (comma operator) to create
-        // a reactive dependency — without it, ListModel changes won’t
-        // trigger re-evaluation of property bindings.
-        var _rev = (BeeConfig.cellsRevision, 0)
         if (BeeConfig.cells.count > slot) {
             var item = BeeConfig.cells.get(slot)
-            // Return a PLAIN COPY so QML bindings detect the change when
-            // cellsRevision bumps (drag & drop swap, etc.). Returning the
-            // live ListModel reference breaks icon/subtitle/detail updates
-            // because QML caches property reads on the same object ref.
             return {
                 icon:         item.icon         || "",
                 title:        item.title        || "",
@@ -88,10 +86,8 @@ Rectangle {
                 color:        item.color       || ""
             }
         }
-
         var registered = BeeModuleRegistry.mayaDashCellAt(slot)
         if (!registered || registered.enabled === false) return null
-
         return {
             icon: registered.icon || "🐝",
             title: registered.title || ("Module " + slot),
@@ -102,34 +98,56 @@ Rectangle {
             customizable: false
         }
     }
+    function _updateCellCache() {
+        var newCache = {}
+        for (var i = 0; i < 8; i++) {
+            newCache[i] = resolveCellData(i)
+        }
+        _cellCache = newCache
+    }
+
+    // Refresh cache when cellsRevision changes (drag & drop, config edits)
+    Connections {
+        target: BeeConfig
+        function onCellsRevisionChanged() { mayaDash._updateCellCache(); mayaDash._refreshAllCells() }
+    }
+
+    // Refresh all HexCell instances after cache update
+    function _refreshAllCells() {
+        for (var i = 0; i < hexGrid.cellRefs.length; i++) {
+            if (hexGrid.cellRefs[i]) hexGrid.cellRefs[i]._refreshCellData()
+        }
+    }
+
+    Component.onCompleted: { _updateCellCache() }
 
     // ─── Dispatcher d'actions ─────────────────────────────────
     function handleCellAction(action) {
         if (!action || action === "none") return
-        
+
         // toggle:settings → Ouvre The Hive (System tab)
         if (action === "toggle:settings") {
             mayaDash.openSettings()
             return
         }
-        
+
         // toggle:studio → Ouvre BeeStudio
         if (action === "toggle:studio") {
             mayaDash.openStudio()
             return
         }
-        
+
         // app:<command> → Lance une application
         if (action.startsWith("app:")) {
             var cmd = action.substring(4).trim()
             if (!cmd) return
-            
+
             // Special case: app:notes opens BeeNotes panel
             if (cmd === "notes") {
                 mayaDash.openNotes()
                 return
             }
-            
+
             // App alias mapping: old generic names → CachyOS real binaries
             var appAliases = {
                 "calendar":   "gnome-calendar",
@@ -143,7 +161,7 @@ Rectangle {
                 console.warn("[Bee-Hive] app:" + cmd + " est un alias déprécié, mappé vers app:" + appAliases[cmd])
                 cmd = appAliases[cmd]
             }
-            
+
             var launchCmd = cmd.replace(/"/g, '\\"')
             var launchQml = 'import Quickshell.Io; Process {\n'
                 + '  running: true\n'
@@ -159,7 +177,7 @@ Rectangle {
             console.log("[Bee-Hive] Lancement app: " + cmd)
             return
         }
-        
+
         // url:<url> → Ouvre une URL dans le navigateur
         if (action.startsWith("url:")) {
             var url = action.substring(4).trim()
@@ -224,7 +242,7 @@ Rectangle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BEEMOTION — Parallaxe 3D
+    // BEEMOTION - Parallaxe 3D
     // ═══════════════════════════════════════════════════════════
 
     // ─── BeeVibe ───────────────────────────────────────────────
@@ -256,7 +274,7 @@ Rectangle {
             dashShown: mayaDash.dashShown
         }
 
-        // Particules hexagonales flottantes — couche profonde (parallaxe amplifiée)
+        // Particules hexagonales flottantes - couche profonde (parallaxe amplifiée)
         // Désactivé car remplacé par BeeMotion2D
         // Repeater { ... }
 
@@ -269,16 +287,22 @@ Rectangle {
 
         // ─── Data from BeeConfig ───────────────────────────────
         property int    cellIndex:     0
-        // resolveCellData returns a plain JS copy keyed on cellsRevision,
-        // so bindings re-evaluate properly after drag & drop swaps.
-        property var    cellData:      mayaDash.resolveCellData(cellIndex)
+        // cellData is set imperatively from the cached _cellCache,
+        // avoiding the binding loop caused by resolveCellData()
+        // returning a new JS object on every evaluation.
+        property var    cellData: null
+        function _refreshCellData() {
+            var cached = mayaDash._cellCache[cellIndex]
+            if (cached !== undefined) cellData = cached
+        }
+        Component.onCompleted: _refreshCellData()
 
         // ─── Resolved data (declarative bindings, no imperative onXxx) ───
         // Using bindings instead of onCellDataChanged avoids the binding loop.
         property bool   isNetCell:  cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")
         property string icon:          cellData ? (isNetCell ? beeNet.networkIcon : (cellData.icon || "🐝")) : "🐝"
         property string title:         cellData ? cellData.title         : "Module"
-        property string subtitle:      cellData ? (isNetCell ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData.subtitle || "")) : (cellData.subtitle || "")) : ""
+        property string subtitle:      cellData ? (isNetCell ? (beeNet.latency !== "- ms" ? beeNet.latency : (cellData.subtitle || "")) : (cellData.subtitle || "")) : ""
         property string detail:        cellData ? cellData.detail        : ""
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
@@ -466,7 +490,7 @@ Rectangle {
                 }
                 ctx.closePath()
 
-                // Glassmorphism fill — propriétés réactives interpolées
+                // Glassmorphism fill - propriétés réactives interpolées
                 ctx.fillStyle = hexCell._cellFillColor.toString()
                 ctx.fill()
 
@@ -739,7 +763,7 @@ Rectangle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // LAYOUT — Grille en nid d'abeille (2 + 3 + 3)
+    // LAYOUT - Grille en nid d'abeille (2 + 3 + 3)
     // BeeMotion : inclinaison 3D selon la position de la souris
     // ═══════════════════════════════════════════════════════════
     Column {
@@ -811,7 +835,7 @@ Rectangle {
 
         Item { width: 1; height: 50 }
 
-        // ─── Rangée 1 : 2 alvéoles (indices 0–1) ─────────────
+        // ─── Rangée 1 : 2 alvéoles (indices 0-1) ─────────────
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
@@ -819,7 +843,7 @@ Rectangle {
             HexCell { cellIndex: 1; Component.onCompleted: hexGrid.cellRefs[1] = this }
         }
 
-        // ─── Rangée 2 : 3 alvéoles décalées (indices 2–4) ────
+        // ─── Rangée 2 : 3 alvéoles décalées (indices 2-4) ────
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
@@ -828,7 +852,7 @@ Rectangle {
             HexCell { cellIndex: 4; Component.onCompleted: hexGrid.cellRefs[4] = this }
         }
 
-        // ─── Rangée 3 : 3 alvéoles (indices 5–7) ─────────────
+        // ─── Rangée 3 : 3 alvéoles (indices 5-7) ─────────────
         Row {
             spacing: -10
             anchors.horizontalCenter: parent.horizontalCenter
@@ -888,10 +912,10 @@ Rectangle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BeeCalendar — now in own PanelWindow (BeeHiveShell.qml)
+    // BeeCalendar - now in own PanelWindow (BeeHiveShell.qml)
 
     // ═══════════════════════════════════════════════════════════
-    // BeeMonitor — Détail système (overlay panel)
+    // BeeMonitor - Détail système (overlay panel)
     // ═══════════════════════════════════════════════════════════
     Rectangle {
         id: monitorOverlay
@@ -1371,7 +1395,7 @@ Rectangle {
                                 width: parent.width
                                 property var proc: beeMon.topProcesses[index] || {}
                                 Text {
-                                    text: (proc.name || "—")
+                                    text: (proc.name || "-")
                                     color: BeeTheme.textPrimary
                                     font.pixelSize: 10; font.family: "monospace"
                                     width: parent.width * 0.50
@@ -1379,7 +1403,7 @@ Rectangle {
                                     Behavior on color { ColorAnimation { duration: 600 } }
                                 }
                                 Text {
-                                    text: (proc.cpu !== undefined ? proc.cpu.toFixed(1) : "—")
+                                    text: (proc.cpu !== undefined ? proc.cpu.toFixed(1) : "-")
                                     color: proc.cpu > 10 ? Qt.rgba(1.0, 0.65, 0.2, 1.0) : BeeTheme.textPrimary
                                     font.pixelSize: 10; font.family: "monospace"; font.bold: proc.cpu > 10
                                     width: parent.width * 0.18
@@ -1387,7 +1411,7 @@ Rectangle {
                                     Behavior on color { ColorAnimation { duration: 300 } }
                                 }
                                 Text {
-                                    text: (proc.mem !== undefined ? proc.mem.toFixed(1) : "—")
+                                    text: (proc.mem !== undefined ? proc.mem.toFixed(1) : "-")
                                     color: proc.mem > 10 ? Qt.rgba(1.0, 0.45, 0.1, 1.0) : BeeTheme.textSecondary
                                     font.pixelSize: 10; font.family: "monospace"
                                     width: parent.width * 0.18
@@ -1403,7 +1427,7 @@ Rectangle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BeeNetwork — Détail réseau (overlay panel)
+    // BeeNetwork - Détail réseau (overlay panel)
     // ═══════════════════════════════════════════════════════════
     Rectangle {
         id: networkOverlay
@@ -1649,17 +1673,17 @@ Rectangle {
                             Column {
                                 spacing: 2
                                 Text { text: "\u2193"; color: BeeTheme.accent; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stDlResult === "—" || beeNet._stDlResult === "") ? beeNet.tr("not_available") : beeNet._stDlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stDlResult === "-" || beeNet._stDlResult === "") ? beeNet.tr("not_available") : beeNet._stDlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                             Column {
                                 spacing: 2
                                 Text { text: "\u2191"; color: BeeTheme.textSecondary; font.pixelSize: 14; font.bold: true; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stUlResult === "—" || beeNet._stUlResult === "") ? beeNet.tr("not_available") : beeNet._stUlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stUlResult === "-" || beeNet._stUlResult === "") ? beeNet.tr("not_available") : beeNet._stUlResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                             Column {
                                 spacing: 2
                                 Text { text: "\u23f1"; color: BeeTheme.textSecondary; font.pixelSize: 14; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
-                                Text { text: (beeNet._stPingResult === "—" || beeNet._stPingResult === "") ? beeNet.tr("not_available") : beeNet._stPingResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
+                                Text { text: (beeNet._stPingResult === "-" || beeNet._stPingResult === "") ? beeNet.tr("not_available") : beeNet._stPingResult; color: BeeTheme.textPrimary; font.pixelSize: 16; font.bold: true; font.family: "monospace"; anchors.horizontalCenter: parent.horizontalCenter; Behavior on color { ColorAnimation { duration: 600 } } }
                             }
                         }
                     }
@@ -1765,7 +1789,7 @@ Rectangle {
     }
 
     // ═══════════════════════════════════════════════════════════
-    // BeeFocus — Pomodoro & Health Timer (overlay panel)
+    // BeeFocus - Pomodoro & Health Timer (overlay panel)
     // ═══════════════════════════════════════════════════════════
     Rectangle {
         id: focusOverlay
@@ -2078,7 +2102,7 @@ Rectangle {
                             Text {
                                 text: BeeFocus.hydrationEnabled
                                     ? Math.floor(BeeFocus.hydrationSeconds / 60) + ":" + (BeeFocus.hydrationSeconds % 60 < 10 ? "0" : "") + (BeeFocus.hydrationSeconds % 60).toString()
-                                    : "—"
+                                    : "-"
                                 color: BeeFocus.hydrationEnabled ? "#2980B9" : BeeTheme.textSecondary
                                 font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
@@ -2108,7 +2132,7 @@ Rectangle {
                             Text {
                                 text: BeeFocus.postureEnabled
                                     ? Math.floor(BeeFocus.postureSeconds / 60) + ":" + (BeeFocus.postureSeconds % 60 < 10 ? "0" : "") + (BeeFocus.postureSeconds % 60).toString()
-                                    : "—"
+                                    : "-"
                                 color: BeeFocus.postureEnabled ? "#27AE60" : BeeTheme.textSecondary
                                 font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
@@ -2138,7 +2162,7 @@ Rectangle {
                             Text {
                                 text: BeeFocus.eyesEnabled
                                     ? Math.floor(BeeFocus.eyesSeconds / 60) + ":" + (BeeFocus.eyesSeconds % 60 < 10 ? "0" : "") + (BeeFocus.eyesSeconds % 60).toString()
-                                    : "—"
+                                    : "-"
                                 color: BeeFocus.eyesEnabled ? "#9B59B6" : BeeTheme.textSecondary
                                 font.pixelSize: 13; font.family: "monospace"; font.bold: true
                             }
