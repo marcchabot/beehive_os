@@ -273,34 +273,21 @@ Rectangle {
         // so bindings re-evaluate properly after drag & drop swaps.
         property var    cellData:      mayaDash.resolveCellData(cellIndex)
 
-        property string icon:          "🐝"
+        // ─── Resolved data (declarative bindings, no imperative onXxx) ───
+        // Using bindings instead of onCellDataChanged avoids the binding loop.
+        property bool   isNetCell:  cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")
+        property string icon:          cellData ? (isNetCell ? beeNet.networkIcon : (cellData.icon || "🐝")) : "🐝"
         property string title:         cellData ? cellData.title         : "Module"
-        property string subtitle:      ""
+        property string subtitle:      cellData ? (isNetCell ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData.subtitle || "")) : (cellData.subtitle || "")) : ""
         property string detail:        cellData ? cellData.detail        : ""
         property bool   isHighlighted: cellData ? cellData.highlighted   : false
         property real   glowIntensity: isHighlighted ? 0.8 : 0.3
         Behavior on glowIntensity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
-        // ─── Force icon & subtitle refresh when cellData changes ───
-        // QML property bindings on JS object properties are unreliable
-        // when the object reference changes (drag & drop swap). Using
-        // an explicit onCellDataChanged handler guarantees these update.
-        onCellDataChanged: {
-            if (cellData) {
-                var isNet = cellData.action === "detail:network" || cellData.icon === "🌐"
-                icon = isNet ? beeNet.networkIcon : cellData.icon || "🐝"
-                subtitle = isNet ? (beeNet.latency !== "— ms" ? beeNet.latency : (cellData.subtitle || "")) : (cellData.subtitle || "")
-            } else {
-                icon = "🐝"
-                subtitle = ""
-            }
-        }
-
             // Détection de la cellule Calendar pour afficher le compteur live
             property bool isCalendarCell: cellData && (cellData.icon === "📅" || cellData.title === "Calendar" || cellData.title === "Calendrier")
 
-            // Détection de la cellule Network pour afficher les stats live
-            property bool isNetworkCell: cellData && (cellData.action === "detail:network" || cellData.icon === "🌐")
+            // isNetCell is declared above at component level
 
             // Détection de la cellule Monitor pour afficher les températures live
             property bool isMonitorCell: cellData && (cellData.action === "detail:monitor" || cellData.icon === "🖥️")
@@ -326,7 +313,7 @@ Rectangle {
                         return (lang === "fr") ? "Aucun événement à venir" : "No upcoming events";
                     }
                 }
-                if (hexCell.isNetworkCell) {
+                if (hexCell.isNetCell) {
                     return beeNet.downloadRate + " / " + beeNet.uploadRate;
                 }
                 if (hexCell.isMonitorCell) {
@@ -351,10 +338,10 @@ Rectangle {
             Connections {
                 target: beeNet
                 function onDownloadRateChanged() {
-                    if (hexCell.isNetworkCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
+                    if (hexCell.isNetCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
                 }
                 function onUploadRateChanged() {
-                    if (hexCell.isNetworkCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
+                    if (hexCell.isNetCell) hexCell.dynamicDetail = hexCell.dynamicDetail;
                 }
                 function onLatencyChanged() {
                     // Force subtitle re-evaluation for network cell
@@ -562,7 +549,7 @@ Rectangle {
             }
 
             Text {
-                text: (hexCell.isCalendarCell || hexCell.isNetworkCell || hexCell.isMonitorCell) ? hexCell.dynamicDetail : hexCell.detail
+                text: (hexCell.isCalendarCell || hexCell.isNetCell || hexCell.isMonitorCell) ? hexCell.dynamicDetail : hexCell.detail
                 color: hexCell.isHighlighted
                     ? Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5)
                     : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
