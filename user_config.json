@@ -165,11 +165,7 @@
   "vibe_mode": false,
   "corners_mode": true,
   "motion_mode": true,
-  "contextual_blur": {
-    "enabled": false,
-    "intensity": 0.45
-  },
-  "pinned_apps": [
+: [
     "__studio__",
     "zeditor",
     "/opt/enpass/Enpass"

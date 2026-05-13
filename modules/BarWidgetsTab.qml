@@ -392,48 +392,7 @@ Item {
                 Switch { checked: BeeConfig.cornersMode; onToggled: { BeeConfig.cornersMode = checked; BeeConfig.saveConfig() } }
             }
 
-            // ─── Contextual Blur 🌫️ ─────────────────────
-            RowLayout {
-                spacing: 10
-                Layout.fillWidth: true
-                ColumnLayout {
-                    spacing: 1
-                    Text {
-                        text: s.contextual_blur || "Contextual blur"
-                        color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
-                        Behavior on color { ColorAnimation { duration: 600 } }
-                    }
-                    Text {
-                        text: s.contextual_blur_desc || "Blur overlay panels for depth"
-                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
-                        font.pixelSize: 10; font.italic: true
-                        Layout.fillWidth: true; wrapMode: Text.WordWrap
-                    }
-                }
-                Switch { checked: BeeConfig.contextualBlurEnabled; onToggled: { BeeConfig.contextualBlurEnabled = checked; BeeConfig.saveConfig() } }
-            }
 
-            // ─── Blur Intensity Slider 🎚️ ─────────────
-            RowLayout {
-                spacing: 10
-                Layout.fillWidth: true
-                visible: BeeConfig.contextualBlurEnabled
-                ColumnLayout {
-                    spacing: 1
-                    Text {
-                        text: s.blur_intensity || "Blur intensity"
-                        color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
-                        Behavior on color { ColorAnimation { duration: 600 } }
-                    }
-                    Slider {
-                        from: 0.1; to: 1.0; stepSize: 0.05
-                        value: BeeConfig.contextualBlurIntensity
-                        onMoved: { BeeConfig.contextualBlurIntensity = value; BeeConfig.saveConfig() }
-                        Layout.fillWidth: true
-                        Layout.minimumWidth: 120
-                    }
-                }
-            }
         }
     }
 }
