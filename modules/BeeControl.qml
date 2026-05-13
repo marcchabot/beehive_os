@@ -54,7 +54,9 @@ Rectangle {
         shadowColor: Qt.rgba(0,0,0, BeeTheme.mode === "HoneyDark" ? 0.45 : 0.12)
         shadowBlur: 1.0
         shadowVerticalOffset: 6
-        blurEnabled: false
+        blurEnabled: BeeConfig.contextualBlurEnabled
+        blur: BeeConfig.contextualBlurIntensity
+        blurMax: 48
     }
 
     // ─── Reusable Components ───────────────────────────────

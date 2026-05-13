@@ -14,7 +14,7 @@ QtObject {
     id: root
 
     // ─── Version 🐝 ──────────────────────────────────────────────
-    property string appVersion: "0.8.25"
+    property string appVersion: "1.3.7"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -100,6 +100,18 @@ QtObject {
     property bool motionMode: true
     onMotionModeChanged: {
         BeeBarState.motionActive = motionMode
+        if (root._loaded) saveConfig()
+    }
+
+    // ─── Contextual Blur 🌫️ ──────────────────────────────────
+    // Dynamic blur on overlay panels (BeeBar, BeeControl, BeeStudio)
+    // configurable intensity via BeeSettings slider
+    property bool contextualBlurEnabled: true
+    onContextualBlurEnabledChanged: {
+        if (root._loaded) saveConfig()
+    }
+    property real contextualBlurIntensity: 0.45   // 0.0 – 1.0
+    onContextualBlurIntensityChanged: {
         if (root._loaded) saveConfig()
     }
 
@@ -1035,6 +1047,10 @@ QtObject {
         if (cfg.bee_keybinds !== undefined) beeKeybinds = cfg.bee_keybinds
         if (cfg.corners_mode !== undefined) cornersMode = cfg.corners_mode === true
         if (cfg.motion_mode !== undefined)  motionMode = cfg.motion_mode === true
+        if (cfg.contextual_blur !== undefined) {
+            if (cfg.contextual_blur.enabled !== undefined) contextualBlurEnabled = cfg.contextual_blur.enabled === true
+            if (cfg.contextual_blur.intensity !== undefined) contextualBlurIntensity = Number(cfg.contextual_blur.intensity)
+        }
         if (cfg.analog_clock !== undefined) analogClock = cfg.analog_clock === true
         
         if (cfg.beebar_stats !== undefined) {
@@ -1428,6 +1444,10 @@ QtObject {
         cfg.bee_keybinds = beeKeybinds
         cfg.corners_mode = cornersMode
         cfg.motion_mode  = motionMode
+        cfg.contextual_blur = {
+            enabled: contextualBlurEnabled,
+            intensity: contextualBlurIntensity
+        }
         cfg.analog_clock = analogClock
         cfg.beebar_stats = {
             cpu: showCpu,

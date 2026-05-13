@@ -287,6 +287,9 @@ Item {
             shadowEnabled: true
             shadowColor: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
             shadowBlur: 0.8; shadowVerticalOffset: 0; shadowHorizontalOffset: 0
+            blurEnabled: BeeConfig.contextualBlurEnabled
+            blur: BeeConfig.contextualBlurIntensity
+            blurMax: 48
         }
 
         // Bouton fermeture (Top Right) — masqué en mode embedded

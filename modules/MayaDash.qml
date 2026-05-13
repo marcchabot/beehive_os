@@ -893,7 +893,7 @@ Rectangle {
 
     // ─── Label version ────────────────────────────────────────
     Text {
-        text: "Bee-Hive OS v0.9.1 · NectarSync2 · BeeAlarm · BeeFocus 🐝"
+        text: "Bee-Hive OS v1.3.7 · NectarSync2 · BeeAlarm · BeeFocus 🐝"
         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.15)
         font.pixelSize: 10; font.letterSpacing: 1
         anchors.bottom: parent.bottom; anchors.bottomMargin: 15

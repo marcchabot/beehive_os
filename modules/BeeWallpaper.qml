@@ -3,8 +3,8 @@ import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
 // BeeWallpaper.qml — Gestionnaire de fonds d'écran 🐝🖼️
-// v0.6 : Smooth crossfade 1.8s InOutSine + slight scale effect
-// Enhanced transition polish for BeeHive OS visual coherence
+// v1.0 : Cross-fade 800ms InOutQuad + subtle scale + texture cleanup
+// Enhanced transition polish for Bee-Hive OS v1.3.7
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -25,8 +25,9 @@ Item {
         fillMode: Image.PreserveAspectCrop
         cache: false                        // Évite l'accumulation en VRAM après transition
         opacity: 1.0
-        Behavior on opacity { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
-        Behavior on scale { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
+        scale: 1.0
+        Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.InOutQuad } }
+        Behavior on scale { NumberAnimation { duration: 800; easing.type: Easing.InOutQuad } }
     }
 
     // ─── Image de transition (crossfade) ─────────────────────
@@ -37,17 +38,17 @@ Item {
         fillMode: Image.PreserveAspectCrop
         cache: false
         opacity: 0.0
-        scale: 1.02   // Slight zoom for entrance
-        Behavior on opacity { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
-        Behavior on scale { NumberAnimation { duration: 1800; easing.type: Easing.InOutSine } }
+        scale: 1.015   // Subtle zoom for entrance depth
+        Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.InOutQuad } }
+        Behavior on scale { NumberAnimation { duration: 800; easing.type: Easing.InOutQuad } }
     }
 
-    // ─── Timer de libération texture (2s après fin de crossfade) ─
+    // ─── Timer de libération texture (1.2s après fin de crossfade) ─
     // Libère la source de l'image en arrière-plan pour éviter
     // l'accumulation de textures 4K en VRAM.
     Timer {
         id: freeTimer
-        interval: 2000
+        interval: 1200
         repeat: false
         onTriggered: {
             if (wallpaperRoot._usingImage1) bgImage2.source = ""
@@ -60,7 +61,7 @@ Item {
         anchors.fill: parent
         color: "#000000"
         opacity: BeeTheme.mode === "HoneyDark" ? 0.20 : 0.05
-        Behavior on opacity { NumberAnimation { duration: 1500 } }
+        Behavior on opacity { NumberAnimation { duration: 800; easing.type: Easing.InOutQuad } }
     }
 
     // ─── Réagit aux changements de wallpaper ──────────────────
@@ -70,8 +71,8 @@ Item {
     }
 
     // ─── Crossfade robuste avec léger zoom (polish visuel) ──────
-    // L'image sortante fait un léger zoom-out (1.0→1.02)
-    // L'image entrante fait un léger zoom-in (1.02→1.0)
+    // L'image sortante fait un léger zoom-out (1.0→1.015)
+    // L'image entrante fait un léger zoom-in (1.015→1.0)
     // pour un effet plus cinématique que le simple fondu.
     function crossfadeTo(src) {
         freeTimer.stop()
@@ -80,14 +81,14 @@ Item {
             bgImage2.opacity = 1.0
             bgImage2.scale   = 1.0
             bgImage1.opacity = 0.0
-            bgImage1.scale   = 1.02
+            bgImage1.scale   = 1.015
             _usingImage1 = false
         } else {
             bgImage1.source  = src
             bgImage1.opacity = 1.0
             bgImage1.scale   = 1.0
             bgImage2.opacity = 0.0
-            bgImage2.scale   = 1.02
+            bgImage2.scale   = 1.015
             _usingImage1 = true
         }
         freeTimer.restart()

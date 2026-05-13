@@ -26,8 +26,18 @@ Rectangle {
     y: BeeBarState.barShown ? 1 : -50
     opacity: BeeBarState.barShown ? 1.0 : 0.0
 
-    Behavior on y       { NumberAnimation { duration: 400; easing.type: Easing.InOutCubic } }
-    Behavior on opacity { NumberAnimation { duration: 300 } }
+    Behavior on y {
+        NumberAnimation {
+            duration: BeeBarState.barShown ? 250 : 350
+            easing.type: Easing.OutCubic
+        }
+    }
+    Behavior on opacity {
+        NumberAnimation {
+            duration: BeeBarState.barShown ? 200 : 300
+            easing.type: Easing.OutCubic
+        }
+    }
 
     // Removed: was breaking the barShown binding in BeeBarState.qml
 
@@ -118,6 +128,9 @@ Rectangle {
         shadowColor: Qt.rgba(0,0,0, BeeTheme.mode === "HoneyDark" ? 0.4 : 0.15)
         shadowBlur: 0.6
         shadowVerticalOffset: 3
+        blurEnabled: BeeConfig.contextualBlurEnabled
+        blur: BeeConfig.contextualBlurIntensity
+        blurMax: 32
     }
 
     // ─── Autostart Scripts ─────────────────────────────────
