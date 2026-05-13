@@ -88,6 +88,12 @@ Item {
         if (voiceRoot.ttsBackend) envPrefix += 'BEE_TTS_BACKEND=' + voiceRoot.ttsBackend + ' ';
         if (voiceRoot.edgeTtsVoice) envPrefix += 'BEE_EDGE_TTS_VOICE=' + voiceRoot.edgeTtsVoice + ' ';
         if (voiceRoot.edgeTtsRate) envPrefix += 'BEE_EDGE_TTS_RATE=' + voiceRoot.edgeTtsRate + ' ';
+        if (voiceRoot.elevenlabsVoice) envPrefix += 'BEE_ASSISTANT_VOICE=' + voiceRoot.elevenlabsVoice + ' ';
+        if (voiceRoot.ollamaModel) envPrefix += 'BEE_ASSISTANT_MODEL=' + voiceRoot.ollamaModel + ' ';
+        if (voiceRoot.ollamaUrl) envPrefix += 'BEE_ASSISTANT_URL=' + voiceRoot.ollamaUrl + ' ';
+        if (voiceRoot.whisperModel) envPrefix += 'BEE_WHISPER_MODEL=' + voiceRoot.whisperModel + ' ';
+        envPrefix += 'BEE_ASSISTANT_API_KEY=4906405d881f4883d3acf9aa69e7cdaad9312b6952cb7043bae6bef6020c0f62 ';
+        envPrefix += 'BEE_RECORD_DURATION=' + voiceRoot.recordDuration + ' ';
 
         voiceProc.command = [
             "bash",
