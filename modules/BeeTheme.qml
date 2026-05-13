@@ -162,7 +162,7 @@ QtObject {
     }
 
     // ─── Auto Theme Overlay (user_config.auto.json) ───────────
-    property string autoThemeMode: ""
+    property string autoThemeMode: BeeConfig.autoThemeMode
     property bool autoPaletteEnabled: false
     property var autoPalette: ({})
     property string autoSourceWallpaper: ""
@@ -532,7 +532,7 @@ QtObject {
         onTriggered: root._checkTimeOfDay()
     }
 
-    property string autoThemeMode: BeeConfig.autoThemeMode
+    // autoThemeMode already declared at line 165 — binding updated there
 
     function _checkTimeOfDay() {
         if (BeeConfig.autoThemeMode !== "timeOfDay" && BeeConfig.autoThemeMode !== "combined") return
