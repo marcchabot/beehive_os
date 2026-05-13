@@ -286,7 +286,7 @@ QtObject {
     property bool voiceEnabled: true
     property string voiceOllamaModel: "gemma4:31b-cloud"
     property string voiceOllamaUrl: "http://127.0.0.1:11434"
-    property string voiceElevenlabsVoiceId: "BpjGufoPiobT79j2vtj4"
+    property string voiceElevenlabsVoiceId: "BZgkqPqms7Kj9ulSkVzn"
     property string voiceElevenlabsModelId: "eleven_flash_v2_5"
     property string voiceTtsBackend: "edge-tts"
     property string voiceEdgeTtsVoice: "fr-CA-SylvieNeural"
