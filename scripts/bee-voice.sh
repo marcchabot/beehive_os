@@ -134,32 +134,10 @@ transcribe_audio() {
 
     emit_state "transcribing" ""
 
-    # Try faster-whisper (Python)
-    if python3 -c "from faster_whisper import WhisperModel" &>/dev/null; then
+    # Try whisper CLI (fastest, uses /usr/bin/whisper)
+    if command -v whisper &>/dev/null; then
         local result
-        result=$(python3 -c "
-import sys, json
-from faster_whisper import WhisperModel
-model = WhisperModel('$WHISPER_MODEL', device='cpu', compute_type='int8')
-segments, info = model.transcribe('$audio_path', language='fr')
-text = ' '.join(seg.text for seg in segments).strip()
-print(text)
-" 2>/dev/null)
-        if [ -n "$result" ]; then
-            echo "$result"
-            return 0
-        fi
-    fi
-
-    # Try openai-whisper (Python)
-    if python3 -c "import whisper" &>/dev/null; then
-        local result
-        result=$(python3 -c "
-import whisper
-model = whisper.load_model('$WHISPER_MODEL')
-result = model.transcribe('$audio_path', language='fr')
-print(result['text'].strip())
-" 2>/dev/null)
+        result=$(whisper "$audio_path" --model "$WHISPER_MODEL" --language fr --output_format none --no_speech_threshold 0.6 2>/dev/null | grep -v '\[\|\]' | head -1 | sed 's/^\s*//')
         if [ -n "$result" ]; then
             echo "$result"
             return 0
@@ -189,6 +167,21 @@ print(result['text'].strip())
         fi
         local result
         result=$($whisper_bin -m "$model_path" -f "$audio_path" -l fr 2>/dev/null | tail -1)
+        if [ -n "$result" ]; then
+            echo "$result"
+            return 0
+        fi
+    fi
+
+    # Try openai-whisper Python module (slow fallback — loads model each call)
+    if python3 -c "import whisper" &>/dev/null; then
+        local result
+        result=$(python3 -c "
+import whisper
+model = whisper.load_model('$WHISPER_MODEL')
+result = model.transcribe('$audio_path', language='fr')
+print(result['text'].strip())
+" 2>/dev/null)
         if [ -n "$result" ]; then
             echo "$result"
             return 0
