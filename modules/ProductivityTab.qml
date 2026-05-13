@@ -11,7 +11,8 @@ import "."
 Item {
     id: productivityTab
 
-    property string _fr: BeeConfig.uiLang === "fr"
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
 
     ScrollView {
         id: productivityScroll
@@ -23,11 +24,9 @@ Item {
             width: productivityScroll.availableWidth
             spacing: 16
 
-            // ═══════════════════════════════════════════════════
-            // Section: Calendar
-            // ═══════════════════════════════════════════════════
+            // ─── Calendar ───
             Text {
-                text: "📅 " + (_fr ? "Calendrier" : "Calendar")
+                text: "📅 " + (s.calendar || "Calendar")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -35,12 +34,12 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Widget événements" : "Events widget"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.events_widget || "Events widget"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.eventsEnabled; onToggled: { BeeConfig.eventsEnabled = checked; BeeConfig.saveConfig() } }
             }
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Synchronisation CalDAV" : "CalDAV sync"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.caldav_sync || "CalDAV sync"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.caldavEnabled; onToggled: { BeeConfig.caldavEnabled = checked; BeeConfig.saveConfig() } }
             }
 
@@ -50,12 +49,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Rappels de rendez-vous" : "Calendar reminders"
+                        text: s.calendar_reminders || "Calendar reminders"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Notification avant chaque événement du calendrier" : "Notification before each calendar event"
+                        text: s.calendar_reminders_desc || "Notification before each calendar event"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -69,7 +68,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.beeCalendarReminderEnabled
                 Text {
-                    text: _fr ? "Avance rappel (min)" : "Reminder advance (min)"
+                    text: s.reminder_advance || "Reminder advance (min)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -93,12 +92,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Synchronisation automatique" : "Auto-sync"
+                        text: s.auto_sync || "Auto-sync"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Synchronise CalDAV toutes les " + BeeConfig.caldavAutoSyncIntervalMin + " min" : "Sync CalDAV every " + BeeConfig.caldavAutoSyncIntervalMin + " min"
+                        text: (s.auto_sync_desc || "Sync CalDAV every %1 min").arg(BeeConfig.caldavAutoSyncIntervalMin)
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -109,11 +108,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Alarms
-            // ═══════════════════════════════════════════════════
+            // ─── Alarms ───
             Text {
-                text: "⏰ " + (_fr ? "Alarmes" : "Alarms")
+                text: "⏰ " + (s.alarms || "Alarms")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -121,14 +118,14 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Alarmes activées" : "Alarms enabled"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.alarms_enabled || "Alarms enabled"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.alarmEnabled; onToggled: { BeeConfig.alarmEnabled = checked; BeeConfig.saveConfig() } }
             }
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 Text {
-                    text: _fr ? "Avance rappel (min)" : "Reminder advance (min)"
+                    text: s.alarm_advance || "Reminder advance (min)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -147,7 +144,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 Text {
-                    text: _fr ? "Durée répétition (min)" : "Snooze duration (min)"
+                    text: s.alarm_snooze || "Snooze duration (min)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -165,11 +162,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Voice Assistant (BeeVoice)
-            // ═══════════════════════════════════════════════════
+            // ─── Voice Assistant (BeeVoice) ───
             Text {
-                text: "🎤 " + (_fr ? "Assistant vocal (BeeVoice)" : "Voice Assistant (BeeVoice)")
+                text: "🎤 " + (s.voice_assistant || "Voice Assistant (BeeVoice)")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -180,12 +175,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Assistant vocal" : "Voice assistant"
+                        text: s.voice_assistant_title || "Voice assistant"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Activation par Super+M ou raccourci vocal" : "Activate with Super+M or voice shortcut"
+                        text: s.voice_assistant_desc || "Activate with Super+M or voice shortcut"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -199,7 +194,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.voiceEnabled
                 Text {
-                    text: _fr ? "Synthèse vocale" : "TTS backend"
+                    text: s.tts_backend || "TTS backend"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 RowLayout {
@@ -238,7 +233,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.voiceEnabled
                 Text {
-                    text: _fr ? "Modèle Whisper (STT)" : "Whisper model (STT)"
+                    text: s.whisper_model || "Whisper model (STT)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 RowLayout {
@@ -274,7 +269,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.voiceEnabled
                 Text {
-                    text: _fr ? "Durée d'enregistrement (s)" : "Record duration (s)"
+                    text: s.record_duration || "Record duration (s)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -293,11 +288,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Sound (BeeSound)
-            // ═══════════════════════════════════════════════════
+            // ─── Sound (BeeSound) ───
             Text {
-                text: "🔊 " + (_fr ? "Sons système (BeeSound)" : "System sounds (BeeSound)")
+                text: "🔊 " + (s.sounds || "System sounds (BeeSound)")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -308,12 +301,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode nuit automatique" : "Auto night mode"
+                        text: s.sound_night_mode || "Auto night mode"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Réduit le volume des sons entre " + BeeConfig.soundNightStartHour + "h et " + BeeConfig.soundNightEndHour + "h" : "Reduce sound volume between " + BeeConfig.soundNightStartHour + ":00 and " + BeeConfig.soundNightEndHour + ":00"
+                        text: (s.sound_night_mode_desc || "Reduce sound volume between %1 and %2").arg(BeeConfig.soundNightStartHour + (BeeConfig.uiLang === "fr" ? "h" : ":00")).arg(BeeConfig.soundNightEndHour + (BeeConfig.uiLang === "fr" ? "h" : ":00"))
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -326,7 +319,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 Text {
-                    text: _fr ? "Volume jour" : "Day volume"
+                    text: s.sound_day_gain || "Day volume"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -347,7 +340,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.soundNightMode
                 Text {
-                    text: _fr ? "Volume nuit" : "Night volume"
+                    text: s.sound_night_gain || "Night volume"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {

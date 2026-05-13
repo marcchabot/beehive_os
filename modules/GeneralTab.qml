@@ -10,6 +10,9 @@ import "."
 Item {
     id: generalTab
 
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
     ScrollView {
         id: generalScroll
         anchors.fill: parent
@@ -22,7 +25,7 @@ Item {
 
             // ─── Language ───
             Text {
-                text: "🌐 " + (BeeConfig.uiLang === "fr" ? "Langue" : "Language")
+                text: "🌐 " + (s.language || "Language")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -57,7 +60,7 @@ Item {
 
             // ─── Startup ───
             Text {
-                text: "⚡ " + (BeeConfig.uiLang === "fr" ? "Démarrage" : "Startup")
+                text: "⚡ " + (s.launch_at_startup || "Startup")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -65,7 +68,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Lancer au démarrage" : "Launch at startup"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.launch_at_startup || "Launch at startup"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.launchAtStartup; onToggled: { BeeConfig.launchAtStartup = checked; BeeConfig.saveConfig() } }
             }
 
@@ -73,7 +76,7 @@ Item {
 
             // ─── Keyboard Shortcuts ───
             Text {
-                text: "⌨️ " + (BeeConfig.uiLang === "fr" ? "Raccourcis clavier" : "Keyboard shortcuts")
+                text: "⌨️ " + (s.keyboard_shortcuts || "Keyboard shortcuts")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -81,12 +84,12 @@ Item {
 
             Repeater {
                 model: [
-                    { key: "Super + D", action: BeeConfig.uiLang === "fr" ? "Tableau de bord (MayaDash)" : "Dashboard (MayaDash)" },
-                    { key: "Super + Z", action: BeeConfig.uiLang === "fr" ? "Recherche (BeeSearch)" : "Search (BeeSearch)" },
-                    { key: "Super + Escape", action: "The Hive (Settings)" },
-                    { key: "Super + P", action: "BeePower" },
-                    { key: "Super + M", action: BeeConfig.uiLang === "fr" ? "Assistant vocal (BeeVoice)" : "Voice assistant (BeeVoice)" },
-                    { key: "F12", action: BeeConfig.uiLang === "fr" ? "Changer de thème" : "Toggle theme" }
+                    { key: "Super + D", action_en: "Dashboard (MayaDash)", action_fr: "Tableau de bord (MayaDash)" },
+                    { key: "Super + Z", action_en: "Search (BeeSearch)", action_fr: "Recherche (BeeSearch)" },
+                    { key: "Super + Escape", action_en: "The Hive (Settings)", action_fr: "The Hive (Paramètres)" },
+                    { key: "Super + P", action_en: "BeePower", action_fr: "BeePower" },
+                    { key: "Super + M", action_en: "Voice assistant (BeeVoice)", action_fr: "Assistant vocal (BeeVoice)" },
+                    { key: "F12", action_en: "Toggle theme", action_fr: "Changer de thème" }
                 ]
                 delegate: RowLayout {
                     Layout.fillWidth: true; spacing: 12
@@ -101,7 +104,7 @@ Item {
                         }
                     }
                     Text {
-                        text: modelData.action
+                        text: BeeConfig.uiLang === "fr" ? modelData.action_fr : modelData.action_en
                         color: BeeTheme.textPrimary; font.pixelSize: 13
                         Layout.fillWidth: true
                     }

@@ -10,6 +10,9 @@ import "."
 Item {
     id: extensionsTab
 
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
     ScrollView {
         id: extensionsScroll
         anchors.fill: parent
@@ -21,7 +24,7 @@ Item {
             spacing: 16
 
             Text {
-                text: "🧩 " + (BeeConfig.uiLang === "fr" ? "Extensions" : "Extensions")
+                text: "🧩 " + (s.plugins || "Extensions")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -29,12 +32,12 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Activer les plugins communautaires" : "Enable community plugins"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.enable_plugins || "Enable community plugins"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.pluginsEnabled; onToggled: { BeeConfig.pluginsEnabled = checked; BeeConfig.saveConfig() } }
             }
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Mise à jour automatique" : "Auto-update"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.auto_update || "Auto-update"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.pluginAutoUpdate; onToggled: { BeeConfig.pluginAutoUpdate = checked; BeeConfig.saveConfig() } }
             }
 
@@ -59,18 +62,14 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {
-                        text: BeeConfig.uiLang === "fr"
-                            ? "Les extensions arrivent bientôt"
-                            : "Extensions coming soon"
+                        text: s.extensions_coming_soon || "Extensions coming soon"
                         color: BeeTheme.textPrimary
                         font.pixelSize: 15
                         font.bold: true
                         Layout.alignment: Qt.AlignHCenter
                     }
                     Text {
-                        text: BeeConfig.uiLang === "fr"
-                            ? "Bee-Hive OS supportera les plugins communautaires"
-                            : "Bee-Hive OS will support community plugins"
+                        text: s.extensions_coming_desc || "Bee-Hive OS will support community plugins"
                         color: BeeTheme.textSecondary
                         font.pixelSize: 12
                         Layout.alignment: Qt.AlignHCenter

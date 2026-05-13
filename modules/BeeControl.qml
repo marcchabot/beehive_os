@@ -96,7 +96,7 @@ Rectangle {
 
                 // Logo
                 Text { text: "🐝"; font.pixelSize: 28; Layout.alignment: Qt.AlignHCenter; bottomPadding: 4 }
-                Text { text: "The Hive"; color: BeeTheme.accent; font.bold: true; font.pixelSize: 13; Layout.alignment: Qt.AlignHCenter; bottomPadding: 8 }
+                Text { text: controlRoot._s.title || "The Hive"; color: BeeTheme.accent; font.bold: true; font.pixelSize: 13; Layout.alignment: Qt.AlignHCenter; bottomPadding: 8 }
 
                 // Search bar
                 Rectangle {
@@ -173,18 +173,30 @@ Rectangle {
     }
 
     // ─── Navigation Data & Logic ─────────────────────────────
-    property var tabData: [
-        { icon: "🏠", label: qsTr("General"),       idx: 0 },
-        { icon: "🎨", label: qsTr("Appearance"),    idx: 1 },
-        { icon: "🖼️", label: qsTr("Wallpaper"),     idx: 2 },
-        { icon: "📊", label: qsTr("Bar & Widgets"),  idx: 3 },
-        { icon: "📅", label: qsTr("Productivity"),   idx: 4 },
-        { icon: "🧩", label: qsTr("Extensions"),    idx: 5 },
-        { icon: "♿", label: qsTr("Accessibility"),  idx: 6 },
-        { icon: "📜", label: qsTr("Journal"),       idx: 7 }
-    ]
+    property var tabData: []
 
-    Component.onCompleted: rebuildNav()
+    function _buildTabData() {
+        var s = controlRoot._s
+        tabData = [
+            { icon: "🏠", label: s.tab_general || "General",           idx: 0 },
+            { icon: "🎨", label: s.tab_appearance || "Appearance",      idx: 1 },
+            { icon: "🖼️", label: s.tab_wallpaper || "Wallpaper",       idx: 2 },
+            { icon: "📊", label: s.tab_bar_widgets || "Bar & Widgets",  idx: 3 },
+            { icon: "📅", label: s.tab_productivity || "Productivity",   idx: 4 },
+            { icon: "🧩", label: s.tab_extensions || "Extensions",      idx: 5 },
+            { icon: "♿", label: s.tab_accessibility || "Accessibility", idx: 6 },
+            { icon: "📜", label: s.tab_journal || "Journal",           idx: 7 }
+        ]
+    }
+
+    Component.onCompleted: { _buildTabData(); rebuildNav() }
+
+    // Rebuild nav when language or translations change
+    Connections {
+        target: BeeConfig
+        function onUiLangChanged() { controlRoot._buildTabData(); controlRoot.rebuildNav() }
+        function onTrChanged() { controlRoot._buildTabData(); controlRoot.rebuildNav() }
+    }
 
     function rebuildNav() {
         navModel.clear()

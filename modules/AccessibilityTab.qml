@@ -10,6 +10,9 @@ import "."
 Item {
     id: accessibilityTab
 
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
     ScrollView {
         id: accessibilityScroll
         anchors.fill: parent
@@ -21,7 +24,7 @@ Item {
             spacing: 16
 
             Text {
-                text: "♿ " + (BeeConfig.uiLang === "fr" ? "Accessibilité" : "Accessibility")
+                text: "♿ " + (s.accessibility || "Accessibility")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -30,21 +33,21 @@ Item {
             // High contrast
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Contraste élevé" : "High contrast"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.high_contrast || "High contrast"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.accessibilityHighContrast; onToggled: { BeeConfig.accessibilityHighContrast = checked; BeeConfig.saveConfig() } }
             }
 
             // Reduce animations
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Réduire les animations" : "Reduce animations"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.reduce_animations || "Reduce animations"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.accessibilityReducedMotion; onToggled: { BeeConfig.accessibilityReducedMotion = checked; BeeConfig.saveConfig() } }
             }
 
             // Screen reader
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Lecteur d'écran" : "Screen reader"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.screen_reader || "Screen reader"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.accessibilityScreenReader; onToggled: { BeeConfig.accessibilityScreenReader = checked; BeeConfig.saveConfig() } }
             }
 
@@ -52,7 +55,7 @@ Item {
 
             // Text scale slider
             Text {
-                text: "🔤 " + (BeeConfig.uiLang === "fr" ? "Taille du texte" : "Text scale")
+                text: "🔤 " + (s.text_scale || "Text scale")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -61,7 +64,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 Text {
-                    text: (BeeConfig.uiLang === "fr" ? "Échelle du texte" : "Text scale factor")
+                    text: s.text_scale_factor || "Text scale factor"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {

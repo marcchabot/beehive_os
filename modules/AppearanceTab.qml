@@ -10,7 +10,8 @@ import "."
 Item {
     id: appearanceTab
 
-    property string _fr: BeeConfig.uiLang === "fr"
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
 
     ScrollView {
         id: appearanceScroll
@@ -24,7 +25,7 @@ Item {
 
             // ─── Theme Mode ───
             Text {
-                text: "🎨 " + (_fr ? "Thème" : "Theme")
+                text: "🎨 " + (s.theme || "Theme")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -34,8 +35,8 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 Repeater {
                     model: [
-                        { key: "HoneyDark", icon: "🌙", label: "Dark", labelFr: "Sombre" },
-                        { key: "HoneyLight", icon: "☀️", label: "Light", labelFr: "Clair" }
+                        { key: "HoneyDark", icon: "🌙", labelEn: "Dark", labelFr: "Sombre" },
+                        { key: "HoneyLight", icon: "☀️", labelEn: "Light", labelFr: "Clair" }
                     ]
                     delegate: Rectangle {
                         width: 130; height: 70; radius: 12
@@ -56,7 +57,7 @@ Item {
                                 Layout.alignment: Qt.AlignHCenter
                             }
                             Text {
-                                text: _fr ? modelData.labelFr : modelData.label
+                                text: BeeConfig.uiLang === "fr" ? modelData.labelFr : modelData.labelEn
                                 color: BeeConfig.mode === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
                                 font.pixelSize: 12; font.bold: BeeConfig.mode === modelData.key
                                 Layout.alignment: Qt.AlignHCenter
@@ -74,7 +75,7 @@ Item {
 
             // ─── Nectar Sync (Adaptive Theme) ───
             Text {
-                text: "🍯 " + (_fr ? "Nectar Sync — Thème adaptatif" : "Nectar Sync — Adaptive Theme")
+                text: "🍯 " + (s.nectar_sync || "Nectar Sync — Adaptive Theme")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -85,12 +86,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Nectar Sync 🍯" : "Nectar Sync 🍯"
+                        text: s.nectar_sync_title || "Nectar Sync 🍯"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: _fr ? "Adaptation automatique du thème au fond d'écran" : "Automatic theme adaptation to the chosen wallpaper"
+                        text: s.nectar_sync_desc || "Automatic theme adaptation to the chosen wallpaper"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -107,12 +108,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode jour/nuit automatique" : "Auto day/night schedule"
+                        text: s.auto_day_night || "Auto day/night schedule"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: _fr ? "🌙 Sombre le soir → ☀️ Clair le matin" : "🌙 Dark at night → ☀️ Light in the morning"
+                        text: s.auto_day_night_desc || "🌙 Dark at night → ☀️ Light in the morning"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -128,7 +129,7 @@ Item {
 
             // ─── Nectar Auto-Theme (Time/Weather) 🐝🎨☀️🌧️ v0.8.25 ───
             Text {
-                text: "🎨☀️🌧️ " + (_fr ? "Thème automatique Nectar" : "Nectar Auto-Theme")
+                text: "🎨☀️🌧️ " + (s.auto_theme || "Nectar Auto-Theme")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -138,16 +139,16 @@ Item {
             RowLayout {
                 Layout.fillWidth: true; spacing: 8
                 Text {
-                    text: _fr ? "Mode :" : "Mode:"
+                    text: s.auto_theme_mode || "Mode:"
                     color: BeeTheme.textSecondary; font.pixelSize: 12
                     Layout.alignment: Qt.AlignVCenter
                 }
                 Repeater {
                     model: [
-                        { key: "off", icon: "⛔", label: "Off", labelFr: "Désactivé" },
-                        { key: "timeOfDay", icon: "☀️🌙", label: "Time of Day", labelFr: "Heure du jour" },
-                        { key: "weather", icon: "🌧️", label: "Weather", labelFr: "Météo" },
-                        { key: "combined", icon: "🎨", label: "Combined", labelFr: "Combiné" }
+                        { key: "off", icon: "⛔", labelEn: "Off", labelFr: "Désactivé" },
+                        { key: "timeOfDay", icon: "☀️🌙", labelEn: "Time of Day", labelFr: "Heure du jour" },
+                        { key: "weather", icon: "🌧️", labelEn: "Weather", labelFr: "Météo" },
+                        { key: "combined", icon: "🎨", labelEn: "Combined", labelFr: "Combiné" }
                     ]
                     delegate: Rectangle {
                         width: 90; height: 50; radius: 8
@@ -165,7 +166,7 @@ Item {
                             anchors.centerIn: parent; spacing: 3
                             Text { text: modelData.icon; font.pixelSize: 14 }
                             Text {
-                                text: _fr ? modelData.labelFr : modelData.label
+                                text: BeeConfig.uiLang === "fr" ? modelData.labelFr : modelData.labelEn
                                 color: BeeConfig.autoThemeMode === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
                                 font.pixelSize: 9; font.bold: BeeConfig.autoThemeMode === modelData.key
                             }
@@ -181,10 +182,10 @@ Item {
             Text {
                 text: {
                     var mode = BeeConfig.autoThemeMode
-                    if (mode === "off") return _fr ? "Auto-thème désactivé" : "Auto-theme disabled"
-                    if (mode === "timeOfDay") return _fr ? "Thème adapté à l'heure (clair le jour, sombre la nuit)" : "Theme follows time of day (light by day, dark by night)"
-                    if (mode === "weather") return _fr ? "Accent adapté à la météo (soleil=ambre, pluie=bleu-gris)" : "Accent follows weather (sunny=amber, rain=blue-grey)"
-                    if (mode === "combined") return _fr ? "Heure du jour + accent météo combinés" : "Time of day + weather accent combined"
+                    if (mode === "off") return s.auto_theme_off_desc || "Auto-theme disabled"
+                    if (mode === "timeOfDay") return s.auto_theme_timeofday_desc || "Theme follows time of day (light by day, dark by night)"
+                    if (mode === "weather") return s.auto_theme_weather_desc || "Accent follows weather (sunny=amber, rain=blue-grey)"
+                    if (mode === "combined") return s.auto_theme_combined_desc || "Time of day + weather accent combined"
                     return ""
                 }
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
@@ -192,14 +193,11 @@ Item {
                 Layout.fillWidth: true; wrapMode: Text.WordWrap
             }
 
-
-
-
             Item { height: 4 }
 
             // ─── Color Therapy ───
             Text {
-                text: "✨ " + (_fr ? "Thérapie chromatique" : "Color Therapy")
+                text: "✨ " + (s.color_therapy || "Color Therapy")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -210,12 +208,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Cycle chromatique" : "Color cycle"
+                        text: s.color_cycle || "Color cycle"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
                     }
                     Text {
-                        text: _fr ? "Pulsation lente des couleurs d'accent pour un effet apaisant" : "Slow accent color pulse cycle for a calming effect"
+                        text: s.color_cycle_desc || "Slow accent color pulse cycle for a calming effect"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap

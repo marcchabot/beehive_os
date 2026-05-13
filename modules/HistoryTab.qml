@@ -10,6 +10,9 @@ import "."
 Item {
     id: historyTab
 
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
     ScrollView {
         id: historyScroll
         anchors.fill: parent
@@ -22,7 +25,7 @@ Item {
 
             // Header
             Text {
-                text: "📋 " + (BeeConfig.uiLang === "fr" ? "Historique des notifications" : "Notification history")
+                text: "📋 " + (s.history || "Notification history")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -30,7 +33,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
-                Text { text: (BeeConfig.uiLang === "fr" ? "Activer l'historique" : "Enable history"); color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.enable_history || "Enable history"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.historyEnabled; onToggled: { BeeConfig.historyEnabled = checked; BeeConfig.saveConfig() } }
             }
 
@@ -96,9 +99,7 @@ Item {
             Text {
                 Layout.fillWidth: true
                 visible: BeeBarState.historyModel.length === 0
-                text: BeeConfig.uiLang === "fr"
-                    ? "Aucune notification pour le moment."
-                    : "No notifications yet."
+                text: s.no_history || "No notifications yet."
                 color: BeeTheme.textSecondary
                 font.pixelSize: 12
                 font.italic: true
@@ -109,7 +110,7 @@ Item {
             Button {
                 Layout.alignment: Qt.AlignHCenter
                 visible: BeeBarState.historyModel.length > 0
-                text: BeeConfig.uiLang === "fr" ? "Effacer tout" : "Clear all"
+                text: s.clear_all || "Clear all"
                 onClicked: BeeBarState.clearHistory()
 
                 background: Rectangle {

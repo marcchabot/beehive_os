@@ -11,7 +11,8 @@ import "."
 Item {
     id: barWidgetsTab
 
-    property string _fr: BeeConfig.uiLang === "fr"
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
 
     ScrollView {
         id: barWidgetsScroll
@@ -23,11 +24,9 @@ Item {
             width: barWidgetsScroll.availableWidth
             spacing: 16
 
-            // ═══════════════════════════════════════════════════
-            // Section: Horloge
-            // ═══════════════════════════════════════════════════
+            // ─── Clock ───
             Text {
-                text: "🕐 " + (_fr ? "Horloge" : "Clock")
+                text: "🕐 " + (s.clock || "Clock")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -38,12 +37,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Horloge analogique" : "Analog clock"
+                        text: s.analog_clock || "Analog clock"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Afficher l'horloge analogique au centre du tableau de bord" : "Show analog clock in the center of the dashboard"
+                        text: s.analog_clock_desc || "Show analog clock in the center of the dashboard"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -57,11 +56,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Indicateurs système
-            // ═══════════════════════════════════════════════════
+            // ─── System indicators ───
             Text {
-                text: "📟 " + (_fr ? "Indicateurs système" : "System indicators")
+                text: "📟 " + (s.system_indicators || "System indicators")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -76,25 +73,23 @@ Item {
                 Switch { checked: BeeConfig.showRam; onToggled: { BeeConfig.showRam = checked; BeeConfig.saveConfig() } }
             }
             RowLayout { Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Disque" : "Disk"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.disk || "Disk"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.showDisk; onToggled: { BeeConfig.showDisk = checked; BeeConfig.saveConfig() } }
             }
             RowLayout { Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Réseau" : "Network"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.network || "Network"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.showNet; onToggled: { BeeConfig.showNet = checked; BeeConfig.saveConfig() } }
             }
             RowLayout { Layout.fillWidth: true; spacing: 12
-                Text { text: _fr ? "Batterie" : "Battery"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
+                Text { text: s.battery || "Battery"; color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true }
                 Switch { checked: BeeConfig.showBattery; onToggled: { BeeConfig.showBattery = checked; BeeConfig.saveConfig() } }
             }
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Comportement de la barre
-            // ═══════════════════════════════════════════════════
+            // ─── Bar behavior ───
             Text {
-                text: "🎛️ " + (_fr ? "Comportement de la barre" : "Bar behavior")
+                text: "🎛️ " + (s.bar_behavior || "Bar behavior")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -105,12 +100,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Barre contextuelle" : "Contextual bar"
+                        text: s.contextual_bar || "Contextual bar"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "La barre s'adapte au contexte de l'app active" : "Bar adapts to the active app context"
+                        text: s.contextual_bar_desc || "Bar adapts to the active app context"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -124,12 +119,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode furtif" : "Stealth mode"
+                        text: s.stealth_mode || "Stealth mode"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Barre minimale, icônes uniquement" : "Minimal bar, icons only"
+                        text: s.stealth_mode_desc || "Minimal bar, icons only"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -143,12 +138,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode concentration" : "Focus mode"
+                        text: s.focus_mode || "Focus mode"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Masque les distractions, notifications minimales" : "Hide distractions, minimal notifications"
+                        text: s.focus_mode_desc || "Hide distractions, minimal notifications"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -157,11 +152,9 @@ Item {
                 Switch { checked: BeeConfig.focusMode; onToggled: { BeeConfig.focusMode = checked; BeeConfig.saveConfig() } }
             }
 
-
-            // Section: Vibe (Audio Visualizer)
-            // ═══════════════════════════════════════════════════
+            // ─── Vibe (Audio Visualizer) ───
             Text {
-                text: "🎵 " + (_fr ? "Vibe (Visualiseur audio)" : "Vibe (Audio Visualizer)")
+                text: "🎵 " + (s.vibe || "Vibe (Audio Visualizer)")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -172,12 +165,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Visualiseur audio" : "Audio visualizer"
+                        text: s.vibe_visualizer || "Audio visualizer"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Visualiseur de spectre audio en arrière-plan" : "Audio spectrum visualizer in background"
+                        text: s.vibe_visualizer_desc || "Audio spectrum visualizer in background"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -190,7 +183,7 @@ Item {
             RowLayout {
                 Layout.fillWidth: true; spacing: 12
                 Text {
-                    text: _fr ? "Backend" : "Backend"
+                    text: s.vibe_backend || "Backend"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 RowLayout {
@@ -228,12 +221,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode X-Ray" : "X-Ray mode"
+                        text: s.vibe_xray || "X-Ray mode"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Révèle les couleurs du fond d'écran à travers le visualiseur" : "Reveal wallpaper colors through the visualizer"
+                        text: s.vibe_xray_desc || "Reveal wallpaper colors through the visualizer"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -247,7 +240,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.vibeXray
                 Text {
-                    text: _fr ? "Intensité X-Ray" : "X-Ray intensity"
+                    text: s.vibe_intensity || "X-Ray intensity"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -269,7 +262,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: BeeConfig.vibeXray
                 Text {
-                    text: _fr ? "Fusion X-Ray" : "X-Ray blend"
+                    text: s.vibe_xray_blend || "X-Ray blend"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 RowLayout {
@@ -303,11 +296,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Batterie
-            // ═══════════════════════════════════════════════════
+            // ─── Battery & Power Saver ───
             Text {
-                text: "🔋 " + (_fr ? "Batterie & Économie d'énergie" : "Battery & Power Saver")
+                text: "🔋 " + (s.battery_mode || "Battery & Power Saver")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -318,12 +309,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Mode économie d'énergie" : "Power saver mode"
+                        text: s.battery_mode || "Power saver mode"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Réduit les animations et les effets visuels" : "Reduces animations and visual effects"
+                        text: s.battery_mode_desc || "Reduces animations and visual effects"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -337,12 +328,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Détection automatique" : "Auto-detect"
+                        text: s.battery_saver || "Auto-detect"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Détecte automatiquement si sur batterie ou secteur" : "Auto-detect battery vs AC power status"
+                        text: s.battery_saver_desc || "Auto-detect battery vs AC power status"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap
@@ -355,7 +346,7 @@ Item {
                 Layout.fillWidth: true; spacing: 12
                 visible: !BeeConfig.batteryModeAuto
                 Text {
-                    text: _fr ? "Seuil d'économie (%)" : "Saver threshold (%)"
+                    text: s.battery_threshold || "Saver threshold (%)"
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 Text {
@@ -374,11 +365,9 @@ Item {
 
             Item { height: 4 }
 
-            // ═══════════════════════════════════════════════════
-            // Section: Hot Corners
-            // ═══════════════════════════════════════════════════
+            // ─── Hot Corners ───
             Text {
-                text: "🔲 " + (_fr ? "Coins actifs" : "Hot Corners")
+                text: "🔲 " + (s.corners || "Hot Corners")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -389,12 +378,12 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 2
                     Text {
-                        text: _fr ? "Coins actifs (Hot Corners)" : "Hot Corners"
+                        text: s.corners || "Hot Corners"
                         color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
                         Layout.fillWidth: true
                     }
                     Text {
-                        text: _fr ? "Actions rapides en pointant les coins de l'écran" : "Quick actions by pointing at screen corners"
+                        text: s.corners_desc || "Quick actions by pointing at screen corners"
                         color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
                         font.pixelSize: 10; font.italic: true
                         Layout.fillWidth: true; wrapMode: Text.WordWrap

@@ -11,6 +11,9 @@ import "."
 Item {
     id: wallpaperTab
 
+    // ─── i18n shortcut ─────────────────────────────────────────
+    readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
     property string wallpaperFolder: BeeConfig.wallpaperFolder || "/home/marc/Pictures/Wallpapers"
 
     // ─── WallCard Component ───
@@ -99,7 +102,7 @@ Item {
 
             // ─── Folder Path ───
             Text {
-                text: "📁 " + (BeeConfig.uiLang === "fr" ? "Dossier personnel" : "Personal folder")
+                text: "📁 " + (s.wallpaper_personal || "Personal folder")
                 color: BeeTheme.accent
                 font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
             }
@@ -135,7 +138,7 @@ Item {
                 }
                 Text {
                     visible: wallpaperModel.count > 0
-                    text: wallpaperModel.count + (BeeConfig.uiLang === "fr" ? " image" : " image") + (wallpaperModel.count !== 1 ? (BeeConfig.uiLang === "fr" ? "s" : "s") : "")
+                    text: wallpaperModel.count + " " + (s.images_count || "image") + (wallpaperModel.count !== 1 ? "s" : "")
                     color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.40)
                     font.pixelSize: 9
                 }
@@ -145,33 +148,31 @@ Item {
 
             // ─── Bee-Hive Originals ───
             Text {
-                text: (BeeConfig.uiLang === "fr" ? "🍯 ORIGINAUX BEE-HIVE" : "🍯 BEE-HIVE ORIGINALS")
+                text: "🍯 " + (s.wallpaper_originals || "BEE-HIVE ORIGINALS")
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                 font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
             }
 
             Flow {
                 Layout.fillWidth: true; spacing: 10
-                WallCard { src: "../assets/wallpaper.png";               label: qsTr("Mysterious");      mode: "HoneyDark" }
-                WallCard { src: "../assets/wallpaper_dark_bee.png";      label: qsTr("Dark Bee");        mode: "HoneyDark" }
-                WallCard { src: "../assets/wallpaper_light_bee.png";     label: qsTr("Light Bee");       mode: "HoneyLight" }
-                WallCard { src: "../assets/wallpaper_light.png";          label: qsTr("Soft Light");      mode: "HoneyLight" }
+                WallCard { src: "../assets/wallpaper.png";               label: s.wallpaper_mysterious || "Mysterious";      mode: "HoneyDark" }
+                WallCard { src: "../assets/wallpaper_dark_bee.png";      label: s.wallpaper_dark_bee || "Dark Bee";        mode: "HoneyDark" }
+                WallCard { src: "../assets/wallpaper_light_bee.png";     label: s.wallpaper_light_bee || "Light Bee";       mode: "HoneyLight" }
+                WallCard { src: "../assets/wallpaper_light.png";          label: s.wallpaper_soft_light || "Soft Light";      mode: "HoneyLight" }
             }
 
             Rectangle { height: 1; Layout.fillWidth: true; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08) }
 
             // ─── My Library ───
             Text {
-                text: (BeeConfig.uiLang === "fr" ? "🖼 MA BIBLIOTHÈQUE" : "🖼 MY LIBRARY")
+                text: "🖼 " + (s.wallpaper_library || "MY LIBRARY")
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.45)
                 font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5
             }
 
             Text {
                 visible: wallpaperModel.count === 0
-                text: (BeeConfig.uiLang === "fr"
-                    ? "Aucun fond d'écran trouvé dans " + wallpaperTab.wallpaperFolder
-                    : "No wallpapers found in " + wallpaperTab.wallpaperFolder)
+                text: (s.wallpaper_no_found || "No wallpapers found in") + " " + wallpaperTab.wallpaperFolder
                 color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.25)
                 font.pixelSize: 11; font.italic: true
                 Layout.leftMargin: 10
