@@ -257,6 +257,8 @@ speak_elevenlabs() {
 
     emit_state "speaking" "$text"
 
+    echo "DEBUG speak: TTS_BACKEND=$TTS_BACKEND ELEVENLABS_VOICE=$ELEVENLABS_VOICE ELEVENLABS_MODEL=$ELEVENLABS_MODEL" >> /tmp/bee-voice-debug.log
+
     # Generate speech
     local http_code
     http_code=$(curl -s -o "$output_mp3" -w "%{http_code}" \
