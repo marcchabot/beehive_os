@@ -106,7 +106,7 @@ QtObject {
     // ─── Contextual Blur 🌫️ ──────────────────────────────────
     // Dynamic blur on overlay panels (BeeBar, BeeControl, BeeStudio)
     // configurable intensity via BeeSettings slider
-    property bool contextualBlurEnabled: true
+    property bool contextualBlurEnabled: false
     onContextualBlurEnabledChanged: {
         if (root._loaded) saveConfig()
     }

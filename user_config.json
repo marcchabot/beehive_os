@@ -166,7 +166,7 @@
   "corners_mode": true,
   "motion_mode": true,
   "contextual_blur": {
-    "enabled": true,
+    "enabled": false,
     "intensity": 0.45
   },
   "pinned_apps": [

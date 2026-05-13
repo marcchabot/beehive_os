@@ -128,9 +128,6 @@ Rectangle {
         shadowColor: Qt.rgba(0,0,0, BeeTheme.mode === "HoneyDark" ? 0.4 : 0.15)
         shadowBlur: 0.6
         shadowVerticalOffset: 3
-        blurEnabled: BeeConfig.contextualBlurEnabled
-        blur: BeeConfig.contextualBlurIntensity
-        blurMax: 32
     }
 
     // ─── Autostart Scripts ─────────────────────────────────
