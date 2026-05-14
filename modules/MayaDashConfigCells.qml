@@ -231,6 +231,12 @@ Item {
                 anchors.fill: parent; anchors.margins: 16
                 contentHeight: editForm.implicitHeight; clip: true
 
+                // Sync action ComboBox when cell is loaded
+                Connections {
+                    target: dashConfig
+                    function onEditActionChanged() { actionCombo.syncToAction(dashConfig.editAction) }
+                }
+
                 ColumnLayout {
                     id: editForm
                     width: parent.width; spacing: 10
@@ -312,7 +318,130 @@ Item {
                     }
 
                     FieldLabel { labelText: _fr ? "Action" : "Action" }
-                    BeeField { id: actionField; placeholderText: "none | app:nom | toggle:settings"; onTextEdited: { if (!dashConfig._loading) dashConfig.editAction = text } }
+                    // ─── Action Selector: ComboBox + custom field ───
+                    ColumnLayout {
+                        Layout.fillWidth: true; spacing: 4
+                        ComboBox {
+                            id: actionCombo
+                            Layout.fillWidth: true; height: 36
+                            enabled: dashConfig.editCustomizable
+                            model: ListModel {
+                                id: actionModel
+                                ListElement { label: "\uD83D\uDD12 Verrouillé" ; value: "none" }
+                                ListElement { label: "\uD83D\uDCC5 Calendrier"; value: "detail:calendar" }
+                                ListElement { label: "\uD83D\uDCDD Notes"; value: "detail:notes" }
+                                ListElement { label: "\uD83D\uDDA5\uFE0F Système"; value: "detail:monitor" }
+                                ListElement { label: "\uD83C\uDF10 Réseau"; value: "detail:network" }
+                                ListElement { label: "\uD83C\uDF45 Pomodoro"; value: "detail:focus" }
+                                ListElement { label: "\u2699\uFE0F Paramètres"; value: "toggle:settings" }
+                                ListElement { label: "\uD83C\uDF10 URL..."; value: "url:" }
+                                ListElement { label: "\uD83D\uDCBB Application..."; value: "app:" }
+                                ListElement { label: "\u270F\uFE0F Personnalisé..."; value: "custom" }
+                            }
+                            textRole: "label"
+                            property bool _syncing: false
+                            onCurrentIndexChanged: {
+                                if (_syncing || !enabled) return
+                                var val = actionModel.get(currentIndex).value
+                                if (val === "custom") {
+                                    customActionField.visible = true
+                                    customActionField.forceActiveFocus()
+                                } else if (val === "url:") {
+                                    customActionField.visible = true
+                                    customActionField.text = "url:https://"
+                                    if (!dashConfig._loading) dashConfig.editAction = "url:https://"
+                                    customActionField.forceActiveFocus()
+                                } else if (val === "app:") {
+                                    customActionField.visible = true
+                                    customActionField.text = "app:"
+                                    if (!dashConfig._loading) dashConfig.editAction = "app:"
+                                    customActionField.forceActiveFocus()
+                                } else {
+                                    customActionField.visible = false
+                                    if (!dashConfig._loading) dashConfig.editAction = val
+                                }
+                            }
+                            function syncToAction(act) {
+                                _syncing = true
+                                for (var i = 0; i < actionModel.count; i++) {
+                                    if (actionModel.get(i).value === act) {
+                                        currentIndex = i
+                                        customActionField.visible = false
+                                        _syncing = false
+                                        return
+                                    }
+                                }
+                                // Custom action
+                                if (act && act.startsWith("url:")) {
+                                    currentIndex = 7
+                                    customActionField.visible = true
+                                    customActionField.text = act
+                                } else if (act && act.startsWith("app:")) {
+                                    currentIndex = 8
+                                    customActionField.visible = true
+                                    customActionField.text = act
+                                } else {
+                                    currentIndex = 9
+                                    customActionField.visible = true
+                                    customActionField.text = act || ""
+                                }
+                                _syncing = false
+                            }
+                            contentItem: Text {
+                                text: actionCombo.displayText
+                                color: BeeTheme.textPrimary
+                                font.pixelSize: 12
+                                leftPadding: 10
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            background: Rectangle {
+                                radius: 7
+                                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, actionCombo.enabled ? 0.07 : 0.03)
+                                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, actionCombo.activeFocus ? 0.5 : (actionCombo.enabled ? 0.15 : 0.07))
+                                border.width: 1
+                            }
+                            popup: Popup {
+                                y: actionCombo.height
+                                width: actionCombo.width
+                                implicitHeight: contentItem.implicitHeight
+                                padding: 1
+                                contentItem: ListView {
+                                    clip: true; spacing: 2
+                                    model: actionCombo.popup.visible ? actionCombo.delegateModel : null
+                                    implicitHeight: contentHeight
+                                }
+                                background: Rectangle {
+                                    radius: 8
+                                    color: BeeTheme.mode === "HoneyDark" ? Qt.rgba(0.12, 0.11, 0.14, 0.98) : Qt.rgba(0.97, 0.95, 0.91, 0.98)
+                                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                                    border.width: 1
+                                }
+                            }
+                            delegate: ItemDelegate {
+                                width: actionCombo.width
+                                height: 34
+                                contentItem: Text {
+                                    text: model.label
+                                    color: actionCombo.highlightedIndex === index ? BeeTheme.accent : BeeTheme.textPrimary
+                                    font.pixelSize: 12
+                                    leftPadding: 10
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+                                background: Rectangle {
+                                    radius: 4
+                                    color: highlighted ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15) : "transparent"
+                                }
+                                highlighted: actionCombo.highlightedIndex === index
+                            }
+                        }
+                        BeeField {
+                            id: customActionField
+                            Layout.fillWidth: true; height: 36
+                            visible: false
+                            placeholderText: "url:https://... ou app:command"
+                            onTextEdited: { if (!dashConfig._loading) dashConfig.editAction = text }
+                        }
+                    }
 
                     RowLayout {
                         Layout.fillWidth: true; spacing: 10
