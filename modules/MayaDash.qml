@@ -990,8 +990,8 @@ Rectangle {
         }
 
         Rectangle {
-            width: 480
-            height: 800
+            width: 380
+            height: 560
             anchors.centerIn: parent
             color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
             radius: 16
@@ -1007,9 +1007,9 @@ Rectangle {
 
             Column {
                 anchors.fill: parent
-                anchors.margins: 20
-                anchors.bottomMargin: 24
-                spacing: 14
+                anchors.margins: 12
+                anchors.bottomMargin: 16
+                spacing: 8
 
                 // ─── Header ──
                 Row {
@@ -1035,14 +1035,14 @@ Rectangle {
                     }
                 }
 
-                // ─── Temperature + Usage Cards ──
+                // ── Temperature + Usage Cards ──
                 Row {
-                    spacing: 10
+                    spacing: 6
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     // CPU Card
                     Rectangle {
-                        width: 140; height: 90
+                        width: 110; height: 72
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(beeMon.cpuTempColor.r, beeMon.cpuTempColor.g, beeMon.cpuTempColor.b, 0.4)
@@ -1063,7 +1063,7 @@ Rectangle {
                             Text {
                                 text: beeMon.cpuTemp.toFixed(0) + "°C"
                                 color: beeMon.cpuTempColor
-                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
+                                font.pixelSize: 22; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -1079,7 +1079,7 @@ Rectangle {
 
                     // GPU Card
                     Rectangle {
-                        width: 140; height: 90
+                        width: 110; height: 72
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(beeMon.gpuTempColor.r, beeMon.gpuTempColor.g, beeMon.gpuTempColor.b, 0.4)
@@ -1100,7 +1100,7 @@ Rectangle {
                             Text {
                                 text: beeMon.gpuTemp.toFixed(0) + "°C"
                                 color: beeMon.gpuTempColor
-                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
+                                font.pixelSize: 22; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -1109,7 +1109,7 @@ Rectangle {
 
                     // RAM Card
                     Rectangle {
-                        width: 140; height: 90
+                        width: 110; height: 72
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
@@ -1130,7 +1130,7 @@ Rectangle {
                             Text {
                                 text: beeMon.ramPct.toFixed(0) + "%"
                                 color: BeeTheme.accent
-                                font.pixelSize: 28; font.bold: true; font.family: "monospace"
+                                font.pixelSize: 22; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
@@ -1145,10 +1145,10 @@ Rectangle {
                     }
                 }
 
-                // ─── RAM Bar ──
+                // ── RAM Bar ──
                 Rectangle {
-                    width: parent.width - 40
-                    height: 22
+                    width: parent.width - 24
+                    height: 18
                     anchors.horizontalCenter: parent.horizontalCenter
                     radius: 4
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
@@ -1173,11 +1173,11 @@ Rectangle {
                     }
                 }
 
-                // ─── Swap + Uptime Row ──
+                // ── Swap + Uptime Row ──
                 Row {
-                    width: parent.width - 40
+                    width: parent.width - 24
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
+                    spacing: 6
 
                     // Swap
                     Rectangle {
@@ -1224,10 +1224,10 @@ Rectangle {
                     }
                 }
 
-                // ─── Fans ──
+                // ── Fans ──
                 Rectangle {
-                    width: parent.width - 40
-                    height: 36
+                    width: parent.width - 24
+                    height: 28
                     anchors.horizontalCenter: parent.horizontalCenter
                     radius: 8
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
@@ -1245,10 +1245,10 @@ Rectangle {
                     }
                 }
 
-                // ─── Process Memory (VmRSS) ──
+                // ── Process Memory ──
                 Rectangle {
-                    width: parent.width - 40
-                    height: 120
+                    width: parent.width - 24
+                    height: 80
                     anchors.horizontalCenter: parent.horizontalCenter
                     radius: 10
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
@@ -1294,7 +1294,7 @@ Rectangle {
                         Canvas {
                             id: rssGraph
                             width: parent.width
-                            height: 70
+                            height: 50
                             onPaint: {
                                 var ctx = getContext("2d")
                                 ctx.clearRect(0, 0, width, height)
@@ -1389,10 +1389,10 @@ Rectangle {
                     }
                 }
 
-                // ─── Top Processes ──
+                // ── Top Processes ──
                 Rectangle {
-                    width: parent.width - 40
-                    height: 210
+                    width: parent.width - 24
+                    height: 160
                     anchors.horizontalCenter: parent.horizontalCenter
                     radius: 10
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
@@ -1502,8 +1502,8 @@ Rectangle {
         }
 
         Rectangle {
-            width: 480
-            height: 620
+            width: 380
+            height: 500
             anchors.centerIn: parent
             color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
             radius: 16
