@@ -92,6 +92,7 @@ Item {
                                 Layout.fillWidth: true; spacing: 1
                                 Text { text: modelData.title; color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true; Layout.fillWidth: true; elide: Text.ElideRight }
                                 Text { text: modelData.subtitle; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5); font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
+                                Text { text: modelData.action.startsWith("url:") ? "\uD83C\uDF10 " + modelData.action.substring(4) : modelData.action.startsWith("app:") ? "\uD83D\uDCBB " + modelData.action.substring(4) : modelData.action.startsWith("detail:") ? "\uD83D\uDD0D " + modelData.action.substring(7) : modelData.action; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.7); font.pixelSize: 8; font.italic: true; Layout.fillWidth: true; elide: Text.ElideRight }
                             }
                         }
 

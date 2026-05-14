@@ -119,7 +119,11 @@ Rectangle {
         }
     }
 
-    Component.onCompleted: { _updateCellCache() }
+    Component.onCompleted: {
+        _updateCellCache()
+        // Start system monitor backend so dynamic details (CPU/GPU temps) show immediately
+        beeMon.startBackend()
+    }
 
     // ─── Dispatcher d'actions ─────────────────────────────────
     function handleCellAction(action) {
