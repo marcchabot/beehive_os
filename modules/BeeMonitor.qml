@@ -22,6 +22,7 @@ Item {
     // ─── Public properties (consumed by MayaDash cells) ───────
     property real   cpuTemp:      0.0       // °C
     property real   gpuTemp:      0.0       // °C
+    property real   gpuPct:       -1.0      // GPU usage % (-1 = N/A)
     property real   cpuPct:       0.0       // %
     property real   ramPct:       0.0       // %
     property string ramUsed:      "0.0 GB"
@@ -33,7 +34,7 @@ Item {
     property var    fans:         []        // [{label, rpm}]
     property var    topProcesses: []        // [{name, cpu, mem, pid}]
     property bool   loading:      true
-    property bool   gpuIsIgu:    false     // true when GPU shares CPU die (Intel iGPU)
+    property bool   gpuIsIgpu:   false     // true when GPU shares CPU die (Intel iGPU)
 
     // ─── RAM tracker (process VmRSS) ──────────────────────────
     property real   processRss:   0.0       // MB — current process RSS
@@ -105,10 +106,12 @@ Item {
                         beeMon.cpuTemp = d.cpu_temp
                     if (d.gpu_temp !== null && d.gpu_temp !== undefined)
                         beeMon.gpuTemp = d.gpu_temp
+                    if (d.gpu_usage !== null && d.gpu_usage !== undefined)
+                        beeMon.gpuPct = d.gpu_usage
 
                     // iGPU flag (Intel integrated shares CPU die)
                     if (d.gpu_is_igpu !== undefined)
-                        beeMon.gpuIsIgu = d.gpu_is_igpu
+                        beeMon.gpuIsIgpu = d.gpu_is_igpu
 
                     // RAM
                     if (d.ram) {

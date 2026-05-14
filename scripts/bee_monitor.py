@@ -256,6 +256,21 @@ def get_uptime():
         return "—"
 
 
+def get_gpu_usage():
+    """Read GPU usage percentage from sysfs (amdgpu)."""
+    import glob
+    # Try dedicated GPU first, then any GPU
+    for path in sorted(glob.glob("/sys/class/drm/card*/device/gpu_busy_percent")):
+        try:
+            val = int(read_file(path).strip())
+            if val >= 0:
+                # Prefer non-iGPU (card0 is usually dedicated on AMD)
+                return float(val)
+        except Exception:
+            pass
+    return -1.0  # Not available
+
+
 def get_process_rss():
     """Get current process RSS in MB."""
     try:
@@ -273,6 +288,7 @@ def main():
         sensors_data, is_json = read_sensors()
         cpu_usage = calc_cpu_usage()
         cpu_temp, gpu_temp, gpu_is_igpu = get_temps(sensors_data, is_json)
+        gpu_usage = get_gpu_usage()
         mem = parse_meminfo()
         fans = get_fans(sensors_data, is_json)
         top_procs = get_top_processes()
@@ -287,6 +303,7 @@ def main():
             "cpu_temp": cpu_temp,
             "gpu_temp": gpu_temp,
             "gpu_is_igpu": gpu_is_igpu,
+            "gpu_usage": gpu_usage,
             "ram": {
                 "pct": mem["pct"],
                 "used_gb": mem["used_gb"],

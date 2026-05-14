@@ -1011,14 +1011,14 @@ Rectangle {
                     }
                 }
 
-                // ── Temperature + Usage Cards ──
+                // ── Stats Cards (CPU · GPU · RAM) ──
                 Row {
                     spacing: 6
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     // CPU Card
                     Rectangle {
-                        width: 110; height: 72
+                        width: 110; height: 76
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(beeMon.cpuTempColor.r, beeMon.cpuTempColor.g, beeMon.cpuTempColor.b, 0.4)
@@ -1027,8 +1027,9 @@ Rectangle {
                         Behavior on border.color { ColorAnimation { duration: 300 } }
 
                         Column {
-                            anchors.centerIn: parent
-                            spacing: 4
+                            anchors.fill: parent; anchors.margins: 6
+                            spacing: 0
+
                             Text {
                                 text: beeMon.tr("cpu")
                                 color: BeeTheme.textSecondary
@@ -1037,7 +1038,7 @@ Rectangle {
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
-                                text: beeMon.cpuTemp.toFixed(0) + "°C"
+                                text: beeMon.cpuTemp.toFixed(0) + "\u00b0C"
                                 color: beeMon.cpuTempColor
                                 font.pixelSize: 22; font.bold: true; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1046,7 +1047,7 @@ Rectangle {
                             Text {
                                 text: beeMon.cpuPct.toFixed(0) + "%"
                                 color: beeMon.cpuTempColor
-                                font.pixelSize: 12; font.family: "monospace"
+                                font.pixelSize: 11; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -1055,7 +1056,7 @@ Rectangle {
 
                     // GPU Card
                     Rectangle {
-                        width: 110; height: 72
+                        width: 110; height: 76
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(beeMon.gpuTempColor.r, beeMon.gpuTempColor.g, beeMon.gpuTempColor.b, 0.4)
@@ -1064,8 +1065,9 @@ Rectangle {
                         Behavior on border.color { ColorAnimation { duration: 300 } }
 
                         Column {
-                            anchors.centerIn: parent
-                            spacing: 4
+                            anchors.fill: parent; anchors.margins: 6
+                            spacing: 0
+
                             Text {
                                 text: beeMon.gpuIsIgpu ? beeMon.tr("igpu") : beeMon.tr("gpu")
                                 color: BeeTheme.textSecondary
@@ -1074,9 +1076,16 @@ Rectangle {
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
                             Text {
-                                text: beeMon.gpuTemp.toFixed(0) + "°C"
+                                text: beeMon.gpuTemp.toFixed(0) + "\u00b0C"
                                 color: beeMon.gpuTempColor
                                 font.pixelSize: 22; font.bold: true; font.family: "monospace"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                Behavior on color { ColorAnimation { duration: 300 } }
+                            }
+                            Text {
+                                text: beeMon.gpuPct >= 0 ? beeMon.gpuPct.toFixed(0) + "%" : ""
+                                color: beeMon.gpuTempColor
+                                font.pixelSize: 11; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 300 } }
                             }
@@ -1085,7 +1094,7 @@ Rectangle {
 
                     // RAM Card
                     Rectangle {
-                        width: 110; height: 72
+                        width: 110; height: 76
                         radius: 10
                         color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
                         border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
@@ -1094,8 +1103,9 @@ Rectangle {
                         Behavior on border.color { ColorAnimation { duration: 300 } }
 
                         Column {
-                            anchors.centerIn: parent
-                            spacing: 4
+                            anchors.fill: parent; anchors.margins: 6
+                            spacing: 0
+
                             Text {
                                 text: beeMon.tr("ram")
                                 color: BeeTheme.textSecondary
@@ -1113,7 +1123,7 @@ Rectangle {
                             Text {
                                 text: beeMon.ramUsed + " / " + beeMon.ramTotal
                                 color: BeeTheme.textSecondary
-                                font.pixelSize: 9; font.family: "monospace"
+                                font.pixelSize: 11; font.family: "monospace"
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 Behavior on color { ColorAnimation { duration: 600 } }
                             }
@@ -1124,7 +1134,7 @@ Rectangle {
                 // ── RAM Bar ──
                 Rectangle {
                     width: parent.width - 24
-                    height: 18
+                    height: 16
                     anchors.horizontalCenter: parent.horizontalCenter
                     radius: 4
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
@@ -1142,7 +1152,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: beeMon.tr("ram") + "  " + beeMon.ramUsed + " / " + beeMon.ramTotal
+                        text: beeMon.ramUsed + " / " + beeMon.ramTotal
                         color: BeeTheme.textPrimary
                         font.pixelSize: 9; font.bold: true
                         Behavior on color { ColorAnimation { duration: 600 } }
@@ -2398,5 +2408,4 @@ Rectangle {
             }
         }
     }
-
 }
