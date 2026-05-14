@@ -367,6 +367,7 @@ ShellRoot {
 
             MayaDash {
                 id: mayaDash
+                z: mayaDash.configVisible ? 200 : 0
                 dashShown: root.dashVisible && !BeeBarState.focusActive
                 beeMotionEnabled: BeeBarState.motionActive
                 beeVibeEnabled:   BeeBarState.vibeActive
@@ -380,13 +381,13 @@ ShellRoot {
             Clock {
                 anchors.right: parent.right; anchors.top: parent.top
                 anchors.topMargin: 60; anchors.rightMargin: 20
-                visible: BeeConfig.analogClock && !BeeBarState.focusActive
+                visible: BeeConfig.analogClock && !BeeBarState.focusActive && !mayaDash.configVisible
             }
 
             BeeEvents {
                 anchors.left: parent.left; anchors.bottom: parent.bottom
                 anchors.leftMargin: 20; anchors.bottomMargin: 20
-                visible: BeeConfig.eventsEnabled && !BeeBarState.focusActive
+                visible: BeeConfig.eventsEnabled && !BeeBarState.focusActive && !mayaDash.configVisible
             }
         }
     }

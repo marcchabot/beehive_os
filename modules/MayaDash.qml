@@ -865,9 +865,9 @@ Rectangle {
     // ─── MayaDashConfig overlay ────────────────────────────────
     Rectangle {
         id: dashConfigOverlay
-        z: 50
+        z: 200
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, 0.5)
+        color: Qt.rgba(0, 0, 0, 0.6)
         visible: mayaDash.configVisible
         opacity: mayaDash.configVisible ? 1.0 : 0.0
         Behavior on opacity { NumberAnimation { duration: 300 } }
@@ -881,50 +881,51 @@ Rectangle {
         }
 
         MayaDashConfig {
+            id: dashConfigPanel
             anchors.centerIn: parent
             visible: mayaDash.configVisible
             onVisibleChanged: {
                 if (!visible) mayaDash.configVisible = false
             }
         }
-    }
 
-    // ⚙️ Config button — on top of overlay so it's always clickable
-    Rectangle {
-        id: configFloatingBtn
-        z: 100
-        width: 36; height: 36; radius: 18
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: mayaDash.configVisible ? 16 : 0
-        anchors.rightMargin: mayaDash.configVisible ? 16 : 0
-        color: configFloatingBtnHover.containsMouse
-            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
-            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
-        border.color: configFloatingBtnHover.containsMouse
-            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.8)
-            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
-        border.width: 1
-        opacity: mayaDash.configVisible ? 1.0 : 0.0
-        visible: opacity > 0.01
-        Behavior on color { ColorAnimation { duration: 150 } }
-        Behavior on border.color { ColorAnimation { duration: 150 } }
-        Behavior on opacity { NumberAnimation { duration: 200 } }
+        // ✕ Close button — top-right corner of the config panel
+        Rectangle {
+            id: configFloatingBtn
+            z: 300
+            width: 34; height: 34; radius: 17
+            anchors.top: dashConfigPanel.top
+            anchors.right: dashConfigPanel.right
+            anchors.topMargin: -14
+            anchors.rightMargin: -14
+            color: configFloatingBtnHover.containsMouse
+                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.45)
+                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+            border.color: configFloatingBtnHover.containsMouse
+                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.9)
+                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
+            border.width: 1.5
+            opacity: mayaDash.configVisible ? 1.0 : 0.0
+            visible: opacity > 0.01
+            Behavior on color { ColorAnimation { duration: 150 } }
+            Behavior on border.color { ColorAnimation { duration: 150 } }
+            Behavior on opacity { NumberAnimation { duration: 200 } }
 
-        Text {
-            anchors.centerIn: parent
-            text: "✕"; font.pixelSize: 18; font.bold: true
-            color: BeeTheme.accent
-        }
+            Text {
+                anchors.centerIn: parent
+                text: "\u2715"; font.pixelSize: 16; font.bold: true
+                color: BeeTheme.accent
+            }
 
-        MouseArea {
-            id: configFloatingBtnHover
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                mayaDash.configVisible = false
-                BeeSound.playEvent("dash.close")
+            MouseArea {
+                id: configFloatingBtnHover
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    mayaDash.configVisible = false
+                    BeeSound.playEvent("dash.close")
+                }
             }
         }
     }

@@ -114,19 +114,7 @@ Rectangle {
         BeeConfig.saveConfig()
     }
 
-    // ─── Close button ───────────────────────────────────────
-    Rectangle {
-        anchors { top: parent.top; right: parent.right; topMargin: 6; rightMargin: 10 }
-        width: 34; height: 34; radius: 17; z: 100
-        color: closeHov.containsMouse
-            ? Qt.rgba(1.0, 0.3, 0.3, 0.25)
-            : (BeeTheme.mode === "HoneyDark" ? Qt.rgba(0.06, 0.05, 0.08, 1.0) : Qt.rgba(0.96, 0.94, 0.90, 1.0))
-        border.color: closeHov.containsMouse ? Qt.rgba(1.0, 0.3, 0.3, 0.6) : BeeTheme.accent
-        border.width: 1
-        Behavior on color { ColorAnimation { duration: 150 } }
-        Text { text: "✕"; anchors.centerIn: parent; color: closeHov.containsMouse ? "#ff5555" : BeeTheme.accent; font.bold: true; font.pixelSize: 14 }
-        MouseArea { id: closeHov; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: { dashConfig.visible = false } }
-    }
+    // ─── Close button is handled by floating ✕ in MayaDash overlay ──
 
     // ─── Sidebar + Content ──────────────────────────────────
     RowLayout {
