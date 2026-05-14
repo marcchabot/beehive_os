@@ -148,8 +148,10 @@ Item {
                         beeMon.rssHistory = hist
                     }
 
-                    // CPU% from delta of /proc/stat snapshots
-                    if (d.cpu_snapshot) {
+                    // CPU% — prefer server-calculated delta (0.2s), fall back to QML delta
+                    if (d.cpu_usage !== undefined && d.cpu_usage !== null && d.cpu_usage > 0)
+                        beeMon.cpuPct = d.cpu_usage
+                    else if (d.cpu_snapshot) {
                         var idle  = d.cpu_snapshot.idle  || 0
                         var total = d.cpu_snapshot.total || 0
 
