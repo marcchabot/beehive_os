@@ -146,15 +146,17 @@ def get_temps(sensors_data, is_json):
                 has_dedicated_gpu = True
                 gpu_temp = edge_temp
 
-        # Decision: prefer dedicated GPU, but if it reports 0°C, use iGPU
+        # Decision logic:
+        # 1. Dedicated GPU with valid temp → use it
+        # 2. iGPU (AMD or Intel integrated) → use its temp, or CPU temp as fallback
+        # 3. No GPU found at all (Intel iGPU) → use CPU temp
         if has_dedicated_gpu and gpu_temp > 0:
             pass  # Dedicated GPU with valid temp
-        elif has_igpu and igpu_temp > 0:
-            # Dedicated GPU is 0°C or absent — use iGPU
-            gpu_is_igpu = True
-            gpu_temp = igpu_temp
         elif has_igpu:
-            # iGPU has no edge temp either — fallback to CPU temp
+            gpu_is_igpu = True
+            gpu_temp = igpu_temp if igpu_temp > 0 else cpu_temp
+        elif gpu_temp == 0:
+            # No amdgpu chip at all (Intel iGPU, etc.) — use CPU temp
             gpu_is_igpu = True
             gpu_temp = cpu_temp
 
