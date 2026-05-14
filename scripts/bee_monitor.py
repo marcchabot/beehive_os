@@ -84,6 +84,8 @@ def get_temps(sensors_data, is_json):
     if sensors_data is None:
         return cpu_temp, gpu_temp, gpu_is_igpu
 
+    igpu_temp = 0.0  # iGPU edge temp, if available
+
     if is_json:
         data = sensors_data
         # CPU temp
@@ -115,24 +117,44 @@ def get_temps(sensors_data, is_json):
                     if cpu_temp > 0:
                         break
 
-        # Dedicated GPU: amdgpu without pci-7600
+        # GPU detection: scan all amdgpu chips
         for chip, chip_data in data.items():
-            if "amdgpu" in chip.lower() and "pci-7600" not in chip.lower():
+            if "amdgpu" not in chip.lower():
+                continue
+            is_igpu = "pci-7600" in chip.lower()
+            edge_temp = 0.0
+            for sub, vals in chip_data.items():
+                if isinstance(vals, dict) and "edge" in sub.lower():
+                    for k, v in vals.items():
+                        if "input" in k.lower():
+                            edge_temp = round(float(v), 1)
+                            break
+            # Also check for temp in other sub-keys (some GPUs use junction/mem)
+            if edge_temp == 0:
                 for sub, vals in chip_data.items():
-                    if isinstance(vals, dict) and "edge" in sub.lower():
+                    if isinstance(vals, dict):
                         for k, v in vals.items():
-                            if "input" in k.lower():
-                                gpu_temp = round(float(v), 1)
-                                has_dedicated_gpu = True
-                                break
+                            if "temp" in k.lower() and "input" in k.lower():
+                                tv = round(float(v), 1)
+                                if tv > 0 and (edge_temp == 0 or tv > edge_temp):
+                                    edge_temp = tv
 
-        # iGPU detection
-        for chip in data:
-            if "amdgpu" in chip.lower() and "pci-7600" in chip.lower():
+            if is_igpu:
                 has_igpu = True
-                break
+                igpu_temp = edge_temp
+            else:
+                has_dedicated_gpu = True
+                gpu_temp = edge_temp
 
-        if not has_dedicated_gpu and has_igpu:
+        # Decision: prefer dedicated GPU, but if it reports 0°C, use iGPU
+        if has_dedicated_gpu and gpu_temp > 0:
+            pass  # Dedicated GPU with valid temp
+        elif has_igpu and igpu_temp > 0:
+            # Dedicated GPU is 0°C or absent — use iGPU
+            gpu_is_igpu = True
+            gpu_temp = igpu_temp
+        elif has_igpu:
+            # iGPU has no edge temp either — fallback to CPU temp
             gpu_is_igpu = True
             gpu_temp = cpu_temp
 

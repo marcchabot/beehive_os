@@ -967,16 +967,29 @@ Rectangle {
                 onClicked: mouse.accepted = true
             }
 
+            // ✕ Close button — top-right corner
+            OverlayCloseButton {
+                z: 10
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 10
+                anchors.rightMargin: 10
+                onCloseAction: {
+                    mayaDash.monitorDetailVisible = false
+                    BeeSound.playEvent("dash.close")
+                }
+            }
+
             Column {
                 anchors.fill: parent
                 anchors.margins: 12
+                anchors.topMargin: 48
                 anchors.bottomMargin: 16
                 spacing: 8
 
                 // ─── Header ──
                 Row {
                     spacing: 10
-                    width: parent.width
                     Text {
                         text: "🖥️"
                         font.pixelSize: 28
@@ -994,13 +1007,6 @@ Rectangle {
                             color: BeeTheme.textSecondary
                             font.pixelSize: 11
                             Behavior on color { ColorAnimation { duration: 600 } }
-                        }
-                    }
-                    Item { Layout.fillWidth: true; height: 1 }
-                    OverlayCloseButton {
-                        onCloseAction: {
-                            mayaDash.monitorDetailVisible = false
-                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -1487,16 +1493,29 @@ Rectangle {
                 onClicked: mouse.accepted = true
             }
 
+            // ✕ Close button — top-right corner
+            OverlayCloseButton {
+                z: 10
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 10
+                anchors.rightMargin: 10
+                onCloseAction: {
+                    mayaDash.networkDetailVisible = false
+                    BeeSound.playEvent("dash.close")
+                }
+            }
+
             Column {
                 anchors.fill: parent
                 anchors.margins: 20
+                anchors.topMargin: 48
                 anchors.bottomMargin: 24
                 spacing: 16
 
                 // ─── Header ──
                 Row {
                     spacing: 10
-                    width: parent.width
                     Text {
                         text: beeNet.networkIcon
                         font.pixelSize: 28
@@ -1514,13 +1533,6 @@ Rectangle {
                             color: BeeTheme.textSecondary
                             font.pixelSize: 11
                             Behavior on color { ColorAnimation { duration: 600 } }
-                        }
-                    }
-                    Item { Layout.fillWidth: true; height: 1 }
-                    OverlayCloseButton {
-                        onCloseAction: {
-                            mayaDash.networkDetailVisible = false
-                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -1857,9 +1869,23 @@ Rectangle {
                 onClicked: mouse.accepted = true
             }
 
+            // ✕ Close button — top-right corner
+            OverlayCloseButton {
+                z: 10
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 10
+                anchors.rightMargin: 10
+                onCloseAction: {
+                    mayaDash.focusDetailVisible = false
+                    BeeSound.playEvent("dash.close")
+                }
+            }
+
             Column {
                 anchors.fill: parent
                 anchors.margins: 24
+                anchors.topMargin: 48
                 anchors.bottomMargin: 28
                 spacing: 16
 
@@ -1883,15 +1909,6 @@ Rectangle {
                             color: BeeTheme.textSecondary
                             font.pixelSize: 11
                             Behavior on color { ColorAnimation { duration: 600 } }
-                        }
-                    }
-                    Item { Layout.fillWidth: true; height: 1 }
-
-                    // Close button (unified style)
-                    OverlayCloseButton {
-                        onCloseAction: {
-                            mayaDash.focusDetailVisible = false
-                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
