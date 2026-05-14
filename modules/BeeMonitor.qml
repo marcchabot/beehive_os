@@ -98,6 +98,7 @@ Item {
             onRead: (line) => {
                 try {
                     var d = JSON.parse(line.trim())
+                    console.log("BeeMonitor: JSON data:", JSON.stringify(d).substring(0, 200))
 
                     // Temperatures
                     if (d.cpu_temp !== null && d.cpu_temp !== undefined)
