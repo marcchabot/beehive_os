@@ -904,42 +904,18 @@ Rectangle {
         }
 
         // ✕ Close button — top-right corner of the config panel
-        Rectangle {
-            id: configFloatingBtn
+        OverlayCloseButton {
             z: 300
-            width: 34; height: 34; radius: 17
             anchors.top: dashConfigPanel.top
             anchors.right: dashConfigPanel.right
             anchors.topMargin: -14
             anchors.rightMargin: -14
-            color: configFloatingBtnHover.containsMouse
-                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.45)
-                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
-            border.color: configFloatingBtnHover.containsMouse
-                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.9)
-                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35)
-            border.width: 1.5
             opacity: mayaDash.configVisible ? 1.0 : 0.0
             visible: opacity > 0.01
-            Behavior on color { ColorAnimation { duration: 150 } }
-            Behavior on border.color { ColorAnimation { duration: 150 } }
             Behavior on opacity { NumberAnimation { duration: 200 } }
-
-            Text {
-                anchors.centerIn: parent
-                text: "\u2715"; font.pixelSize: 16; font.bold: true
-                color: BeeTheme.accent
-            }
-
-            MouseArea {
-                id: configFloatingBtnHover
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    mayaDash.configVisible = false
-                    BeeSound.playEvent("dash.close")
-                }
+            onCloseAction: {
+                mayaDash.configVisible = false
+                BeeSound.playEvent("dash.close")
             }
         }
     }
@@ -1014,6 +990,7 @@ Rectangle {
                 // ─── Header ──
                 Row {
                     spacing: 10
+                    width: parent.width
                     Text {
                         text: "🖥️"
                         font.pixelSize: 28
@@ -1031,6 +1008,13 @@ Rectangle {
                             color: BeeTheme.textSecondary
                             font.pixelSize: 11
                             Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                    }
+                    Item { Layout.fillWidth: true; height: 1 }
+                    OverlayCloseButton {
+                        onCloseAction: {
+                            mayaDash.monitorDetailVisible = false
+                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -1526,6 +1510,7 @@ Rectangle {
                 // ─── Header ──
                 Row {
                     spacing: 10
+                    width: parent.width
                     Text {
                         text: beeNet.networkIcon
                         font.pixelSize: 28
@@ -1539,10 +1524,17 @@ Rectangle {
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                         Text {
-                            text: beeNet.localIp + " \u00b7 " + beeNet.latency
+                            text: beeNet.localIp + " · " + beeNet.latency
                             color: BeeTheme.textSecondary
                             font.pixelSize: 11
                             Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                    }
+                    Item { Layout.fillWidth: true; height: 1 }
+                    OverlayCloseButton {
+                        onCloseAction: {
+                            mayaDash.networkDetailVisible = false
+                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -1907,21 +1899,13 @@ Rectangle {
                             Behavior on color { ColorAnimation { duration: 600 } }
                         }
                     }
-                    Item { Layout.fillWidth: true; width: 120 }
+                    Item { Layout.fillWidth: true; height: 1 }
 
-                    // Close button
-                    Rectangle {
-                        width: 32; height: 32; radius: 16
-                        color: closeFocus.containsMouse ? Qt.rgba(1, 0.3, 0.3, 0.2) : "transparent"
-                        border.color: closeFocus.containsMouse ? "#ff5555" : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
-                        border.width: 1
-                        Text { text: "✕"; anchors.centerIn: parent; color: closeFocus.containsMouse ? "#ff5555" : BeeTheme.textSecondary; font.pixelSize: 14 }
-                        MouseArea {
-                            id: closeFocus; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                mayaDash.focusDetailVisible = false
-                                BeeSound.playEvent("dash.close")
-                            }
+                    // Close button (unified style)
+                    OverlayCloseButton {
+                        onCloseAction: {
+                            mayaDash.focusDetailVisible = false
+                            BeeSound.playEvent("dash.close")
                         }
                     }
                 }
@@ -2035,18 +2019,40 @@ Rectangle {
                     spacing: 12
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    // Play / Pause
+                    // Play / Pause — Canvas icon for pixel-perfect centering
                     Rectangle {
                         width: 56; height: 56; radius: 28
                         color: BeeFocus.isRunning ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3) : BeeTheme.accent
                         border.color: BeeTheme.accent; border.width: 1
                         Behavior on color { ColorAnimation { duration: 200 } }
 
-                        Text {
+                        Canvas {
+                            id: playPauseCanvas
                             anchors.centerIn: parent
-                            text: BeeFocus.isRunning ? "⏸" : (BeeFocus.isPaused ? "▶" : "▶")
-                            color: BeeFocus.isRunning ? BeeTheme.accent : "#000000"
-                            font.pixelSize: 24; font.bold: true
+                            width: 24; height: 24
+                            property bool isRunning: BeeFocus.isRunning
+                            property color accentColor: BeeFocus.isRunning ? BeeTheme.accent : "#000000"
+                            onIsRunningChanged: requestPaint()
+                            onAccentColorChanged: requestPaint()
+                            onPaint: {
+                                var ctx = getContext("2d")
+                                ctx.reset()
+                                if (isRunning) {
+                                    // Pause: two vertical bars
+                                    ctx.fillStyle = accentColor.toString()
+                                    ctx.fillRect(4, 2, 5, 20)
+                                    ctx.fillRect(15, 2, 5, 20)
+                                } else {
+                                    // Play: right-pointing triangle
+                                    ctx.fillStyle = accentColor.toString()
+                                    ctx.beginPath()
+                                    ctx.moveTo(5, 2)
+                                    ctx.lineTo(21, 12)
+                                    ctx.lineTo(5, 22)
+                                    ctx.closePath()
+                                    ctx.fill()
+                                }
+                            }
                         }
                         MouseArea {
                             anchors.fill: parent; cursorShape: Qt.PointingHandCursor
@@ -2060,26 +2066,71 @@ Rectangle {
                         }
                     }
 
-                    // Reset
+                    // Reset — Canvas circular arrow icon
                     Rectangle {
                         width: 40; height: 40; radius: 20
                         color: resetFocus.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15) : "transparent"
                         border.color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
                         border.width: 1
-                        Text { text: "↺"; anchors.centerIn: parent; color: BeeTheme.textSecondary; font.pixelSize: 18 }
+
+                        Canvas {
+                            id: resetCanvas
+                            anchors.centerIn: parent
+                            width: 18; height: 18
+                            property color iconColor: resetFocus.containsMouse ? BeeTheme.accent : BeeTheme.textSecondary
+                            onIconColorChanged: requestPaint()
+                            onPaint: {
+                                var ctx = getContext("2d")
+                                ctx.reset()
+                                // Circular arrow (reset)
+                                ctx.strokeStyle = iconColor.toString()
+                                ctx.lineWidth = 2
+                                ctx.beginPath()
+                                ctx.arc(9, 9, 7, Math.PI * 0.75, Math.PI * 2.25, false)
+                                ctx.stroke()
+                                // Arrowhead
+                                ctx.fillStyle = iconColor.toString()
+                                ctx.beginPath()
+                                ctx.moveTo(9, 1)
+                                ctx.lineTo(6, 5)
+                                ctx.lineTo(12, 5)
+                                ctx.closePath()
+                                ctx.fill()
+                            }
+                        }
                         MouseArea {
                             id: resetFocus; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: BeeFocus.resetTimer()
                         }
                     }
 
-                    // Skip
+                    // Skip — Canvas forward arrow icon
                     Rectangle {
                         width: 40; height: 40; radius: 20
                         color: skipFocus.containsMouse ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15) : "transparent"
                         border.color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
                         border.width: 1
-                        Text { text: "⏭"; anchors.centerIn: parent; color: BeeTheme.textSecondary; font.pixelSize: 18 }
+
+                        Canvas {
+                            id: skipCanvas
+                            anchors.centerIn: parent
+                            width: 18; height: 18
+                            property color iconColor: skipFocus.containsMouse ? BeeTheme.accent : BeeTheme.textSecondary
+                            onIconColorChanged: requestPaint()
+                            onPaint: {
+                                var ctx = getContext("2d")
+                                ctx.reset()
+                                // Skip: right-pointing triangle + bar
+                                ctx.fillStyle = iconColor.toString()
+                                ctx.beginPath()
+                                ctx.moveTo(2, 3)
+                                ctx.lineTo(10, 9)
+                                ctx.lineTo(2, 15)
+                                ctx.closePath()
+                                ctx.fill()
+                                ctx.fillRect(11, 3, 3, 12)
+                            }
+                        }
                         MouseArea {
                             id: skipFocus; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                             onClicked: BeeFocus.skipPhase()
