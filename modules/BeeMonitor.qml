@@ -90,6 +90,8 @@ Item {
         onExited: (code, status) => {
             if (code !== 0)
                 console.warn("BeeMonitor: Process exited with code", code)
+            // Restart after brief pause (one-shot script pattern)
+            restartTimer.start()
         }
 
         stdout: SplitParser {
@@ -105,7 +107,7 @@ Item {
 
                     // iGPU flag (Intel integrated shares CPU die)
                     if (d.gpu_is_igpu !== undefined)
-                        beeMon.gpuIsIgpu = d.gpu_is_igpu
+                        beeMon.gpuIsIgu = d.gpu_is_igpu
 
                     // RAM
                     if (d.ram) {
@@ -197,7 +199,15 @@ Item {
         pollTimer.start()
     }
 
-    // ─── Polling timer (5s) ─────────────────────────────────
+    // ─── Restart timer (one-shot script re-launch) ────────
+    Timer {
+        id: restartTimer
+        interval: 2000
+        repeat: false
+        onTriggered: { _monitorProc.running = true }
+    }
+
+    // ─── Polling timer (5s fallback) ──────────────────────────
     Timer {
         id: pollTimer
         interval: 5000

@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """bee_monitor.py — System Metrics Collector for BeeMonitor.qml
 
-Outputs one JSON line per cycle on stdout.
-Called every 5 seconds by BeeMonitor Process.
+Outputs ONE JSON line on stdout, then exits.
+Called every 5 seconds by BeeMonitor Process + restartTimer.
 Format matches BeeMonitor.qml SplitParser expectations.
 """
 
 import json
-import os
-import sys
-import time
-import shutil
-import tempfile
 import subprocess
+import sys
 
 
 def read_sensors():
@@ -28,13 +24,13 @@ def read_sensors():
 
 
 def parse_cpu_stat():
-    """Parse /proc/stat for CPU idle/total (for delta calculation)."""
+    """Parse /proc/stat for CPU idle/total."""
     try:
         with open("/proc/stat") as f:
             line = f.readline().strip()
         parts = line.split()
         vals = [int(x) for x in parts[2:12]]
-        idle = vals[3] + vals[4]  # idle + iowait
+        idle = vals[3] + vals[4]
         total = sum(vals)
         return {"idle": idle, "total": total}
     except Exception:
@@ -62,9 +58,6 @@ def parse_meminfo():
     swap_free = info.get("SwapFree", 0)
     swap_used = swap_total - swap_free
 
-    KB = 1048576  # 1 MB in KB
-    GB = KB / 1024
-
     return {
         "pct": round(mem_used * 100 / mem_total, 1) if mem_total > 0 else 0,
         "used_gb": round(mem_used / 1048576, 1),
@@ -84,7 +77,6 @@ def get_temps(sensors_data):
     if not sensors_data:
         return cpu_temp, gpu_temp, gpu_is_igpu
 
-    # CPU temp: k10temp (AMD) or coretemp (Intel)
     for chip, chip_data in sensors_data.items():
         if "k10temp" in chip.lower():
             for sub, vals in chip_data.items():
@@ -101,7 +93,6 @@ def get_temps(sensors_data):
                             cpu_temp = round(float(v), 1)
                             break
 
-    # Fallback: acpitz / gigabyte_wmi
     if cpu_temp == 0:
         for chip, chip_data in sensors_data.items():
             if "acpitz" in chip.lower() or "gigabyte" in chip.lower():
@@ -111,10 +102,9 @@ def get_temps(sensors_data):
                             if "input" in k.lower() and float(v) > 0:
                                 cpu_temp = round(float(v), 1)
                                 break
-                    if cpu_temp > 0:
-                        break
+                if cpu_temp > 0:
+                    break
 
-    # GPU temp: amdgpu (dedicated, skip iGPU pci-7600)
     for chip, chip_data in sensors_data.items():
         if "amdgpu" in chip.lower() and "pci-7600" not in chip.lower():
             for sub, vals in chip_data.items():
@@ -124,13 +114,11 @@ def get_temps(sensors_data):
                             gpu_temp = round(float(v), 1)
                             break
 
-    # Detect iGPU (AMD APU with shared die)
     if gpu_temp == 0 and cpu_temp > 0:
-        # Check if amdgpu with pci-7600 (iGPU)
         for chip in sensors_data:
             if "amdgpu" in chip.lower() and "pci-7600" in chip.lower():
                 gpu_is_igpu = True
-                gpu_temp = cpu_temp  # iGPU shares CPU die
+                gpu_temp = cpu_temp
                 break
 
     return cpu_temp, gpu_temp, gpu_is_igpu
@@ -197,7 +185,7 @@ def get_uptime():
 
 
 def get_process_rss():
-    """Get current process RSS in MB (VmRSS from /proc/self/status)."""
+    """Get current process RSS in MB."""
     try:
         with open("/proc/self/status") as f:
             for line in f:
@@ -209,50 +197,37 @@ def get_process_rss():
 
 
 def main():
-    """Main loop: output JSON every 5 seconds."""
-    prev_idle = 0
-    prev_total = 0
+    sensors_data = read_sensors()
+    cpu_temp, gpu_temp, gpu_is_igpu = get_temps(sensors_data)
+    mem = parse_meminfo()
+    fans = get_fans(sensors_data)
+    top_procs = get_top_processes()
+    uptime = get_uptime()
+    process_rss = get_process_rss()
+    cpu_snap = parse_cpu_stat()
 
-    while True:
-        try:
-            # Collect data
-            sensors_data = read_sensors()
-            cpu_temp, gpu_temp, gpu_is_igpu = get_temps(sensors_data)
-            ram = parse_meminfo()
-            fans = get_fans(sensors_data)
-            top_procs = get_top_processes()
-            uptime = get_uptime()
-            process_rss = get_process_rss()
+    result = {
+        "cpu_temp": cpu_temp,
+        "gpu_temp": gpu_temp,
+        "gpu_is_igpu": gpu_is_igpu,
+        "ram": {
+            "pct": mem["pct"],
+            "used_gb": mem["used_gb"],
+            "total_gb": mem["total_gb"],
+        },
+        "swap": {
+            "pct": mem["swap_pct"],
+            "used_gb": mem["swap_used_gb"],
+            "total_gb": mem["swap_total_gb"],
+        },
+        "fans": fans,
+        "top_processes": top_procs,
+        "uptime_str": uptime,
+        "process_rss_mb": process_rss,
+        "cpu_snapshot": cpu_snap,
+    }
 
-            # CPU snapshot for delta calculation
-            cpu_snap = parse_cpu_stat()
-
-            result = {
-                "cpu_temp": cpu_temp,
-                "gpu_temp": gpu_temp,
-                "gpu_is_igpu": gpu_is_igpu,
-                "ram": {
-                    "pct": ram["pct"],
-                    "used_gb": ram["used_gb"],
-                    "total_gb": ram["total_gb"],
-                    "swap_pct": ram["swap_pct"],
-                    "swap_used_gb": ram["swap_used_gb"],
-                    "swap_total_gb": ram["swap_total_gb"],
-                },
-                "fans": fans,
-                "top_processes": top_procs,
-                "uptime_str": uptime,
-                "process_rss_mb": process_rss,
-                "cpu_snapshot": cpu_snap,
-            }
-
-            print(json.dumps(result), flush=True)
-
-        except Exception as e:
-            # Output error JSON so QML knows something went wrong
-            print(json.dumps({"error": str(e)}), flush=True)
-
-        time.sleep(5)
+    print(json.dumps(result), flush=True)
 
 
 if __name__ == "__main__":
