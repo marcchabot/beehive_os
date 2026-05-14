@@ -198,20 +198,12 @@ Item {
         if (beeMon._backendStarted) return
         beeMon._backendStarted = true
         _monitorProc.running = true
-        pollTimer.start()
+        restartTimer.start()
     }
 
-    // ─── Restart timer (one-shot script re-launch) ────────
+    // ─── Restart timer (one-shot script re-launch every 5s) ──
     Timer {
         id: restartTimer
-        interval: 2000
-        repeat: false
-        onTriggered: { _monitorProc.running = true }
-    }
-
-    // ─── Polling timer (5s fallback) ──────────────────────────
-    Timer {
-        id: pollTimer
         interval: 5000
         repeat: true
         onTriggered: { _monitorProc.running = true }

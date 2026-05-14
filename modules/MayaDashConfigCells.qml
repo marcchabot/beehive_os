@@ -115,7 +115,12 @@ Item {
                                     })
                                     BeeConfig.cellsRevision++
                                     BeeConfig.saveConfig()
-                                    dashConfig.loadCell(idx)
+                                    // Force refresh after ListModel sync
+                                    Qt.callLater(function() {
+                                        mayaDash._updateCellCache()
+                                        mayaDash._refreshAllCells()
+                                        dashConfig.loadCell(idx)
+                                    })
                                     cellsTab.libraryOpen = false
                                     BeeBarState.logAction("My Hive", _fr ? "Alv\u00E9ole remplac\u00E9e" : "Cell replaced", "\uD83D\uDD04")
                                 }
