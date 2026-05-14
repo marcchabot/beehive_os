@@ -109,6 +109,11 @@ QtObject {
     property bool showNet: true
     property bool showDisk: true
     property bool showBattery: true
+    onShowCpuChanged:      { if (root._loaded) saveConfig() }
+    onShowRamChanged:      { if (root._loaded) saveConfig() }
+    onShowNetChanged:      { if (root._loaded) saveConfig() }
+    onShowDiskChanged:      { if (root._loaded) saveConfig() }
+    onShowBatteryChanged:  { if (root._loaded) saveConfig() }
 
     // ─── Battery Mode 🐝🔋 ────────────────────────────────────
     // batteryMode: true when on battery power (reduces animations)
@@ -335,6 +340,7 @@ QtObject {
 
     // ─── Horloge Analogique (Bee-Hive Time) ───────────────────
     property bool analogClock: true
+    onAnalogClockChanged: { if (root._loaded) saveConfig() }
 
     // ─── BeeSearch (Favoris) ──────────────────────────────────
     property var pinnedApps: []
@@ -499,6 +505,7 @@ QtObject {
 
     // ─── Dashboard ────────────────────────────────────────────
     property string dashTitle: "🍯 Maya Dashboard"
+    onDashTitleChanged: { if (root._loaded) saveConfig() }
 
     // ─── Cells model ───────────────────────────────────────────
     property ListModel cells: ListModel { id: _cells }
