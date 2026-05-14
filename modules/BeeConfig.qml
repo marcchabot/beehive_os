@@ -1264,6 +1264,7 @@ QtObject {
             } else {
                 loadDefaults()
             }
+            cellsRevision++
         }
 
         if (cfg.auto_theme !== undefined) {
@@ -1389,6 +1390,7 @@ QtObject {
         }
         // Mark migration as done so it never runs again
         _rawConfig._migrated = "0.8.17"
+        if (changed) cellsRevision++
         saveConfig()
     }
 
@@ -1619,5 +1621,6 @@ QtObject {
             _cells.append({ icon: "🌐",  title: "Network",          subtitle: "Connected",           detail: "Real-time stats\n& Speed Test",             action: "detail:network",  highlighted: true,  customizable: true })
             _cells.append({ icon: "⚙️",  title: "Settings",        subtitle: "Bee-Hive OS",          detail: "Configuration\n& Preferences",            action: "toggle:settings", highlighted: false, customizable: true })
         }
+        cellsRevision++
     }
 }
