@@ -180,7 +180,7 @@ QtObject {
             if (!root.scanning) {
                 root.scanning = true
                 root._scanned = []
-                root._proc.running = true
+                root._scanProc.running = true
                 console.log("BeeApps: auto-rescan triggered")
             }
         }
@@ -191,7 +191,7 @@ QtObject {
         if (!root.scanning) {
             root.scanning = true
             root._scanned = []
-            root._proc.running = true
+            root._scanProc.running = true
             console.log("BeeApps: manual rescan triggered")
         }
     }
