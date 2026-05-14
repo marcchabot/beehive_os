@@ -381,6 +381,7 @@ Item {
 
                 Rectangle {
                     id: deleteButton
+                    z: 10
                     width: 24
                     height: 24
                     radius: 12
