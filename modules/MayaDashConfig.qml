@@ -114,7 +114,18 @@ Rectangle {
         BeeConfig.saveConfig()
     }
 
-    // ─── Close button is handled by floating ✕ in MayaDash overlay ──
+    // ─── Close button (inside panel, top-right) ──────────────
+    OverlayCloseButton {
+        z: 10
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 12
+        anchors.rightMargin: 12
+        onCloseAction: {
+            mayaDash.configVisible = false
+            BeeSound.playEvent("dash.close")
+        }
+    }
 
     // ─── Sidebar + Content ──────────────────────────────────
     RowLayout {

@@ -903,21 +903,7 @@ Rectangle {
             }
         }
 
-        // ✕ Close button — top-right corner of the config panel
-        OverlayCloseButton {
-            z: 300
-            anchors.top: dashConfigPanel.top
-            anchors.right: dashConfigPanel.right
-            anchors.topMargin: -14
-            anchors.rightMargin: -14
-            opacity: mayaDash.configVisible ? 1.0 : 0.0
-            visible: opacity > 0.01
-            Behavior on opacity { NumberAnimation { duration: 200 } }
-            onCloseAction: {
-                mayaDash.configVisible = false
-                BeeSound.playEvent("dash.close")
-            }
-        }
+
     }
 
     // ─── Ligne décorative en bas ──────────────────────────────
