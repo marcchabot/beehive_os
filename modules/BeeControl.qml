@@ -32,7 +32,7 @@ Rectangle {
     opacity: panelOpacity
 
     // ─── State ──────────────────────────────────────────────
-    property int currentTab: 0   // 0=General 1=Appearance 2=Wallpaper 3=Dashboard 4=Bar&Widgets 5=Productivity 6=Extensions 7=Accessibility 8=Journal
+    property int currentTab: 0   // 0=General 1=Appearance 2=Wallpaper 3=Bar&Widgets 4=Productivity 5=Extensions 6=Accessibility 7=Journal
 
     property string _activePaletteKey: "honey_gold"
     property var _s: BeeConfig.tr.settings || {}
@@ -160,12 +160,11 @@ Rectangle {
                     case 0: return "GeneralTab.qml"
                     case 1: return "AppearanceTab.qml"
                     case 2: return "WallpaperTab.qml"
-                    case 3: return "DashboardTab.qml"
-                    case 4: return "BarWidgetsTab.qml"
-                    case 5: return "ProductivityTab.qml"
-                    case 6: return "ExtensionsTab.qml"
-                    case 7: return "AccessibilityTab.qml"
-                    case 8: return "HistoryTab.qml"
+                    case 3: return "BarWidgetsTab.qml"
+                    case 4: return "ProductivityTab.qml"
+                    case 5: return "ExtensionsTab.qml"
+                    case 6: return "AccessibilityTab.qml"
+                    case 7: return "HistoryTab.qml"
                     default: return "GeneralTab.qml"
                 }
             }
@@ -181,12 +180,11 @@ Rectangle {
             { icon: "🏠", label: s.tab_general || "General",           idx: 0 },
             { icon: "🎨", label: s.tab_appearance || "Appearance",      idx: 1 },
             { icon: "🖼️", label: s.tab_wallpaper || "Wallpaper",       idx: 2 },
-            { icon: "📊", label: s.tab_dashboard || "Dashboard",        idx: 3 },
-            { icon: "📅", label: s.tab_bar_widgets || "Bar & Widgets",  idx: 4 },
-            { icon: "🗓️", label: s.tab_productivity || "Productivity",   idx: 5 },
-            { icon: "🧩", label: s.tab_extensions || "Extensions",      idx: 6 },
-            { icon: "♿", label: s.tab_accessibility || "Accessibility", idx: 7 },
-            { icon: "📜", label: s.tab_journal || "Journal",           idx: 8 }
+            { icon: "📊", label: s.tab_bar_widgets || "Bar & Widgets",  idx: 3 },
+            { icon: "📅", label: s.tab_productivity || "Productivity",   idx: 4 },
+            { icon: "🧩", label: s.tab_extensions || "Extensions",      idx: 5 },
+            { icon: "♿", label: s.tab_accessibility || "Accessibility", idx: 6 },
+            { icon: "📜", label: s.tab_journal || "Journal",           idx: 7 }
         ]
     }
 
