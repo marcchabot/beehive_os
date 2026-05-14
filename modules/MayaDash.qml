@@ -209,6 +209,16 @@ Rectangle {
             return
         }
 
+        // detail:notes → BeeNotes panel
+        if (action === "detail:notes") {
+            mayaDash.networkDetailVisible = false
+            mayaDash.monitorDetailVisible = false
+            mayaDash.focusDetailVisible = false
+            mayaDash.openNotes()
+            BeeSound.playEvent("dash.open")
+            return
+        }
+
         // detail:calendar → BeeCalendar panel (own PanelWindow via BeeHiveShell)
         if (action === "detail:calendar") {
             mayaDash.networkDetailVisible = false

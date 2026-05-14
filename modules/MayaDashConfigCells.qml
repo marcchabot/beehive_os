@@ -11,6 +11,121 @@ Item {
     id: cellsTab
     property string _fr: BeeConfig.uiLang === "fr" ? "1" : ""
 
+    // ─── Module Library (available presets for cell replacement) ───
+    property var moduleLibrary: [
+        { icon: "\uD83D\uDCC5", title: _fr ? "Famille Chabot" : "Family Calendar", subtitle: _fr ? "Calendrier" : "Calendar", detail: _fr ? "Agenda Familial\nGoogle Calendar" : "Family Agenda\nGoogle Calendar", action: "url:https://calendar.google.com/calendar/u/0/r", highlighted: true },
+        { icon: "\uD83D\uDCC5", title: _fr ? "Calendrier" : "Calendar", subtitle: _fr ? "Agenda" : "Schedule", detail: _fr ? "\u00C9v\u00E9nements du jour\nRappels" : "Today's events\nReminders", action: "detail:calendar", highlighted: false },
+        { icon: "\uD83D\uDCDD", title: "BeeNotes", subtitle: _fr ? "Notes" : "Notes", detail: _fr ? "Notes rapides\nChecklist" : "Quick notes\nChecklist", action: "detail:notes", highlighted: false },
+        { icon: "\uD83D\uDDA5\uFE0F", title: _fr ? "Syst\u00E8me" : "System", subtitle: "CachyOS", detail: "CPU/GPU/RAM\nTemp\u00E9ratures", action: "detail:monitor", highlighted: false },
+        { icon: "\uD83C\uDF10", title: _fr ? "R\u00E9seau" : "Network", subtitle: _fr ? "Speed Test" : "Speed Test", detail: _fr ? "Latence & D\u00E9bit\nTest de vitesse" : "Latency & Speed\nSpeed Test", action: "detail:network", highlighted: true },
+        { icon: "\uD83C\uDF45", title: "BeeFocus", subtitle: _fr ? "Pomodoro" : "Pomodoro", detail: _fr ? "Minuteur de concentration" : "Focus timer", action: "detail:focus", highlighted: false },
+        { icon: "\uD83D\uDC1D", title: "Maya Status", subtitle: _fr ? "En ligne" : "Online", detail: _fr ? "IA Assistante\nConnect\u00E9e" : "AI Assistant\nConnected", action: "url:http://192.168.13.100:18789/", highlighted: true },
+        { icon: "\u26F0\uFE0F", title: "Tremblant", subtitle: _fr ? "Conditions ski" : "Ski conditions", detail: _fr ? "Mont-Tremblant\nConditions de ski" : "Mont-Tremblant\nSki conditions", action: "url:https://www.tremblant.ca/montagne/conditions-ski", highlighted: false },
+        { icon: "\uD83D\uDCB0", title: "Powerland", subtitle: _fr ? "Gestion" : "Management", detail: _fr ? "Documents\nGoogle Drive" : "Documents\nGoogle Drive", action: "url:https://drive.google.com", highlighted: false },
+        { icon: "\uD83C\uDFAE", title: _fr ? "Jeux" : "Gaming", subtitle: "GeForce Now", detail: _fr ? "Cloud Gaming\nGeForce Now" : "Cloud Gaming\nGeForce Now", action: "app:flatpak run com.nvidia.geforcenow", highlighted: false },
+        { icon: "\u2699\uFE0F", title: _fr ? "Param\u00E8tres" : "Settings", subtitle: "Bee-Hive OS", detail: _fr ? "Configuration\nPr\u00E9f\u00E9rences" : "Configuration\nPreferences", action: "toggle:settings", highlighted: false }
+    ]
+
+    property bool libraryOpen: false
+
+    // ─── Module Library Popup ───
+    Rectangle {
+        id: libraryPopup
+        visible: cellsTab.libraryOpen
+        z: 500
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.4)
+        radius: 12
+
+        MouseArea { anchors.fill: parent; onClicked: cellsTab.libraryOpen = false }
+
+        Rectangle {
+            width: 280; height: 400
+            anchors.centerIn: parent
+            radius: 14
+            color: BeeTheme.mode === "HoneyDark" ? Qt.rgba(0.08, 0.07, 0.10, 0.98) : Qt.rgba(0.97, 0.95, 0.91, 0.98)
+            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+            border.width: 1
+
+            ColumnLayout {
+                anchors.fill: parent; anchors.margins: 14; spacing: 8
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        text: _fr ? "\uD83D\uDD04 Remplacer par..." : "\uD83D\uDD04 Replace with..."
+                        color: BeeTheme.accent; font.bold: true; font.pixelSize: 14
+                        Layout.fillWidth: true
+                    }
+                    Rectangle {
+                        width: 26; height: 26; radius: 13
+                        color: closeLib.containsMouse ? Qt.rgba(1, 0.3, 0.3, 0.3) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.1)
+                        Text { text: "\u2715"; color: BeeTheme.accent; font.pixelSize: 12; anchors.centerIn: parent }
+                        MouseArea { id: closeLib; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: cellsTab.libraryOpen = false }
+                    }
+                }
+
+                Rectangle { Layout.fillWidth: true; height: 1; color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15) }
+
+                ListView {
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    clip: true; spacing: 4
+                    model: cellsTab.moduleLibrary
+
+                    delegate: Rectangle {
+                        width: ListView.view.width
+                        height: 48; radius: 8
+                        color: modHov.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.18)
+                            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                        border.color: modHov.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.5)
+                            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.10)
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Behavior on border.color { ColorAnimation { duration: 120 } }
+
+                        RowLayout {
+                            anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 8
+                            Text { text: modelData.icon; font.pixelSize: 20 }
+                            ColumnLayout {
+                                Layout.fillWidth: true; spacing: 1
+                                Text { text: modelData.title; color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true; Layout.fillWidth: true; elide: Text.ElideRight }
+                                Text { text: modelData.subtitle; color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.5); font.pixelSize: 10; Layout.fillWidth: true; elide: Text.ElideRight }
+                            }
+                        }
+
+                        MouseArea {
+                            id: modHov
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                // Replace the selected cell with this module's data
+                                var idx = dashConfig.selectedIndex
+                                if (idx >= 0 && idx < BeeConfig.cells.count) {
+                                    BeeConfig.cells.set(idx, {
+                                        icon: modelData.icon,
+                                        title: modelData.title,
+                                        subtitle: modelData.subtitle,
+                                        detail: modelData.detail,
+                                        action: modelData.action,
+                                        highlighted: modelData.highlighted,
+                                        customizable: true,
+                                        color: BeeConfig.cells.get(idx).color || ""
+                                    })
+                                    BeeConfig.cellsRevision++
+                                    BeeConfig.saveConfig()
+                                    dashConfig.loadCell(idx)
+                                    cellsTab.libraryOpen = false
+                                    BeeBarState.logAction("My Hive", _fr ? "Alv\u00E9ole remplac\u00E9e" : "Cell replaced", "\uD83D\uDD04")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     RowLayout {
         anchors.fill: parent; anchors.margins: 16; spacing: 14
 
@@ -218,27 +333,42 @@ Item {
 
                     // ─── Action Buttons ───
                     RowLayout {
-                        Layout.fillWidth: true; spacing: 10
+                        Layout.fillWidth: true; spacing: 8
                         Layout.topMargin: 8
 
                         // Add cell
                         Rectangle {
-                            width: 100; height: 30; radius: 15
+                            width: 90; height: 30; radius: 15
                             color: Qt.rgba(0.2, 0.7, 0.3, 0.15)
                             border.color: Qt.rgba(0.2, 0.7, 0.3, 0.40); border.width: 1
-                            Text { text: _fr ? "➕ Ajouter" : "➕ Add"; color: "#4CAF50"; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent }
+                            Text { text: _fr ? "\u2795 Ajouter" : "\u2795 Add"; color: "#4CAF50"; font.pixelSize: 10; font.bold: true; anchors.centerIn: parent }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     BeeConfig.cells.append({
-                                        icon: "🐝", title: "New Cell", subtitle: "", detail: "",
+                                        icon: "\uD83D\uDC1D", title: "New Cell", subtitle: "", detail: "",
                                         action: "none", highlighted: false, customizable: true, color: ""
                                     })
                                     BeeConfig.saveConfig()
                                     dashConfig.selectedIndex = BeeConfig.cells.count - 1
                                     dashConfig.loadCell(dashConfig.selectedIndex)
-                                    BeeBarState.logAction("My Hive", _fr ? "Nouvelle alvéole ajoutée" : "New cell added", "➕")
+                                    BeeBarState.logAction("My Hive", _fr ? "Nouvelle alv\u00E9ole ajout\u00E9e" : "New cell added", "\u2795")
                                 }
+                            }
+                        }
+
+                        // Replace cell (module library)
+                        Rectangle {
+                            width: 100; height: 30; radius: 15
+                            color: dashConfig.selectedIndex >= 0 ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12) : Qt.rgba(0.5, 0.5, 0.5, 0.08)
+                            border.color: dashConfig.selectedIndex >= 0 ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35) : "#888888"
+                            border.width: 1
+                            opacity: dashConfig.selectedIndex >= 0 ? 1 : 0.4
+                            Text { text: _fr ? "\uD83D\uDD04 Remplacer" : "\uD83D\uDD04 Replace"; color: dashConfig.selectedIndex >= 0 ? BeeTheme.accent : "#888888"; font.pixelSize: 10; font.bold: true; anchors.centerIn: parent }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                enabled: dashConfig.selectedIndex >= 0
+                                onClicked: { if (dashConfig.selectedIndex >= 0) cellsTab.libraryOpen = true }
                             }
                         }
 
