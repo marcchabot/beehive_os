@@ -7,7 +7,7 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // BeeCalendar.qml — Universal Calendar Widget 🐝📅
-// Sprint v0.8.21 — Reminder system, snooze/dismiss, time-aware Nectar Sync
+// Sprint v0.8.27 — BeeReminder push notifications, snooze persistence, time-aware Nectar Sync
 // Réutilise les données de bee_sync.py → data/events_live.json
 // Bi-directionnel avec Google Calendar via gog CLI
 // ═══════════════════════════════════════════════════════════════
@@ -141,8 +141,9 @@ Rectangle {
     property var  snoozeEvent: null
     property bool snoozeVisible: false
 
-    // 🐝 v0.8.21 — Reminder system properties
+    // 🐝 v0.8.27 — Reminder system properties (BeeReminder integration)
     signal reminderTriggered(string title, string time, string calendarLabel)
+    signal reminderPopupRequested(var eventData)  // 🐝 v0.8.27 — Signal to BeeReminder popup
     property bool reminderEnabled: BeeConfig.beeCalendarReminderEnabled
     property int  reminderMinutes: BeeConfig.beeCalendarReminderMinutes
     property int  snoozeDurationMin: BeeConfig.beeCalendarSnoozeDurationMin
@@ -153,6 +154,78 @@ Rectangle {
 
     // Snoozed reminders — ListModel for re-scheduling
     ListModel { id: snoozedReminders }
+
+    // ─── Snooze persistence path ────────────────────────────
+    property string _remindersCachePath: {
+        var home = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "")
+        return home + "/.cache/beehive_os/reminders.json"
+    }
+
+    // ─── Save snoozed reminders to disk ──────────────────────
+    function saveSnoozedReminders() {
+        var arr = []
+        for (var i = 0; i < snoozedReminders.count; i++) {
+            var sr = snoozedReminders.get(i)
+            arr.push({
+                evtId: sr.evtId,
+                evtTitle: sr.evtTitle,
+                evtTime: sr.evtTime,
+                evtIcon: sr.evtIcon || "📅",
+                evtSub: sr.evtSub || "",
+                evtTimestamp: sr.evtTimestamp || 0,
+                snoozeTriggerTs: sr.snoozeTriggerTs
+            })
+        }
+        var json = JSON.stringify(arr)
+        // Write async via Process
+        Qt.createQmlObject(
+            'import Quickshell.Io; Process { '
+            + '  running: true; '
+            + '  command: ["bash", "-c", "mkdir -p ~/.cache/beehive_os && echo \\"' + json.replace(/"/g, '\\"').replace(/\\/g, '\\\\') + '\\" > ' + _remindersCachePath + '"]; '
+            + '}',
+            beeCalendar, "saveReminders"
+        )
+    }
+
+    // ─── Load snoozed reminders from disk ──────────────────
+    function loadSnoozedReminders() {
+        var doc = new XMLHttpRequest()
+        doc.onreadystatechange = function() {
+            if (doc.readyState !== XMLHttpRequest.DONE) return
+            if (doc.status !== 200 && doc.status !== 0) return
+            var text = doc.responseText.trim()
+            if (text === "" || text === "[]") return
+            try {
+                var arr = JSON.parse(text)
+                if (!Array.isArray(arr)) return
+                var nowTs = Math.floor(new Date().getTime() / 1000)
+                for (var i = 0; i < arr.length; i++) {
+                    var sr = arr[i]
+                    // Only restore snoozed reminders that haven't expired yet
+                    if (sr.snoozeTriggerTs && sr.snoozeTriggerTs > nowTs) {
+                        snoozedReminders.append({
+                            evtId: sr.evtId || "",
+                            evtTitle: sr.evtTitle || "",
+                            evtTime: sr.evtTime || "",
+                            evtIcon: sr.evtIcon || "📅",
+                            evtSub: sr.evtSub || "",
+                            evtTimestamp: sr.evtTimestamp || 0,
+                            snoozeTriggerTs: sr.snoozeTriggerTs
+                        })
+                    }
+                }
+                if (snoozedReminders.count > 0) {
+                    console.log("BeeCalendar: Restored", snoozedReminders.count, "snoozed reminders")
+                }
+            } catch(e) {
+                console.warn("BeeCalendar: Error loading snoozed reminders:", e)
+            }
+        }
+        var path = _remindersCachePath
+        if (!path.startsWith("file://")) path = "file://" + path
+        doc.open("GET", path)
+        doc.send()
+    }
 
     // ─── Reminder check timer (every 60s) ──────────────────
     Timer {
@@ -185,22 +258,24 @@ Rectangle {
                 if (!_firedReminders[key]) {
                     _firedReminders[key] = true
                     var timeStr = evt.evtTime || new Date(evtTs * 1000).toLocaleTimeString(Qt.locale("fr_CA"), "HH:mm")
-                    beeCalendar.snoozeEvent = {
+                    var evtColor = calColor(evt.evtSub)
+                    var evtData = {
                         id: evt.evtId,
                         title: evt.evtTitle,
                         time: timeStr,
                         icon: evt.evtIcon || "📅",
                         sub: evt.evtSub || "",
-                        timestamp: evtTs
+                        timestamp: evtTs,
+                        calendarColor: evtColor,
+                        calendarLabel: evt.evtSub || "",
+                        isSnoozed: false
                     }
-                    beeCalendar.snoozeVisible = true
+                    // 🐝 v0.8.27 — Emit to BeeReminder popup
+                    reminderPopupRequested(evtData)
                     reminderTriggered(evt.evtTitle, timeStr, evt.evtSub)
-                    // Push to BeeNotify via BeeBarState
-                    BeeBarState.notificationReceived(
-                        "📅 Rappel: " + evt.evtTitle,
-                        timeStr + " — " + (evt.evtSub || ""),
-                        evt.evtIcon || "📅"
-                    )
+                    // Also set internal snooze state for backward compat
+                    beeCalendar.snoozeEvent = evtData
+                    beeCalendar.snoozeVisible = true
                     // Play reminder sound
                     BeeSound.playEvent(reminderSound, {})
                 }
@@ -213,21 +288,24 @@ Rectangle {
             var sr = snoozedReminders.get(j)
             var snoozeTs = sr.snoozeTriggerTs
             if (nowTs >= snoozeTs) {
-                // Re-trigger this snoozed reminder
-                beeCalendar.snoozeEvent = {
+                // Re-trigger this snoozed reminder via BeeReminder
+                var srColor = calColor(sr.evtSub)
+                var srData = {
                     id: sr.evtId,
                     title: sr.evtTitle,
                     time: sr.evtTime,
                     icon: sr.evtIcon || "📅",
                     sub: sr.evtSub || "",
-                    timestamp: sr.evtTimestamp
+                    timestamp: sr.evtTimestamp,
+                    calendarColor: srColor,
+                    calendarLabel: sr.evtSub || "",
+                    isSnoozed: true
                 }
+                // 🐝 v0.8.27 — Emit to BeeReminder popup
+                reminderPopupRequested(srData)
+                // Also set internal state for backward compat
+                beeCalendar.snoozeEvent = srData
                 beeCalendar.snoozeVisible = true
-                BeeBarState.notificationReceived(
-                    "📅 Rappel (snooze): " + sr.evtTitle,
-                    sr.evtTime + " — " + (sr.evtSub || ""),
-                    sr.evtIcon || "📅"
-                )
                 BeeSound.playEvent(reminderSound, {})
                 toRemove.push(j)
             }
@@ -235,6 +313,10 @@ Rectangle {
         // Remove expired snoozed reminders (iterate reverse)
         for (var k = 0; k < toRemove.length; k++) {
             snoozedReminders.remove(toRemove[k])
+        }
+        // 🐝 v0.8.27 — Persist snooze state
+        if (toRemove.length > 0) {
+            saveSnoozedReminders()
         }
     }
 
@@ -255,12 +337,26 @@ Rectangle {
             snoozeTriggerTs: snoozeTs
         })
         beeCalendar.snoozeVisible = false
+        // 🐝 v0.8.27 — Persist snooze state to disk
+        saveSnoozedReminders()
     }
 
     // ─── Dismiss action — close notification ─────────────────
     function dismissReminder() {
         beeCalendar.snoozeVisible = false
         beeCalendar.snoozeEvent = null
+    }
+
+    // ─── Dismiss by event ID (for BeeReminder) ──────────────
+    function dismissReminderById(evtId) {
+        // Remove from snoozed reminders if present
+        for (var i = snoozedReminders.count - 1; i >= 0; i--) {
+            if (snoozedReminders.get(i).evtId === evtId) {
+                snoozedReminders.remove(i)
+                break
+            }
+        }
+        saveSnoozedReminders()
     }
 
 
@@ -2406,5 +2502,7 @@ Rectangle {
         selectedDate = new Date()
         viewMode = BeeConfig.calendarView || "month"
         loadEvents()
+        // 🐝 v0.8.27 — Load persisted snooze reminders
+        loadSnoozedReminders()
     }
 }

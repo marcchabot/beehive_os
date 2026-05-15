@@ -85,6 +85,28 @@ Item {
                 onMoved: { BeeConfig.beeCalendarReminderMinutes = Math.round(value); BeeConfig.saveConfig() }
             }
 
+            // Snooze duration
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.beeCalendarReminderEnabled
+                Text {
+                    text: s.snooze_duration || "Snooze duration (min)"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeeConfig.beeCalendarSnoozeDurationMin + " min"
+                    color: BeeTheme.accent; font.pixelSize: 13; font.bold: true
+                    Layout.minimumWidth: 50; horizontalAlignment: Text.AlignRight
+                }
+            }
+            Slider {
+                Layout.fillWidth: true
+                visible: BeeConfig.beeCalendarReminderEnabled
+                from: 1; to: 30; stepSize: 1
+                value: BeeConfig.beeCalendarSnoozeDurationMin
+                onMoved: { BeeConfig.beeCalendarSnoozeDurationMin = Math.round(value); BeeConfig.saveConfig() }
+            }
+
             // CalDAV auto-sync
             RowLayout {
                 Layout.fillWidth: true; spacing: 12

@@ -7,6 +7,7 @@ import '../modules'
 
 ShellRoot {
     id: root
+    objectName: "beehiveShell"
 
     property bool dashVisible: false
     property bool searchVisible: false
@@ -14,12 +15,211 @@ ShellRoot {
     property bool welcomeVisible: false
     property bool voiceVisible: false
 
+    // 🐝 v0.8.27 — Global reminder engine (works even when calendar panel is closed)
+    property var _firedReminders: ({})
+    property var _snoozedReminders: []
+    property string _remindersCachePath: {
+        var home = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "")
+        return home + "/.cache/beehive_os/reminders.json"
+    }
+
+    // ─── Load snoozed reminders from disk ────────────────────
+    function _loadSnoozedReminders() {
+        var doc = new XMLHttpRequest()
+        doc.onreadystatechange = function() {
+            if (doc.readyState !== XMLHttpRequest.DONE) return
+            if (doc.status !== 200 && doc.status !== 0) return
+            var text = doc.responseText.trim()
+            if (text === "" || text === "[]") return
+            try {
+                var arr = JSON.parse(text)
+                if (!Array.isArray(arr)) return
+                var nowTs = Math.floor(new Date().getTime() / 1000)
+                for (var i = 0; i < arr.length; i++) {
+                    var sr = arr[i]
+                    if (sr.snoozeTriggerTs && sr.snoozeTriggerTs > nowTs) {
+                        root._snoozedReminders.push(sr)
+                    }
+                }
+                if (root._snoozedReminders.length > 0) {
+                    console.log("BeeHiveShell: Restored", root._snoozedReminders.length, "snoozed reminders")
+                }
+            } catch(e) {
+                console.warn("BeeHiveShell: Error loading snoozed reminders:", e)
+            }
+        }
+        var path = root._remindersCachePath
+        if (!path.startsWith("file://")) path = "file://" + path
+        doc.open("GET", path)
+        doc.send()
+    }
+
+    // ─── Save snoozed reminders to disk ──────────────────────
+    function _saveSnoozedReminders() {
+        var arr = root._snoozedReminders
+        var json = JSON.stringify(arr)
+        // Use Process to write file
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "mkdir -p ~/.cache/beehive_os && cat > ' + root._remindersCachePath + ' << \'BEEJSONEOF\'\n' + json.replace(/'/g, "'\\''") + '\nBEEJSONEOF"] }',
+            root, "saveReminders"
+        )
+    }
+
+    // ─── Snooze a reminder (called from BeeReminder) ───────
+    function snoozeReminder(evtId, minutes) {
+        // Find in fired reminders by scanning _firedReminders and events
+        // We need to reconstruct from the last triggered event
+        // The BeeReminder snooze flow: user clicks snooze → BeeReminder.snoozeReminder → beeCalendar.snoozeReminder
+        // For global reminders, we handle it here
+        var nowTs = Math.floor(new Date().getTime() / 1000)
+        var snoozeTs = nowTs + (minutes * 60)
+
+        // Find the event in recently-checked data
+        // We'll store it from checkGlobalReminders
+        if (root._lastTriggeredEvent) {
+            root._snoozedReminders.push({
+                evtId: evtId || root._lastTriggeredEvent.id || "",
+                evtTitle: root._lastTriggeredEvent.title || "",
+                evtTime: root._lastTriggeredEvent.time || "",
+                evtIcon: root._lastTriggeredEvent.icon || "📅",
+                evtSub: root._lastTriggeredEvent.sub || "",
+                evtTimestamp: root._lastTriggeredEvent.timestamp || 0,
+                snoozeTriggerTs: snoozeTs
+            })
+            root._saveSnoozedReminders()
+        }
+    }
+
+    property var _lastTriggeredEvent: null
+
+    // ─── Global reminder timer ───────────────────────────────
+    Timer {
+        id: globalReminderTimer
+        interval: 60000  // Check every 60 seconds
+        running: BeeConfig.beeCalendarReminderEnabled
+        repeat: true
+        onTriggered: root.checkGlobalReminders()
+    }
+
+    // ─── Events data for global reminders ───────────────────
+    property var _globalEventsData: []
+    FileWatcher {
+        path: BeeConfig.eventsLivePath || (StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/beehive_os/data/events_live.json")
+        onFileChanged: root._loadGlobalEvents()
+    }
+    Timer {
+        id: globalEventsReload
+        interval: 300000  // Reload every 5 min
+        running: true
+        repeat: true
+        onTriggered: root._loadGlobalEvents()
+    }
+
+    function _loadGlobalEvents() {
+        var doc = new XMLHttpRequest()
+        var path = BeeConfig.eventsLivePath || (StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/beehive_os/data/events_live.json")
+        if (!path.startsWith("file://")) path = "file://" + path
+        doc.onreadystatechange = function() {
+            if (doc.readyState !== XMLHttpRequest.DONE) return
+            try {
+                var data = JSON.parse(doc.responseText)
+                root._globalEventsData = Array.isArray(data) ? data : (data.events || [])
+            } catch(e) {
+                // Silently ignore parse errors
+            }
+        }
+        doc.open("GET", path)
+        doc.send()
+    }
+
+    // ─── Calendar colors for reminder popups ────────────────
+    property var _calColors: ({
+        "Famille": "#FFB81C",
+        "Personnel": "#4A90D9",
+        "Pharmacie": "#4CAF50",
+        "default": "#FFB81C"
+    })
+    function _calColor(sub) {
+        return root._calColors[sub] || root._calColors["default"]
+    }
+
+    // ─── Check events and trigger reminders ──────────────────
+    function checkGlobalReminders() {
+        if (!BeeConfig.beeCalendarReminderEnabled) return
+
+        var now = new Date()
+        var nowTs = Math.floor(now.getTime() / 1000)
+        var reminderWindow = BeeConfig.beeCalendarReminderMinutes * 60
+        var events = root._globalEventsData
+
+        for (var i = 0; i < events.length; i++) {
+            var evt = events[i]
+            var evtTs = evt.timestamp || 0
+            if (evtTs <= 0) continue
+
+            var diff = evtTs - nowTs
+            // Event is within the reminder window (and hasn't started yet)
+            if (diff > 0 && diff <= reminderWindow) {
+                var key = (evt.id || evt.title) + "_" + evtTs
+                if (!root._firedReminders[key]) {
+                    root._firedReminders[key] = true
+                    var timeStr = evt.time || new Date(evtTs * 1000).toLocaleTimeString(Qt.locale("fr_CA"), "HH:mm")
+                    var evtColor = root._calColor(evt.sub) || "#FFB81C"
+                    var evtData = {
+                        id: evt.id || (evt.title + "_" + evtTs),
+                        title: evt.title || (BeeConfig.uiLang === "fr" ? "Rappel" : "Reminder"),
+                        time: timeStr,
+                        icon: evt.icon || "📅",
+                        sub: evt.sub || "",
+                        timestamp: evtTs,
+                        calendarColor: evtColor,
+                        calendarLabel: evt.sub || "",
+                        isSnoozed: false
+                    }
+                    root._lastTriggeredEvent = evtData
+                    beeReminderOverlay.showReminder(evtData)
+                }
+            }
+        }
+
+        // Check snoozed reminders for re-triggering
+        var newSnoozed = []
+        for (var j = 0; j < root._snoozedReminders.length; j++) {
+            var sr = root._snoozedReminders[j]
+            var snoozeTs = sr.snoozeTriggerTs
+            if (nowTs >= snoozeTs) {
+                // Re-trigger this snoozed reminder
+                var srColor = root._calColor(sr.evtSub) || "#FFB81C"
+                var srData = {
+                    id: sr.evtId,
+                    title: sr.evtTitle,
+                    time: sr.evtTime,
+                    icon: sr.evtIcon || "📅",
+                    sub: sr.evtSub || "",
+                    timestamp: sr.evtTimestamp || 0,
+                    calendarColor: srColor,
+                    calendarLabel: sr.evtSub || "",
+                    isSnoozed: true
+                }
+                beeReminderOverlay.showReminder(srData)
+            } else {
+                newSnoozed.push(sr)
+            }
+        }
+        if (newSnoozed.length !== root._snoozedReminders.length) {
+            root._snoozedReminders = newSnoozed
+            root._saveSnoozedReminders()
+        }
+    }
+
     // ─── Startup Performance Profiling ⚡ ──────────────────────
     property var _startupTimestamps: ({
         "shell_created": Date.now()
     })
 
     Component.onCompleted: {
+        root._loadGlobalEvents()
+        root._loadSnoozedReminders()
         root._startupTimestamps["shell_completed"] = Date.now()
         var totalMs = root._startupTimestamps["shell_completed"] - root._startupTimestamps["shell_created"]
         console.log("🐝 BeeHiveShell: Component completed in", totalMs, "ms")
@@ -437,6 +637,17 @@ ShellRoot {
                 anchors.top: parent.top
                 anchors.right: parent.right
             }
+
+            // 🐝 v0.8.27 — BeeReminder overlay for calendar push notifications
+            BeeReminder {
+                id: beeReminderOverlay
+                anchors.fill: parent
+                onReminderSnoozed: function(evtData, minutes) {
+                    // Handle snooze from BeeReminder → persist in global reminder engine
+                    root._lastTriggeredEvent = evtData
+                    root.snoozeReminder(evtData.id || "", minutes)
+                }
+            }
         }
     }
 
@@ -634,10 +845,15 @@ ShellRoot {
 
                 // BeeCalendar centré dans le panel (par-dessus l'overlay)
                 BeeCalendar {
+                    id: beeCalendarPanel
                     anchors.centerIn: parent
                     onCloseRequested: {
                         root.calendarVisible = false
                         BeeSound.playEvent("dash.close")
+                    }
+                    onReminderPopupRequested: function(evtData) {
+                        // 🐝 v0.8.27 — Forward reminder to BeeReminder overlay
+                        beeReminderOverlay.showReminder(evtData)
                     }
                 }
             }
