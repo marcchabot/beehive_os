@@ -75,13 +75,17 @@ Rectangle {
     function resolveCellData(slot) {
         if (BeeConfig.cells.count > slot) {
             var item = BeeConfig.cells.get(slot)
+            // Combine user highlight flag with module runtime highlight (OR logic)
+            // e.g. BeeFocus sets highlighted=true when running, user can also force it ON
+            var reg = BeeModuleRegistry.mayaDashCellAt(slot)
+            var runtimeHighlight = reg ? reg.highlighted === true : false
             return {
                 icon:         item.icon         || "",
                 title:        item.title        || "",
                 subtitle:     item.subtitle     || "",
                 detail:       item.detail      || "",
                 action:       item.action      || "none",
-                highlighted:  item.highlighted || false,
+                highlighted:  item.highlighted || runtimeHighlight || false,
                 customizable: item.customizable !== false,
                 color:        item.color       || ""
             }
