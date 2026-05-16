@@ -787,7 +787,12 @@ Item {
                                                     }
                                                     Switch {
                                                         checked: beeStudio.editHighlighted; enabled: beeStudio.editCustomizable
-                                                        onCheckedChanged: { if (!beeStudio._loading) beeStudio.editHighlighted = checked }
+                                                        onCheckedChanged: {
+                                                            if (!beeStudio._loading) {
+                                                                beeStudio.editHighlighted = checked
+                                                                beeStudio.applyEdits()
+                                                            }
+                                                        }
                                                     }
                                                 }
 

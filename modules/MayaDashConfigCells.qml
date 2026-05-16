@@ -462,7 +462,12 @@ Item {
                         }
                         Switch {
                             checked: dashConfig.editHighlighted; enabled: dashConfig.editCustomizable
-                            onCheckedChanged: { if (!dashConfig._loading) dashConfig.editHighlighted = checked }
+                            onCheckedChanged: {
+                                if (!dashConfig._loading) {
+                                    dashConfig.editHighlighted = checked
+                                    dashConfig.applyEdits()
+                                }
+                            }
                         }
                     }
 

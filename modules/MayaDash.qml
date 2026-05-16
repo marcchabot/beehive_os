@@ -106,7 +106,6 @@ Rectangle {
         var newCache = {}
         for (var i = 0; i < 8; i++) {
             newCache[i] = resolveCellData(i)
-            console.log("🐝 [MayaDash] _updateCellCache slot", i, "highlighted=", newCache[i] ? newCache[i].highlighted : "null", "title=", newCache[i] ? newCache[i].title : "null")
         }
         _cellCache = newCache
     }
@@ -114,7 +113,7 @@ Rectangle {
     // Refresh cache when cellsRevision changes (drag & drop, config edits)
     Connections {
         target: BeeConfig
-        function onCellsRevisionChanged() { console.log("🐝 [MayaDash] cellsRevision changed → refreshing cache"); mayaDash._updateCellCache(); mayaDash._refreshAllCells() }
+        function onCellsRevisionChanged() { mayaDash._updateCellCache(); mayaDash._refreshAllCells() }
     }
 
     // Refresh all HexCell instances after cache update
@@ -312,10 +311,7 @@ Rectangle {
         property var    cellData: null
         function _refreshCellData() {
             var cached = mayaDash._cellCache[cellIndex]
-            if (cached !== undefined) {
-                cellData = cached
-                console.log("🐝 [HexCell #" + cellIndex + "] refreshed, highlighted=", cellData.highlighted)
-            }
+            if (cached !== undefined) cellData = cached
         }
         Component.onCompleted: _refreshCellData()
 
