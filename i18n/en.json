@@ -140,6 +140,7 @@
     "tab_appearance": "Appearance",
     "tab_wallpaper": "Wallpaper",
     "tab_bar_widgets": "Bar & Widgets",
+    "tab_dashboard": "Dashboard",
     "tab_productivity": "Productivity",
     "tab_extensions": "Extensions",
     "tab_accessibility": "Accessibility",
@@ -246,7 +247,29 @@
     "no_history_desc": "Notifications will appear here over time.",
     "save": "Save",
     "close": "Close",
-    "images_count": "image"
+    "images_count": "image",
+    "dashboard": {
+      "dashboard": "Dashboard",
+      "dash_title": "Dashboard Title",
+      "motion": "Parallax 3D (BeeMotion)",
+      "vibe": "Audio Visualizer (BeeVibe)",
+      "vibe_backend": "Audio backend",
+      "vibe_xray": "X-ray mode",
+      "vibe_xray_intensity": "X-ray intensity",
+      "vibe_xray_blend": "X-ray blend",
+      "analog_clock": "Analog clock",
+      "bar_stats": "Bar Statistics",
+      "show_cpu": "CPU",
+      "show_ram": "RAM",
+      "show_net": "Network",
+      "show_disk": "Disk",
+      "show_battery": "Battery",
+      "battery_mode": "Battery Saver",
+      "battery_auto": "Auto-enable on low battery",
+      "battery_threshold": "Threshold (%)",
+      "hot_corners": "Hot Corners",
+      "contextual_bar": "Contextual Bar"
+    }
   },
   "power": {
     "title": "BEE POWER",

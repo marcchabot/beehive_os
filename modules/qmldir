@@ -38,3 +38,4 @@ BeeCalendar  1.0 BeeCalendar.qml
 BeeSystemMonitor 1.0 BeeSystemMonitor.qml
 MayaDashConfig 1.0 MayaDashConfig.qml
 OverlayCloseButton 1.0 OverlayCloseButton.qml
+DashboardTab 1.0 DashboardTab.qml
