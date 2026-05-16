@@ -103,8 +103,9 @@ ShellRoot {
 
     // ─── Events data for global reminders ───────────────────
     property var _globalEventsData: []
-    FileWatcher {
-        path: BeeConfig.eventsLivePath || (StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/beehive_os/data/events_live.json")
+    property string _eventsLivePath: BeeConfig.eventsLivePath || (StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/beehive_os/data/events_live.json")
+    FileView {
+        path: root._eventsLivePath
         onFileChanged: root._loadGlobalEvents()
     }
     Timer {
