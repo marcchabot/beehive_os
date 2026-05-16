@@ -235,16 +235,19 @@ Item {
             Flickable {
                 id: editFlickable
                 visible: dashConfig.selectedIndex >= 0
-                anchors.fill: parent; anchors.margins: 16
+                anchors.fill: parent
+                anchors.topMargin: 16; anchors.bottomMargin: 16; anchors.leftMargin: 16; anchors.rightMargin: 24
                 contentHeight: editForm.implicitHeight + 24; clip: true
                 boundsBehavior: Flickable.StopAtBounds
 
                 ScrollBar.vertical: ScrollBar {
+                    id: editScrollBar
                     policy: editFlickable.contentHeight > editFlickable.height ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
-                    width: 6
+                    width: 6; anchors.right: parent.right; anchors.top: parent.top; anchors.bottom: parent.bottom
                     contentItem: Rectangle {
                         radius: 3
-                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                        color: editScrollBar.active ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.6) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                        Behavior on color { ColorAnimation { duration: 200 } }
                     }
                 }
 
@@ -256,7 +259,7 @@ Item {
 
                 ColumnLayout {
                     id: editForm
-                    width: parent.width - 32; spacing: 10
+                    width: editFlickable.width - 8; spacing: 10
 
                     RowLayout {
                         Layout.fillWidth: true; spacing: 10
@@ -482,40 +485,40 @@ Item {
                         }
                     }
 
-                    // ─── Action Buttons ───
+                    // ─── Action Buttons (adaptive width) ───
                     RowLayout {
-                        Layout.fillWidth: true; spacing: 8
+                        Layout.fillWidth: true; spacing: 6
                         Layout.topMargin: 8
 
                         // Add cell
                         Rectangle {
-                            width: 90; height: 30; radius: 15
+                            Layout.fillWidth: true; Layout.minimumWidth: 60; height: 28; radius: 14
                             color: Qt.rgba(0.2, 0.7, 0.3, 0.15)
                             border.color: Qt.rgba(0.2, 0.7, 0.3, 0.40); border.width: 1
-                            Text { text: _fr ? "\u2795 Ajouter" : "\u2795 Add"; color: "#4CAF50"; font.pixelSize: 10; font.bold: true; anchors.centerIn: parent }
+                            Text { text: "➕"; color: "#4CAF50"; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     BeeConfig.cells.append({
-                                        icon: "\uD83D\uDC1D", title: "New Cell", subtitle: "", detail: "",
+                                        icon: "🐝", title: "New Cell", subtitle: "", detail: "",
                                         action: "none", highlighted: false, customizable: true, color: ""
                                     })
                                     BeeConfig.saveConfig()
                                     dashConfig.selectedIndex = BeeConfig.cells.count - 1
                                     dashConfig.loadCell(dashConfig.selectedIndex)
-                                    BeeBarState.logAction("My Hive", _fr ? "Nouvelle alv\u00E9ole ajout\u00E9e" : "New cell added", "\u2795")
+                                    BeeBarState.logAction("My Hive", _fr ? "Nouvelle alvéole ajoutée" : "New cell added", "➕")
                                 }
                             }
                         }
 
                         // Replace cell (module library)
                         Rectangle {
-                            width: 100; height: 30; radius: 15
+                            Layout.fillWidth: true; Layout.minimumWidth: 70; height: 28; radius: 14
                             color: dashConfig.selectedIndex >= 0 ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12) : Qt.rgba(0.5, 0.5, 0.5, 0.08)
                             border.color: dashConfig.selectedIndex >= 0 ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.35) : "#888888"
                             border.width: 1
                             opacity: dashConfig.selectedIndex >= 0 ? 1 : 0.4
-                            Text { text: _fr ? "\uD83D\uDD04 Remplacer" : "\uD83D\uDD04 Replace"; color: dashConfig.selectedIndex >= 0 ? BeeTheme.accent : "#888888"; font.pixelSize: 10; font.bold: true; anchors.centerIn: parent }
+                            Text { text: "🔄"; color: dashConfig.selectedIndex >= 0 ? BeeTheme.accent : "#888888"; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                 enabled: dashConfig.selectedIndex >= 0
@@ -523,16 +526,14 @@ Item {
                             }
                         }
 
-                        Item { Layout.fillWidth: true }
-
                         // Delete cell
                         Rectangle {
-                            width: 100; height: 30; radius: 15
+                            Layout.fillWidth: true; Layout.minimumWidth: 70; height: 28; radius: 14
                             color: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable ? Qt.rgba(0.9, 0.2, 0.2, 0.15) : Qt.rgba(0.5, 0.5, 0.5, 0.1)
                             border.color: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable ? "#ff4444" : "#888888"
                             border.width: 1
                             opacity: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable ? 1 : 0.5
-                            Text { text: _fr ? "🗑️ Supprimer" : "🗑️ Delete"; color: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable ? "#ff4444" : "#888888"; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent }
+                            Text { text: "🗑️"; color: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable ? "#ff4444" : "#888888"; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                 enabled: dashConfig.selectedIndex >= 0 && dashConfig._cellDeletable
@@ -549,21 +550,21 @@ Item {
 
                         // Save
                         Rectangle {
-                            width: 130; height: 30; radius: 15
+                            Layout.fillWidth: true; Layout.minimumWidth: 80; height: 28; radius: 14
                             color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
                             border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.40); border.width: 1
-                            Text { text: dashConfig.selectedIndex >= 0 ? (_fr ? "💾 Sauvegarder" : "💾 Save") : ""; color: BeeTheme.accent; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
+                            Text { text: dashConfig.selectedIndex >= 0 ? "💾" : ""; color: BeeTheme.accent; font.pixelSize: 11; font.bold: true; anchors.centerIn: parent; Behavior on color { ColorAnimation { duration: 600 } } }
                             MouseArea {
                                 anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     dashConfig.applyEdits()
-                                    BeeBarState.logAction("My Hive", _fr ? "Alvéoles sauvegardées" : "Cells saved", "🍯")
+                                    BeeBarState.logAction("My Hive", _fr ? "Alvéoles sauvegardées" : "Cells saved", "💾")
                                 }
                             }
                         }
                     }
 
-                    // ─── Bottom padding to ensure buttons are scrollable into view ───
+                                        // ─── Bottom padding to ensure buttons are scrollable into view ───
                     Item { Layout.fillWidth: true; height: 24 }
                 }
             }
