@@ -233,9 +233,20 @@ Item {
 
             // Form
             Flickable {
+                id: editFlickable
                 visible: dashConfig.selectedIndex >= 0
                 anchors.fill: parent; anchors.margins: 16
-                contentHeight: editForm.implicitHeight; clip: true
+                contentHeight: editForm.implicitHeight + 24; clip: true
+                boundsBehavior: Flickable.StopAtBounds
+
+                ScrollBar.vertical: ScrollBar {
+                    policy: editFlickable.contentHeight > editFlickable.height ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+                    width: 6
+                    contentItem: Rectangle {
+                        radius: 3
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                    }
+                }
 
                 // Sync action ComboBox when cell is loaded
                 Connections {
@@ -245,7 +256,7 @@ Item {
 
                 ColumnLayout {
                     id: editForm
-                    width: parent.width; spacing: 10
+                    width: parent.width - 32; spacing: 10
 
                     RowLayout {
                         Layout.fillWidth: true; spacing: 10
@@ -551,6 +562,9 @@ Item {
                             }
                         }
                     }
+
+                    // ─── Bottom padding to ensure buttons are scrollable into view ───
+                    Item { Layout.fillWidth: true; height: 24 }
                 }
             }
         }
