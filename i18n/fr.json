@@ -209,6 +209,16 @@
     "calendar": "Calendrier",
     "events_widget": "Widget événements",
     "caldav_sync": "Synchronisation CalDAV",
+    "caldav_url": "URL du serveur",
+    "caldav_username": "Nom d'utilisateur",
+    "caldav_password": "Mot de passe",
+    "caldav_calendar": "Nom du calendrier",
+    "caldav_status": "État de synchronisation",
+    "caldav_sync_now": "Synchroniser",
+    "weather": "Météo",
+    "weather_city": "Ville",
+    "weather_unit": "Unité",
+    "weather_lang": "Langue",
     "calendar_reminders": "Rappels de rendez-vous",
     "calendar_reminders_desc": "Notification avant chaque événement du calendrier",
     "reminder_advance": "Avance rappel (min)",
@@ -268,7 +278,9 @@
       "battery_auto": "Activation automatique batterie faible",
       "battery_threshold": "Seuil (%)",
       "hot_corners": "Coins actifs",
-      "contextual_bar": "Barre contextuelle"
+      "contextual_bar": "Barre contextuelle",
+      "clock_format": "Format de l'heure",
+      "time_format": "Format d'heure"
     }
   },
   "power": {

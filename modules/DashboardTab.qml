@@ -300,6 +300,53 @@ Item {
 
             Item { height: 4 }
 
+            // ─── 🕐 Clock Format ───
+            Text {
+                text: "🕐 " + (sd.clock_format || "Clock Format")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.clock_format || "Time format"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { key: "24h", label: "24h" },
+                            { key: "12h", label: "12h" }
+                        ]
+                        delegate: Rectangle {
+                            width: 64; height: 30; radius: 8
+                            color: BeeConfig.clockFormat === modelData.key
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.clockFormat === modelData.key
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.clockFormat === modelData.key ? 2 : 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: BeeConfig.clockFormat === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.clockFormat === modelData.key
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.clockFormat = modelData.key; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item { height: 4 }
+
             // ─── 📊 BeeBar Stats ───
             Text {
                 text: "📊 " + (sd.bar_stats || "Bar Statistics")

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import Quickshell.Io
 import "."
 
 // ═══════════════════════════════════════════════════════════════
@@ -126,6 +127,301 @@ Item {
                     }
                 }
                 Switch { checked: BeeConfig.caldavAutoSync; onToggled: { BeeConfig.caldavAutoSync = checked; BeeConfig.saveConfig() } }
+            }
+
+            // ─── CalDAV Connection Settings ───
+            ColumnLayout {
+                Layout.fillWidth: true; spacing: 10
+                visible: BeeConfig.caldavEnabled
+
+                // Server URL
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.caldav_url || "Server URL"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: caldavUrlField
+                        text: BeeConfig.caldavUrl
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        placeholderText: "https://calendar.example.com/dav/"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: caldavUrlField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: caldavUrlField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.caldavUrl = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.caldavUrl) { BeeConfig.caldavUrl = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // Username
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.caldav_username || "Username"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: caldavUsernameField
+                        text: BeeConfig.caldavUsername
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        placeholderText: "user@example.com"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: caldavUsernameField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: caldavUsernameField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.caldavUsername = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.caldavUsername) { BeeConfig.caldavUsername = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // Password
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.caldav_password || "Password"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: caldavPasswordField
+                        text: BeeConfig.caldavPassword
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        echoMode: TextInput.Password
+                        placeholderText: "••••••••"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: caldavPasswordField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: caldavPasswordField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.caldavPassword = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.caldavPassword) { BeeConfig.caldavPassword = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // Calendar name
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.caldav_calendar || "Calendar name"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: caldavCalendarField
+                        text: BeeConfig.caldavCalendarName
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        placeholderText: "personal"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: caldavCalendarField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: caldavCalendarField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.caldavCalendarName = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.caldavCalendarName) { BeeConfig.caldavCalendarName = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // Sync status
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.caldav_status || "Sync status"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    Text {
+                        text: {
+                            var statusText = BeeConfig.caldavSyncStatus || "idle"
+                            if (BeeConfig.caldavLastSync && BeeConfig.caldavLastSync !== "") {
+                                statusText += " — " + BeeConfig.caldavLastSync
+                            }
+                            return statusText
+                        }
+                        color: BeeTheme.textSecondary; font.pixelSize: 12; font.italic: true
+                        Layout.preferredWidth: 220
+                        horizontalAlignment: Text.AlignRight
+                    }
+                }
+
+                // Sync Now button
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignRight
+                    spacing: 8
+                    Rectangle {
+                        width: 110; height: 34; radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                        border.color: BeeTheme.accent; border.width: 1.5
+                        Text {
+                            anchors.centerIn: parent
+                            text: s.caldav_sync_now || "Sync Now"
+                            color: BeeTheme.accent; font.pixelSize: 12; font.bold: true
+                        }
+                        MouseArea {
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                            onClicked: {
+                                BeeConfig.caldavSyncStatus = "syncing"
+                                caldavSyncProc.running = true
+                            }
+                        }
+                    }
+                }
+
+                // Process for CalDAV sync
+                Process {
+                    id: caldavSyncProc
+                    running: false
+                    command: ["bash", Qt.resolvedUrl("../scripts/bee_caldav_sync.sh").toString().replace("file://", "")]
+                    onExited: function(code, status) {
+                        if (code === 0) {
+                            BeeConfig.caldavSyncStatus = "synced"
+                            BeeConfig.caldavLastSync = new Date().toLocaleString(Qt.locale(), Locale.ShortFormat)
+                            BeeBarState.dispatchNotification("CalDAV", BeeConfig.uiLang === "fr" ? "Synchronisation réussie" : "Sync completed", "✅")
+                        } else {
+                            BeeConfig.caldavSyncStatus = "error"
+                            BeeBarState.dispatchNotification("CalDAV", BeeConfig.uiLang === "fr" ? "Erreur de synchronisation" : "Sync failed", "❌")
+                        }
+                    }
+                }
+            }
+
+            Item { height: 4 }
+
+            // ─── Weather ───
+            Text {
+                text: "🌦️ " + (s.weather || "Weather")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // City
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.weather_city || "City"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                TextField {
+                    id: weatherCityField
+                    text: BeeConfig.weatherCity
+                    color: BeeTheme.textPrimary
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 220
+                    placeholderText: "Blainville"
+                    placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                    background: Rectangle {
+                        radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: weatherCityField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                        border.width: weatherCityField.activeFocus ? 2 : 1
+                    }
+                    onAccepted: { BeeConfig.weatherCity = text; BeeConfig.saveConfig() }
+                    onActiveFocusChanged: {
+                        if (!activeFocus && text !== BeeConfig.weatherCity) { BeeConfig.weatherCity = text; BeeConfig.saveConfig() }
+                    }
+                }
+            }
+
+            // Unit selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.weather_unit || "Unit"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { key: "metric", label: "°C" },
+                            { key: "imperial", label: "°F" }
+                        ]
+                        delegate: Rectangle {
+                            width: 64; height: 30; radius: 8
+                            color: BeeConfig.weatherUnit === modelData.key
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.weatherUnit === modelData.key
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.weatherUnit === modelData.key ? 2 : 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: BeeConfig.weatherUnit === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.weatherUnit === modelData.key
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.weatherUnit = modelData.key; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Language selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.weather_lang || "Language"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { key: "fr", label: "FR" },
+                            { key: "en", label: "EN" }
+                        ]
+                        delegate: Rectangle {
+                            width: 64; height: 30; radius: 8
+                            color: BeeConfig.weatherLang === modelData.key
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.weatherLang === modelData.key
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.weatherLang === modelData.key ? 2 : 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: BeeConfig.weatherLang === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.weatherLang === modelData.key
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.weatherLang = modelData.key; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
             }
 
             Item { height: 4 }
