@@ -516,14 +516,15 @@ Item {
                     color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
                 }
                 RowLayout {
-                    spacing: 6
+                    spacing: 4
                     Repeater {
                         model: [
+                            { key: "elevenlabs", label: "ElevenLabs" },
                             { key: "edge-tts", label: "Edge-TTS" },
-                            { key: "elevenlabs", label: "ElevenLabs" }
+                            { key: "espeak-ng", label: "eSpeak-NG" }
                         ]
                         delegate: Rectangle {
-                            width: 80; height: 30; radius: 8
+                            width: modelData.key === "espeak-ng" ? 80 : 78; height: 30; radius: 8
                             color: BeeConfig.voiceTtsBackend === modelData.key
                                 ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
                                 : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
@@ -542,6 +543,183 @@ Item {
                                 onClicked: { BeeConfig.voiceTtsBackend = modelData.key; BeeConfig.saveConfig() }
                             }
                         }
+                    }
+                }
+            }
+
+            // ── ElevenLabs settings (visible when backend is elevenlabs) ──
+            ColumnLayout {
+                Layout.fillWidth: true; spacing: 8
+                visible: BeeConfig.voiceEnabled && BeeConfig.voiceTtsBackend === "elevenlabs"
+
+                // ElevenLabs Voice ID
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.voice_elevenlabs_voice || "Voice ID"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: elevenlabsVoiceField
+                        text: BeeConfig.voiceElevenlabsVoiceId
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        placeholderText: "BZgkqPqms7Kj9ulSkVzn"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: elevenlabsVoiceField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: elevenlabsVoiceField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.voiceElevenlabsVoiceId = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.voiceElevenlabsVoiceId) { BeeConfig.voiceElevenlabsVoiceId = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // ElevenLabs Model ID
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.voice_elevenlabs_model || "Model ID"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    RowLayout {
+                        spacing: 6
+                        Repeater {
+                            model: [
+                                { key: "eleven_flash_v2_5", label: "Flash v2.5" },
+                                { key: "eleven_multilingual_v2", label: "Multi v2" },
+                                { key: "eleven_turbo_v2_5", label: "Turbo v2.5" }
+                            ]
+                            delegate: Rectangle {
+                                width: 90; height: 28; radius: 7
+                                color: BeeConfig.voiceElevenlabsModelId === modelData.key
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                border.color: BeeConfig.voiceElevenlabsModelId === modelData.key
+                                    ? BeeTheme.accent
+                                    : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                                border.width: BeeConfig.voiceElevenlabsModelId === modelData.key ? 2 : 1
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    color: BeeConfig.voiceElevenlabsModelId === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                    font.pixelSize: 10; font.bold: BeeConfig.voiceElevenlabsModelId === modelData.key
+                                }
+                                MouseArea {
+                                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                    onClicked: { BeeConfig.voiceElevenlabsModelId = modelData.key; BeeConfig.saveConfig() }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Edge-TTS settings (visible when backend is edge-tts) ──
+            ColumnLayout {
+                Layout.fillWidth: true; spacing: 8
+                visible: BeeConfig.voiceEnabled && BeeConfig.voiceTtsBackend === "edge-tts"
+
+                // Edge-TTS Voice
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.voice_edge_tts_voice || "Voice name"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    TextField {
+                        id: edgeTtsVoiceField
+                        text: BeeConfig.voiceEdgeTtsVoice
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13
+                        Layout.preferredWidth: 220
+                        placeholderText: "fr-CA-SylvieNeural"
+                        placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                        background: Rectangle {
+                            radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            border.color: edgeTtsVoiceField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: edgeTtsVoiceField.activeFocus ? 2 : 1
+                        }
+                        onAccepted: { BeeConfig.voiceEdgeTtsVoice = text; BeeConfig.saveConfig() }
+                        onActiveFocusChanged: {
+                            if (!activeFocus && text !== BeeConfig.voiceEdgeTtsVoice) { BeeConfig.voiceEdgeTtsVoice = text; BeeConfig.saveConfig() }
+                        }
+                    }
+                }
+
+                // Edge-TTS Rate
+                RowLayout {
+                    Layout.fillWidth: true; spacing: 12
+                    Text {
+                        text: s.voice_edge_tts_rate || "Speech rate"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                    }
+                    RowLayout {
+                        spacing: 6
+                        Repeater {
+                            model: [
+                                { key: "-20%", label: "-20%" },
+                                { key: "-10%", label: "-10%" },
+                                { key: "+0%", label: "+0%" },
+                                { key: "+10%", label: "+10%" },
+                                { key: "+20%", label: "+20%" }
+                            ]
+                            delegate: Rectangle {
+                                width: 52; height: 28; radius: 7
+                                color: BeeConfig.voiceEdgeTtsRate === modelData.key
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                    : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                                border.color: BeeConfig.voiceEdgeTtsRate === modelData.key
+                                    ? BeeTheme.accent
+                                    : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                                border.width: BeeConfig.voiceEdgeTtsRate === modelData.key ? 2 : 1
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.label
+                                    color: BeeConfig.voiceEdgeTtsRate === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                    font.pixelSize: 10; font.bold: BeeConfig.voiceEdgeTtsRate === modelData.key
+                                }
+                                MouseArea {
+                                    anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                    onClicked: { BeeConfig.voiceEdgeTtsRate = modelData.key; BeeConfig.saveConfig() }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Ollama model (visible whenever voice is enabled) ──
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.voiceEnabled
+                Text {
+                    text: s.voice_ollama_model || "Ollama model"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                TextField {
+                    id: ollamaModelField
+                    text: BeeConfig.voiceOllamaModel
+                    color: BeeTheme.textPrimary
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 220
+                    placeholderText: "gemma4:31b-cloud"
+                    placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                    background: Rectangle {
+                        radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: ollamaModelField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                        border.width: ollamaModelField.activeFocus ? 2 : 1
+                    }
+                    onAccepted: { BeeConfig.voiceOllamaModel = text; BeeConfig.saveConfig() }
+                    onActiveFocusChanged: {
+                        if (!activeFocus && text !== BeeConfig.voiceOllamaModel) { BeeConfig.voiceOllamaModel = text; BeeConfig.saveConfig() }
                     }
                 }
             }
@@ -631,6 +809,40 @@ Item {
                     }
                 }
                 Switch { checked: BeeConfig.soundNightMode; onToggled: { BeeConfig.soundNightMode = checked; BeeConfig.saveConfig() } }
+            }
+
+            // Night start hour
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.soundNightMode
+                Text {
+                    text: s.sound_night_start || "Night starts at"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                SpinBox {
+                    from: 0; to: 23
+                    value: BeeConfig.soundNightStartHour
+                    onValueModified: { BeeConfig.soundNightStartHour = value; BeeConfig.saveConfig() }
+                    textFromValue: function(value) { return value.toString().padStart(2, "0") + "h" }
+                    valueFromText: function(text) { return parseInt(text) || 0 }
+                }
+            }
+
+            // Night end hour
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                visible: BeeConfig.soundNightMode
+                Text {
+                    text: s.sound_night_end || "Night ends at"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                SpinBox {
+                    from: 0; to: 23
+                    value: BeeConfig.soundNightEndHour
+                    onValueModified: { BeeConfig.soundNightEndHour = value; BeeConfig.saveConfig() }
+                    textFromValue: function(value) { return value.toString().padStart(2, "0") + "h" }
+                    valueFromText: function(text) { return parseInt(text) || 0 }
+                }
             }
 
             // Day volume

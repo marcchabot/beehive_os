@@ -281,7 +281,14 @@
       "contextual_bar": "Barre contextuelle",
       "clock_format": "Format de l'heure",
       "time_format": "Format d'heure"
-    }
+    },
+    "sound_night_start": "Nuit commence à",
+    "sound_night_end": "Nuit se termine à",
+    "voice_ollama_model": "Modèle Ollama",
+    "voice_elevenlabs_voice": "ID voix",
+    "voice_elevenlabs_model": "ID modèle",
+    "voice_edge_tts_voice": "Nom de la voix",
+    "voice_edge_tts_rate": "Vitesse de parole"
   },
   "power": {
     "title": "BEE POWER",
