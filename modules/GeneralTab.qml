@@ -4,7 +4,8 @@ import QtQuick.Controls
 import "."
 
 // ═══════════════════════════════════════════════════════════════
-// GeneralTab.qml — 🏠 General Settings + Keyboard Shortcuts
+// GeneralTab.qml — 🏠 General Settings + Profiles + Keyboard Shortcuts
+// v0.8.31: Profile Switching UI added
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -12,6 +13,16 @@ Item {
 
     // ─── i18n shortcut ─────────────────────────────────────────
     readonly property var s: BeeConfig.tr && BeeConfig.tr.settings ? BeeConfig.tr.settings : ({})
+
+    // ─── Profile creation state ────────────────────────────────
+    property bool showAddProfile: false
+    property string newProfileName: ""
+    property string newProfileIcon: "👤"
+
+    readonly property var iconOptions: [
+        "👤", "👨‍💻", "👩‍💼", "🧒", "👦", "👧", "👨‍🔧", "👩‍🍳",
+        "🎮", "📚", "🎵", "🏃", "🧑‍🎨", "🧑‍🔬", "👨‍🚀", "🦊"
+    ]
 
     ScrollView {
         id: generalScroll
@@ -22,6 +33,277 @@ Item {
         ColumnLayout {
             width: generalScroll.availableWidth
             spacing: 16
+
+            // ─── 👥 Profiles Section ──────────────────────────
+            Text {
+                text: "👥 " + (s.profiles || "Profiles")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // Profile cards row
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+
+                Repeater {
+                    model: BeeProfiles.profiles
+
+                    delegate: Rectangle {
+                        id: profileCard
+                        width: 90
+                        height: showAddProfile ? 0 : 100
+                        radius: 12
+                        visible: !showAddProfile || modelData.id === BeeProfiles.activeProfileId
+
+                        // Active border glow
+                        color: modelData.id === BeeProfiles.activeProfileId
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                            : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.08)
+                        border.color: modelData.id === BeeProfiles.activeProfileId
+                            ? BeeTheme.accent
+                            : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3)
+                        border.width: modelData.id === BeeProfiles.activeProfileId ? 2 : 1
+
+                        // Active glow effect
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: -2
+                            radius: 14
+                            color: "transparent"
+                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                            border.width: modelData.id === BeeProfiles.activeProfileId ? 1 : 0
+                            visible: modelData.id === BeeProfiles.activeProfileId
+                        }
+
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            Text {
+                                text: modelData.icon || "👤"
+                                font.pixelSize: 28
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+                            Text {
+                                text: modelData.name || modelData.id
+                                color: modelData.id === BeeProfiles.activeProfileId
+                                    ? BeeTheme.accent
+                                    : BeeTheme.textPrimary
+                                font.pixelSize: 11
+                                font.bold: modelData.id === BeeProfiles.activeProfileId
+                                Layout.alignment: Qt.AlignHCenter
+                                Layout.maximumWidth: 80
+                                elide: Text.ElideRight
+                            }
+                            // Active indicator dot
+                            Rectangle {
+                                width: 6; height: 6; radius: 3
+                                color: modelData.id === BeeProfiles.activeProfileId
+                                    ? BeeTheme.accent
+                                    : "transparent"
+                                Layout.alignment: Qt.AlignHCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (modelData.id !== BeeProfiles.activeProfileId) {
+                                    BeeProfiles.switchWithTransition(modelData.id)
+                                }
+                            }
+                        }
+
+                        // Transition animation feedback
+                        Connections {
+                            target: BeeProfiles
+                            function onTransitionOpacityChanged() {
+                                if (BeeProfiles.transitionActive && modelData.id === BeeProfiles.activeProfileId) {
+                                    profileCard.opacity = 1.0 - (1.0 - BeeProfiles.transitionOpacity) * 0.3
+                                } else {
+                                    profileCard.opacity = 1.0
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ─── "+" Add Profile Card ─────────────────────
+                Rectangle {
+                    width: 90
+                    height: 100
+                    radius: 12
+                    color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.06)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                    border.width: 1
+                    border.style: Qt.DashLine
+
+                    ColumnLayout {
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Text {
+                            text: "➕"
+                            font.pixelSize: 28
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                        Text {
+                            text: s.add_profile || "Add"
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 11
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            generalTab.showAddProfile = !generalTab.showAddProfile
+                            generalTab.newProfileName = ""
+                            generalTab.newProfileIcon = "👤"
+                        }
+                    }
+                }
+            }
+
+            // ─── Add Profile Inline Form ──────────────────────
+            Rectangle {
+                Layout.fillWidth: true
+                height: showAddProfile ? addFormLayout.implicitHeight + 24 : 0
+                visible: showAddProfile
+                radius: 10
+                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                border.width: 1
+                clip: true
+
+                ColumnLayout {
+                    id: addFormLayout
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: s.new_profile || "New Profile"
+                        color: BeeTheme.accent
+                        font.bold: true
+                        font.pixelSize: 13
+                    }
+
+                    // Name input
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+                        Text {
+                            text: s.profile_name || "Name:"
+                            color: BeeTheme.textPrimary
+                            font.pixelSize: 12
+                            Layout.preferredWidth: 60
+                        }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            height: 30
+                            radius: 6
+                            color: Qt.rgba(BeeTheme.bg.r, BeeTheme.bg.g, BeeTheme.bg.b, 0.8)
+                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                            border.width: 1
+
+                            TextInput {
+                                id: profileNameInput
+                                anchors.fill: parent
+                                anchors.margins: 6
+                                color: BeeTheme.textPrimary
+                                font.pixelSize: 13
+                                verticalAlignment: Qt.AlignVCenter
+                                maximumLength: 20
+                                text: generalTab.newProfileName
+                                onTextChanged: generalTab.newProfileName = text
+                                Keys.onReturnPressed: _createProfile()
+                            }
+                        }
+                    }
+
+                    // Icon picker
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 6
+                        Text {
+                            text: s.profile_icon || "Icon:"
+                            color: BeeTheme.textPrimary
+                            font.pixelSize: 12
+                            Layout.preferredWidth: 60
+                        }
+                        Repeater {
+                            model: generalTab.iconOptions
+                            delegate: Rectangle {
+                                width: 32; height: 32; radius: 6
+                                color: generalTab.newProfileIcon === modelData
+                                    ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                                    : Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.1)
+                                border.color: generalTab.newProfileIcon === modelData
+                                    ? BeeTheme.accent
+                                    : "transparent"
+                                border.width: generalTab.newProfileIcon === modelData ? 1.5 : 0
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData
+                                    font.pixelSize: 18
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: generalTab.newProfileIcon = modelData
+                                }
+                            }
+                        }
+                    }
+
+                    // Create / Cancel buttons
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
+                        Rectangle {
+                            width: 80; height: 30; radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            border.color: BeeTheme.accent; border.width: 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.create || "Create"
+                                color: BeeTheme.accent
+                                font.pixelSize: 12; font.bold: true
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: generalTab._createProfile()
+                            }
+                        }
+                        Rectangle {
+                            width: 80; height: 30; radius: 8
+                            color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.1)
+                            border.color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3); border.width: 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.cancel || "Cancel"
+                                color: BeeTheme.textSecondary
+                                font.pixelSize: 12
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: generalTab.showAddProfile = false
+                            }
+                        }
+                    }
+                }
+            }
+
+            Item { height: 8 }
 
             // ─── Language ───
             Text {
@@ -110,6 +392,24 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    // ─── Helper: Create a new profile ──────────────────────────
+    function _createProfile() {
+        var name = newProfileName.trim()
+        if (name.length === 0) return
+        var icon = newProfileIcon
+        var id = BeeProfiles.createProfile(name, icon)
+        if (id) {
+            showAddProfile = false
+            newProfileName = ""
+            newProfileIcon = "👤"
+            BeeBarState.dispatchNotification(
+                "👤 " + (s.profile_created || "Profile Created"),
+                name,
+                icon
+            )
         }
     }
 }

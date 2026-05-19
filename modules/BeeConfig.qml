@@ -431,8 +431,14 @@ QtObject {
     }
 
     // ─── BeeProfiles — Profile Switching Multi-User 🐝👥 ───────
-    property var    profilesConfig: null     // raw profiles from config
+    property var    profilesConfig: null     // raw profiles from config (legacy, BeeProfiles now owns data)
     property string activeProfileId: "marc"
+    onActiveProfileIdChanged: {
+        // Sync BeeProfiles active profile when BeeConfig changes it
+        if (BeeProfiles.activeProfileId !== activeProfileId && activeProfileId) {
+            BeeProfiles.activeProfileId = activeProfileId
+        }
+    }
 
     // ─── Plugin System v2 🐝🧩 ────────────────────────────────
     property bool   pluginsEnabled: false   // Disabled until plugin manager script is implemented
@@ -1352,14 +1358,16 @@ QtObject {
         }
 
         // ─── BeeProfiles config ────────────────────────────
-        if (cfg.profiles !== undefined) {
-            profilesConfig = cfg.profiles
-        }
+        // BeeProfiles v0.8.31: Now manages its own profiles.json file.
+        // We still pass config data from user_config.json for backwards compatibility,
+        // but BeeProfiles will merge with its own file and take precedence.
         if (cfg.active_profile !== undefined) {
             activeProfileId = cfg.active_profile
         }
         // Initialize BeeProfiles singleton with loaded config
-        BeeProfiles.loadFromConfig({ profiles: profilesConfig, activeProfile: activeProfileId })
+        // BeeProfiles.loadFromConfig will trigger _mergeAndApply which loads profiles.json
+        var profilesData = cfg.profiles !== undefined ? cfg.profiles : null
+        BeeProfiles.loadFromConfig({ profiles: profilesData, activeProfile: activeProfileId })
 
         root._loaded = true
         root.configLoaded()
