@@ -16,6 +16,7 @@ Item {
         { icon: "\uD83D\uDCC5", title: _fr ? "Famille Chabot" : "Family Calendar", subtitle: _fr ? "Calendrier" : "Calendar", detail: _fr ? "Agenda Familial\nGoogle Calendar" : "Family Agenda\nGoogle Calendar", action: "url:https://calendar.google.com/calendar/u/0/r", highlighted: true },
         { icon: "\uD83D\uDCC5", title: _fr ? "Calendrier" : "Calendar", subtitle: _fr ? "Agenda" : "Schedule", detail: _fr ? "\u00C9v\u00E9nements du jour\nRappels" : "Today's events\nReminders", action: "detail:calendar", highlighted: false },
         { icon: "\uD83D\uDCDD", title: "BeeNotes", subtitle: _fr ? "Notes" : "Notes", detail: _fr ? "Notes rapides\nChecklist" : "Quick notes\nChecklist", action: "detail:notes", highlighted: false },
+        { icon: "\uD83D\uDCDD", title: _fr ? "Notes Rapides" : "Quick Notes", subtitle: _fr ? "Dashboard" : "Dashboard", detail: _fr ? "Notes persistantes\nÉdition directe" : "Persistent notes\nEdit on dashboard", action: "detail:quick_notes", highlighted: false },
         { icon: "\uD83D\uDDA5\uFE0F", title: _fr ? "Syst\u00E8me" : "System", subtitle: "CachyOS", detail: "CPU/GPU/RAM\nTemp\u00E9ratures", action: "detail:monitor", highlighted: false },
         { icon: "\uD83C\uDF10", title: _fr ? "R\u00E9seau" : "Network", subtitle: _fr ? "Speed Test" : "Speed Test", detail: _fr ? "Latence & D\u00E9bit\nTest de vitesse" : "Latency & Speed\nSpeed Test", action: "detail:network", highlighted: true },
         { icon: "\uD83C\uDF45", title: "BeeFocus", subtitle: _fr ? "Pomodoro" : "Pomodoro", detail: _fr ? "Minuteur de concentration" : "Focus timer", action: "detail:focus", highlighted: false },
@@ -350,6 +351,7 @@ Item {
                                 ListElement { label: "\uD83D\uDD12 Verrouillé" ; value: "none" }
                                 ListElement { label: "\uD83D\uDCC5 Calendrier"; value: "detail:calendar" }
                                 ListElement { label: "\uD83D\uDCDD Notes"; value: "detail:notes" }
+                                ListElement { label: "\uD83D\uDCDD Quick Notes"; value: "detail:quick_notes" }
                                 ListElement { label: "\uD83D\uDDA5\uFE0F Système"; value: "detail:monitor" }
                                 ListElement { label: "\uD83C\uDF10 Réseau"; value: "detail:network" }
                                 ListElement { label: "\uD83C\uDF45 Pomodoro"; value: "detail:focus" }

@@ -433,6 +433,13 @@
       "subtitle": "Bee-Hive OS",
       "detail": "Configuration\n& Preferences",
       "action": "toggle:settings"
+    },
+    "quick_notes": {
+      "icon": "📝",
+      "title": "Quick Notes",
+      "subtitle": "Dashboard",
+      "detail": "Persistent notes\nEdit on dashboard",
+      "action": "detail:quick_notes"
     }
   },
   "common": {

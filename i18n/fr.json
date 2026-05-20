@@ -367,6 +367,13 @@
       "subtitle": "Bee-Hive OS",
       "detail": "Configuration\n& Préférences",
       "action": "toggle:settings"
+    },
+    "quick_notes": {
+      "icon": "📝",
+      "title": "Notes Rapides",
+      "subtitle": "Tableau de bord",
+      "detail": "Notes persistantes\nÉdition directe",
+      "action": "detail:quick_notes"
     }
   },
   "studio": {

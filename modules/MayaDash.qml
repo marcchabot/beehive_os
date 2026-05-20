@@ -3,6 +3,7 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import QtQuick.Controls
 import "."
 
 // ═══════════════════════════════════════════════════════════════
@@ -49,6 +50,104 @@ Rectangle {
 
     // ─── BeeNetwork instance ────────────────────────────────
     property bool networkDetailVisible: false
+
+    // ─── Quick Notes state ──────────────────────────────────
+    property bool quickNotesVisible: false
+
+    // ─── Quick Notes data (FileView + persistence) ──────────
+    property string _quickNotesPath: BeeConfig.configDir + "/quick_notes.json"
+    property var _quickNotesData: ({ notes: [], activeNoteId: "note1" })
+    property string _quickNotesEditContent: ""
+    property string _quickNotesEditTitle: ""
+    property bool _quickNotesEditing: false
+
+    function _quickNotesActiveContent() {
+        var data = mayaDash._quickNotesData
+        if (!data || !data.notes) return ""
+        for (var i = 0; i < data.notes.length; i++) {
+            if (data.notes[i].id === data.activeNoteId) {
+                var c = data.notes[i].content || ""
+                // Return first line only for cell preview
+                var firstLine = c.split("\n")[0]
+                // Strip markdown bold markers for preview
+                firstLine = firstLine.replace(/\*\*/g, "")
+                return firstLine
+            }
+        }
+        return ""
+    }
+
+    function _quickNotesLoadFromText(text) {
+        try {
+            var parsed = JSON.parse(text)
+            if (parsed.notes) {
+                mayaDash._quickNotesData = parsed
+            }
+        } catch(e) {
+            console.warn("[Bee-Hive] Quick Notes: parse error", e)
+        }
+    }
+
+    function _quickNotesActiveIndex() {
+        var data = mayaDash._quickNotesData
+        if (!data || !data.notes) return 0
+        for (var i = 0; i < data.notes.length; i++) {
+            if (data.notes[i].id === data.activeNoteId) return i
+        }
+        return 0
+    }
+
+    function _quickNotesSave() {
+        var data = mayaDash._quickNotesData
+        if (!data || !data.notes) return
+        // If editing, apply current edit to data first
+        if (mayaDash._quickNotesEditing) {
+            var idx = mayaDash._quickNotesActiveIndex()
+            if (idx < data.notes.length) {
+                data.notes[idx].content = mayaDash._quickNotesEditContent
+                data.notes[idx].title = mayaDash._quickNotesEditTitle || data.notes[idx].title
+                data.notes[idx].updated = Date.now()
+            }
+        }
+        quickNotesSaver.write(JSON.stringify(data, null, 2))
+    }
+
+    FileView {
+        id: quickNotesLoader
+        path: mayaDash._quickNotesPath
+        watchChanges: true
+        onFileChanged: {
+            var text = quickNotesLoader.text()
+            if (text.length > 0) {
+                mayaDash._quickNotesLoadFromText(text)
+            }
+        }
+        Component.onCompleted: {
+            var text = quickNotesLoader.text()
+            if (text.length > 0) {
+                mayaDash._quickNotesLoadFromText(text)
+            } else {
+                // Load default data from project
+                var defaultPath = Qt.resolvedUrl("../data/quick_notes.json")
+                // Use hardcoded defaults
+                mayaDash._quickNotesData = {
+                    notes: [
+                        { id: "note1", title: "Quick Note", content: "Welcome to Bee-Hive OS Quick Notes! ✨\n\n- Click to edit\n- Auto-saves after 3 seconds\n- Supports **bold** and bullet lists", updated: Date.now() },
+                        { id: "note2", title: "Todo", content: "- Check system updates\n- Review calendar events\n- Backup important files", updated: Date.now() },
+                        { id: "note3", title: "Ideas", content: "", updated: Date.now() }
+                    ],
+                    activeNoteId: "note1"
+                }
+                quickNotesSaver.write(JSON.stringify(mayaDash._quickNotesData, null, 2))
+            }
+        }
+    }
+
+    FileView {
+        id: quickNotesSaver
+        path: mayaDash._quickNotesPath
+        watchChanges: false
+    }
 
     BeeNetwork {
         id: beeNet
@@ -201,6 +300,7 @@ Rectangle {
         if (action === "detail:network") {
             mayaDash.monitorDetailVisible = false
             mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.networkDetailVisible = !mayaDash.networkDetailVisible
             beeNet.startBackend()  // Lazy start backend on first open
             BeeSound.playEvent(mayaDash.networkDetailVisible ? "dash.open" : "dash.close")
@@ -211,6 +311,7 @@ Rectangle {
         if (action === "detail:monitor") {
             mayaDash.networkDetailVisible = false
             mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.monitorDetailVisible = !mayaDash.monitorDetailVisible
             beeMon.startBackend()  // Lazy start backend on first open
             BeeSound.playEvent(mayaDash.monitorDetailVisible ? "dash.open" : "dash.close")
@@ -222,8 +323,19 @@ Rectangle {
             mayaDash.networkDetailVisible = false
             mayaDash.monitorDetailVisible = false
             mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.openNotes()
             BeeSound.playEvent("dash.open")
+            return
+        }
+
+        // detail:quick_notes → Quick Notes overlay on MayaDash
+        if (action === "detail:quick_notes") {
+            mayaDash.networkDetailVisible = false
+            mayaDash.monitorDetailVisible = false
+            mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = !mayaDash.quickNotesVisible
+            BeeSound.playEvent(mayaDash.quickNotesVisible ? "dash.open" : "dash.close")
             return
         }
 
@@ -232,6 +344,7 @@ Rectangle {
             mayaDash.networkDetailVisible = false
             mayaDash.monitorDetailVisible = false
             mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.openCalendar()
             BeeSound.playEvent("dash.open")
             return
@@ -241,6 +354,7 @@ Rectangle {
         if (action === "detail:focus") {
             mayaDash.networkDetailVisible = false
             mayaDash.monitorDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.focusDetailVisible = !mayaDash.focusDetailVisible
             BeeSound.playEvent(mayaDash.focusDetailVisible ? "dash.open" : "dash.close")
             return
@@ -251,6 +365,7 @@ Rectangle {
             mayaDash.networkDetailVisible = false
             mayaDash.monitorDetailVisible = false
             mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
             mayaDash.openSysmon()
             BeeSound.playEvent("dash.open")
             return
@@ -337,6 +452,9 @@ Rectangle {
             // Détection de la cellule Focus pour afficher le timer Pomodoro
             property bool isFocusCell: cellData && (cellData.action === "detail:focus" || cellData.icon === "🍅" || cellData.icon === "⚡" || cellData.icon === "🔥" || cellData.icon === "🎯" || cellData.icon === "☕")
 
+            // Détection de la cellule Quick Notes
+            property bool isQuickNotesCell: cellData && (cellData.action === "detail:quick_notes" || cellData.icon === "📝")
+
             // Texte de détail dynamique pour les cellules Calendar et Network
             property string dynamicDetail: {
                 if (hexCell.isCalendarCell) {
@@ -364,6 +482,11 @@ Rectangle {
                 }
                 if (hexCell.isFocusCell) {
                     return BeeFocus.timeDisplay + (BeeFocus.isRunning ? (BeeFocus.isBreakPhase ? " ☕" : " 🍅") : "");
+                }
+                if (hexCell.isQuickNotesCell) {
+                    var activeNote = mayaDash._quickNotesActiveContent();
+                    if (activeNote.length > 40) return activeNote.substring(0, 40) + "...";
+                    return activeNote || (BeeConfig.uiLang === "fr" ? "Appuyez pour écrire" : "Tap to write");
                 }
                 return cellData ? cellData.detail : "";
             }
@@ -2409,6 +2532,409 @@ Rectangle {
                 }
 
                 Item { height: 8 }
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Quick Notes - Persistent notes overlay panel
+    // ═══════════════════════════════════════════════════════════
+    Rectangle {
+        id: quickNotesOverlay
+        anchors.fill: parent
+        color: Qt.rgba(0, 0, 0, 0.5)
+        visible: mayaDash.quickNotesVisible
+        opacity: mayaDash.quickNotesVisible ? 1.0 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                mayaDash.quickNotesVisible = false
+                if (mayaDash._quickNotesEditing) mayaDash._quickNotesSave()
+                mayaDash._quickNotesEditing = false
+                BeeSound.playEvent("dash.close")
+            }
+        }
+
+        Rectangle {
+            id: quickNotesPanel
+            width: 420
+            height: 520
+            anchors.centerIn: parent
+            color: Qt.rgba(BeeTheme.glassBg.r, BeeTheme.glassBg.g, BeeTheme.glassBg.b, 0.95)
+            radius: 16
+            border.color: BeeTheme.glassBorder
+            border.width: 1.5
+            Behavior on color { ColorAnimation { duration: 600 } }
+            Behavior on border.color { ColorAnimation { duration: 600 } }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: mouse.accepted = true
+            }
+
+            // ✕ Close button
+            OverlayCloseButton {
+                z: 10
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 10
+                anchors.rightMargin: 10
+                onCloseAction: {
+                    mayaDash.quickNotesVisible = false
+                    if (mayaDash._quickNotesEditing) mayaDash._quickNotesSave()
+                    mayaDash._quickNotesEditing = false
+                    BeeSound.playEvent("dash.close")
+                }
+            }
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 20
+                anchors.topMargin: 48
+                anchors.bottomMargin: 20
+                spacing: 12
+
+                // ─── Header ──
+                Row {
+                    spacing: 10
+                    Text {
+                        text: "📝"
+                        font.pixelSize: 28
+                    }
+                    Column {
+                        spacing: 2
+                        Text {
+                            text: BeeConfig.uiLang === "fr" ? "Notes Rapides" : "Quick Notes"
+                            color: BeeTheme.textPrimary
+                            font.bold: true; font.pixelSize: 18
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                        Text {
+                            text: BeeConfig.uiLang === "fr" ? "Persistance automatique" : "Auto-saved notes"
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 11
+                            Behavior on color { ColorAnimation { duration: 600 } }
+                        }
+                    }
+                }
+
+                // ─── Note Tabs ──
+                Row {
+                    id: noteTabsRow
+                    spacing: 6
+                    width: parent.width
+
+                    Repeater {
+                        model: mayaDash._quickNotesData.notes ? mayaDash._quickNotesData.notes.length : 0
+
+                        delegate: Rectangle {
+                            height: 30
+                            radius: 8
+                            color: {
+                                var data = mayaDash._quickNotesData
+                                if (data && data.notes && data.notes[index]) {
+                                    return data.notes[index].id === data.activeNoteId
+                                        ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                                }
+                                return Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                            }
+                            border.color: {
+                                var data = mayaDash._quickNotesData
+                                if (data && data.notes && data.notes[index]) {
+                                    return data.notes[index].id === data.activeNoteId
+                                        ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.6)
+                                        : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                                }
+                                return Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                            }
+                            border.width: 1
+                            width: Math.max(60, (noteTabsRow.width - 6 * (mayaDash._quickNotesData.notes ? mayaDash._quickNotesData.notes.length - 1 : 0)) / Math.max(1, mayaDash._quickNotesData.notes ? mayaDash._quickNotesData.notes.length : 1))
+
+                            property string tabId: mayaDash._quickNotesData.notes ? (mayaDash._quickNotesData.notes[index] ? mayaDash._quickNotesData.notes[index].id : "") : ""
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: mayaDash._quickNotesData.notes && mayaDash._quickNotesData.notes[index] ? mayaDash._quickNotesData.notes[index].title : ""
+                                color: {
+                                    var data = mayaDash._quickNotesData
+                                    if (data && data.notes && data.notes[index]) {
+                                        return data.notes[index].id === data.activeNoteId
+                                            ? BeeTheme.accent
+                                            : Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.6)
+                                    }
+                                    return BeeTheme.textPrimary
+                                }
+                                font.pixelSize: 11; font.bold: parent.tabId === mayaDash._quickNotesData.activeNoteId
+                                elide: Text.ElideRight
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (mayaDash._quickNotesEditing) mayaDash._quickNotesSave()
+                                    var data = mayaDash._quickNotesData
+                                    if (data.notes && data.notes[index]) {
+                                        data.activeNoteId = data.notes[index].id
+                                        mayaDash._quickNotesData = data
+                                        mayaDash._quickNotesEditContent = data.notes[index].content || ""
+                                        mayaDash._quickNotesEditTitle = data.notes[index].title || ""
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // ➕ Add note button
+                    Rectangle {
+                        width: 30; height: 30; radius: 8
+                        color: addNoteHover.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "+"; color: BeeTheme.accent; font.pixelSize: 16; font.bold: true
+                        }
+                        MouseArea {
+                            id: addNoteHover
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                var data = mayaDash._quickNotesData
+                                if (!data.notes) data.notes = []
+                                var newId = "note" + (data.notes.length + 1) + "_" + Date.now()
+                                var newNote = { id: newId, title: BeeConfig.uiLang === "fr" ? "Nouvelle Note" : "New Note", content: "", updated: Date.now() }
+                                data.notes.push(newNote)
+                                data.activeNoteId = newId
+                                mayaDash._quickNotesData = data
+                                mayaDash._quickNotesEditContent = ""
+                                mayaDash._quickNotesEditTitle = newNote.title
+                                mayaDash._quickNotesEditing = true
+                                mayaDash._quickNotesSave()
+                            }
+                        }
+                    }
+                }
+
+                // ─── Note Title (editable) ──
+                Rectangle {
+                    width: parent.width; height: 36; radius: 8
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.07)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                    border.width: 1
+
+                    TextInput {
+                        id: noteTitleInput
+                        anchors.fill: parent; anchors.margins: 8
+                        color: BeeTheme.textPrimary; font.pixelSize: 14; font.bold: true
+                        text: mayaDash._quickNotesEditTitle
+                        onTextChanged: {
+                            if (mayaDash._quickNotesEditing) {
+                                mayaDash._quickNotesEditTitle = text
+                                _autoSaveTimer.restart()
+                            }
+                        }
+                        onActiveFocusChanged: {
+                            if (activeFocus) mayaDash._quickNotesEditing = true
+                        }
+                    }
+                }
+
+                // ─── Note Content ──
+                Rectangle {
+                    width: parent.width
+                    height: parent.height - 240 // Fill remaining space
+                    radius: 8
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                    border.width: 1
+
+                    Flickable {
+                        id: noteFlick
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        contentWidth: noteEdit.width
+                        contentHeight: noteEdit.height
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        ScrollBar.vertical: ScrollBar {
+                            policy: noteFlick.contentHeight > noteFlick.height ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
+                            width: 6
+                            contentItem: Rectangle {
+                                radius: 3
+                                color: parent.active ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.6) : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            }
+                        }
+
+                        TextEdit {
+                            id: noteEdit
+                            width: noteFlick.width
+                            height: Math.max(noteFlick.height, contentHeight)
+                            color: BeeTheme.textPrimary
+                            font.pixelSize: 13
+                            wrapMode: TextEdit.Wrap
+                            selectByMouse: true
+                            text: mayaDash._quickNotesEditContent
+                            onTextChanged: {
+                                mayaDash._quickNotesEditContent = text
+                                if (mayaDash._quickNotesEditing) _autoSaveTimer.restart()
+                            }
+                            onActiveFocusChanged: {
+                                if (activeFocus) mayaDash._quickNotesEditing = true
+                            }
+
+                            // Placeholder
+                            Text {
+                                visible: noteEdit.text.length === 0
+                                text: BeeConfig.uiLang === "fr" ? "Écrivez votre note ici..." : "Write your note here..."
+                                color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.3)
+                                font.pixelSize: 13
+                                anchors.fill: parent
+                            }
+                        }
+                    }
+                }
+
+                // ─── Auto-save timer (3 seconds debounce) ──
+                Timer {
+                    id: _autoSaveTimer
+                    interval: 3000
+                    repeat: false
+                    onTriggered: {
+                        mayaDash._quickNotesSave()
+                    }
+                }
+
+                // ─── Bottom actions ──
+                Row {
+                    spacing: 8
+                    width: parent.width
+
+                    // Save button
+                    Rectangle {
+                        height: 32; radius: 16
+                        width: parent.width / 3 - 8
+                        color: saveHover.containsMouse
+                            ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                            : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.12)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                        Row {
+                            anchors.centerIn: parent; spacing: 4
+                            Text { text: "💾"; font.pixelSize: 14 }
+                            Text { text: BeeConfig.uiLang === "fr" ? "Sauver" : "Save"; color: BeeTheme.accent; font.pixelSize: 11; font.bold: true }
+                        }
+
+                        MouseArea {
+                            id: saveHover
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                mayaDash._quickNotesEditing = true
+                                mayaDash._quickNotesSave()
+                            }
+                        }
+                    }
+
+                    // Delete note button
+                    Rectangle {
+                        height: 32; radius: 16
+                        width: parent.width / 3 - 8
+                        color: deleteHover.containsMouse
+                            ? Qt.rgba(0.9, 0.2, 0.2, 0.2)
+                            : Qt.rgba(0.9, 0.2, 0.2, 0.08)
+                        border.color: deleteHover.containsMouse
+                            ? Qt.rgba(0.9, 0.2, 0.2, 0.5)
+                            : Qt.rgba(0.9, 0.2, 0.2, 0.15)
+                        border.width: 1
+                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                        Row {
+                            anchors.centerIn: parent; spacing: 4
+                            Text { text: "🗑️"; font.pixelSize: 14 }
+                            Text { text: BeeConfig.uiLang === "fr" ? "Supprimer" : "Delete"; color: "#ff4444"; font.pixelSize: 11; font.bold: true }
+                        }
+
+                        MouseArea {
+                            id: deleteHover
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                var data = mayaDash._quickNotesData
+                                if (data.notes && data.notes.length > 1) {
+                                    var idx = mayaDash._quickNotesActiveIndex()
+                                    data.notes.splice(idx, 1)
+                                    data.activeNoteId = data.notes[0].id
+                                    mayaDash._quickNotesData = data
+                                    mayaDash._quickNotesEditContent = data.notes[0].content || ""
+                                    mayaDash._quickNotesEditTitle = data.notes[0].title || ""
+                                    mayaDash._quickNotesSave()
+                                }
+                            }
+                        }
+                    }
+
+                    // View / Edit toggle
+                    Rectangle {
+                        height: 32; radius: 16
+                        width: parent.width / 3 - 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                        border.width: 1
+
+                        Row {
+                            anchors.centerIn: parent; spacing: 4
+                            Text {
+                                text: mayaDash._quickNotesEditing ? "👁️" : "✏️"
+                                font.pixelSize: 14
+                            }
+                            Text {
+                                text: mayaDash._quickNotesEditing
+                                    ? (BeeConfig.uiLang === "fr" ? "Voir" : "View")
+                                    : (BeeConfig.uiLang === "fr" ? "Éditer" : "Edit")
+                                color: BeeTheme.accent; font.pixelSize: 11; font.bold: true
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (mayaDash._quickNotesEditing) {
+                                    mayaDash._quickNotesSave()
+                                    mayaDash._quickNotesEditing = false
+                                } else {
+                                    mayaDash._quickNotesEditing = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Initialize edit content when panel becomes visible
+            Connections {
+                target: mayaDash
+                function onQuickNotesVisibleChanged() {
+                    if (mayaDash.quickNotesVisible) {
+                        var data = mayaDash._quickNotesData
+                        if (data && data.notes && data.notes.length > 0) {
+                            var idx = mayaDash._quickNotesActiveIndex()
+                            mayaDash._quickNotesEditContent = data.notes[idx].content || ""
+                            mayaDash._quickNotesEditTitle = data.notes[idx].title || ""
+                        }
+                        mayaDash._quickNotesEditing = true
+                    }
+                }
             }
         }
     }

@@ -354,6 +354,7 @@ QtObject {
     // ─── BeeEvents & History ──────────────────────────────────
     property bool eventsEnabled: true
     property bool historyEnabled: true
+    property bool quickNotesEnabled: true
     property string icsUrl: ""  // URL ICS (Legacy support)
     property ListModel calendars: ListModel { id: _calendars }
 
@@ -1112,6 +1113,9 @@ QtObject {
         else if (cfg.bee_events !== undefined)
             eventsEnabled = cfg.bee_events.enabled !== false
 
+        if (cfg.quick_notes_enabled !== undefined)
+            quickNotesEnabled = cfg.quick_notes_enabled === true
+
         if (cfg.events_live_path !== undefined)
             eventsLivePath = cfg.events_live_path
         else if (cfg.bee_events !== undefined && cfg.bee_events.live_path !== undefined)
@@ -1463,6 +1467,7 @@ QtObject {
         cfg.pinned_apps  = Array.isArray(pinnedApps) ? pinnedApps : []
         cfg.context_rules = context_rules
         cfg.events_enabled = eventsEnabled
+        cfg.quick_notes_enabled = quickNotesEnabled
         cfg.events_live_path = eventsLivePath
         
         // Save calendars array
