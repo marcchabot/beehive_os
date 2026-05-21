@@ -14,7 +14,8 @@ QtObject {
     id: root
 
     // ─── Version 🐝 ──────────────────────────────────────────────
-    property string appVersion: "1.3.7"
+    // v0.8.33: AccessibilityTab enhancement + Auto-Icons integration
+    property string appVersion: "1.3.8"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -396,9 +397,13 @@ QtObject {
 
     // ─── Accessibility 🐝♿ ──────────────────────────────────
     property bool   accessibilityHighContrast: false
-    property real   accessibilityTextScale: 1.0   // 1.0 | 1.2 | 1.4
+    property real   accessibilityTextScale: 1.0   // 0.8 - 1.5
     property bool   accessibilityReducedMotion: false
     property string accessibilityLevel: "none"  // "none" | "AA" | "AAA"
+
+    // ─── Auto-Icons 🐝🖼️ v0.8.33 ─────────────────────────────
+    property bool   autoIconsEnabled: true
+    onAutoIconsEnabledChanged: { if (root._loaded) saveConfig() }
 
     onAccessibilityHighContrastChanged: {
         BeeTheme.highContrast = accessibilityHighContrast
@@ -1318,7 +1323,7 @@ QtObject {
             }
             if (ac.text_scale !== undefined) {
                 var ts = Number(ac.text_scale)
-                if (!isNaN(ts) && [1.0, 1.2, 1.4].indexOf(ts) >= 0) {
+                if (!isNaN(ts) && ts >= 0.8 && ts <= 1.5) {
                     accessibilityTextScale = ts
                     BeeTheme.textScale = ts
                 }
@@ -1336,6 +1341,13 @@ QtObject {
             // ─── Screen Reader config 🐝♿ v0.9.2 ─────────────
             if (ac.screen_reader !== undefined) {
                 accessibilityScreenReader = ac.screen_reader === true
+            }
+        }
+
+        // ─── Auto-Icons config 🐝🖼️ v0.8.33 ─────────────────────
+        if (cfg.auto_icons !== undefined) {
+            if (cfg.auto_icons.enabled !== undefined) {
+                autoIconsEnabled = cfg.auto_icons.enabled !== false
             }
         }
 
@@ -1570,6 +1582,11 @@ QtObject {
             reduced_motion: accessibilityReducedMotion,
             level: accessibilityLevel,
             screen_reader: accessibilityScreenReader
+        }
+
+        // ─── Auto-Icons config 🐝🖼️ v0.8.33 ─────────────────────
+        cfg.auto_icons = {
+            enabled: autoIconsEnabled
         }
 
         // ─── Battery Mode config 🐝🔋 ──────────────────────
