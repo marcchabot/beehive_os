@@ -143,6 +143,60 @@ Rectangle {
         }
     }
 
+    // ─── Auto-Icons Scanner 🐝🖼️ v0.8.33 ────────────────────
+    property Process _autoIconScanProc: Process {
+        id: _autoIconScanProc
+        running: false
+        command: ["python3", "/home/marc/beehive_os/scripts/desktop_icon_scanner.py", "--update"]
+        stdout: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons] " + line) }
+        stderr: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons] " + line) }
+        onExited: (code, status) => {
+            if (code === 0) {
+                console.log("[BeeBar] Auto-icon scan completed, reloading config...")
+                BeeConfig.loadConfig()
+            }
+        }
+    }
+
+    Timer {
+        id: autoIconTimer
+        interval: 15000 // 15s after startup
+        running: BeeConfig.autoIconsEnabled
+        onTriggered: {
+            if (BeeConfig.autoIconsEnabled) {
+                console.log("[BeeBar] Triggering auto-icon scan...")
+                _autoIconScanProc.running = true
+            }
+        }
+    }
+
+    // ─── Single-app icon scan (debounced) 🐝🖼️ v0.8.33 ──────
+    property Process _autoIconSingleScan: Process {
+        id: _autoIconSingleScan
+        running: false
+        property string _pendingApp: ""
+        command: ["python3", "/home/marc/beehive_os/scripts/desktop_icon_scanner.py", "--app", "placeholder"]
+        stdout: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons App] " + line) }
+        stderr: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons App] " + line) }
+        onExited: (code, status) => {
+            if (code === 0) {
+                BeeConfig.loadConfig()
+            }
+        }
+    }
+
+    Connections {
+        target: BeeConfig
+        function onAutoIconsEnabledChanged() {
+            if (BeeConfig.autoIconsEnabled) {
+                console.log("[BeeBar] Auto-icons enabled, scheduling scan...")
+                autoIconTimer.start()
+            } else {
+                autoIconTimer.stop()
+            }
+        }
+    }
+
     Timer {
         id: bootTimer
         interval: 10000 // Increased to 10s to ensure system stability after boot
@@ -352,6 +406,7 @@ Rectangle {
                 property string activeClass: (BeeBarState.activeWindowClass || "").toLowerCase()
 
                 // Dynamic icon loader - handles both emojis and image paths
+                // Fallback hierarchy: user_config → .desktop detected → default bee
                 property string currentIcon: {
                     var cls = activeClass;
                     var icons = BeeConfig.window_icons || {};
@@ -368,7 +423,16 @@ Rectangle {
                     // 2. Get the icon for the current class, or the default icon
                     var icon = caseInsensitiveIcons[cls] || caseInsensitiveIcons["default"];
                     
-                    // 3. If the result is empty, whitespace, or error-like, use the bee
+                    // 3. If auto-icons is enabled and no icon found, trigger a scan for this app
+                    if (!icon && BeeConfig.autoIconsEnabled) {
+                        // Queue a single-app scan (debounced)
+                        if (!_autoIconSingleScan.running) {
+                            _autoIconSingleScan._pendingApp = cls
+                            _autoIconSingleScan.running = true
+                        }
+                    }
+                    
+                    // 4. If the result is empty, whitespace, or error-like, use the bee
                     if (!icon || (typeof icon === 'string' && (icon.trim() === "" || icon.startsWith("error:")))) return "🐝";
                     
                     return icon;

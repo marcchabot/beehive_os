@@ -535,6 +535,31 @@ Item {
                     onToggled: { BeeConfig.contextualBar = checked; BeeConfig.saveConfig() }
                 }
             }
+
+            // ─── Auto-Icons Toggle 🐝🖼️ v0.8.33 ────────────────
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: sd.auto_icons || "Auto-Icons"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: BeeConfig.uiLang === "fr"
+                            ? "Icônes automatiques depuis les fichiers .desktop"
+                            : "Automatic icons from .desktop files"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+                Switch {
+                    checked: BeeConfig.autoIconsEnabled
+                    onToggled: { BeeConfig.autoIconsEnabled = checked; BeeConfig.saveConfig() }
+                }
+            }
         }
     }
 }
