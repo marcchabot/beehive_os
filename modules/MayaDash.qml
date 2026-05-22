@@ -41,6 +41,7 @@ Rectangle {
     signal openNotes()
     signal openCalendar()
     signal openSysmon()
+    signal openWeather()
     signal cellsNeedRefresh()  // Emitted after drag & drop swap
 
     // ─── Drag & Drop state ──────────────────────────────────────
@@ -367,6 +368,17 @@ Rectangle {
             mayaDash.focusDetailVisible = false
             mayaDash.quickNotesVisible = false
             mayaDash.openSysmon()
+            BeeSound.playEvent("dash.open")
+            return
+        }
+
+        // detail:weather → BeeWeather Detail panel (own PanelWindow via BeeHiveShell)
+        if (action === "detail:weather") {
+            mayaDash.networkDetailVisible = false
+            mayaDash.monitorDetailVisible = false
+            mayaDash.focusDetailVisible = false
+            mayaDash.quickNotesVisible = false
+            mayaDash.openWeather()
             BeeSound.playEvent("dash.open")
             return
         }

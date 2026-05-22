@@ -116,6 +116,33 @@
         "❓",
         "Inconnu"
       ]
+    },
+    "humidity": "Humidité",
+    "wind": "Vent",
+    "uv_index": "Indice UV",
+    "precipitation": "Précipitations",
+    "snow": "Neige",
+    "hourly_forecast": "Prévisions horaires",
+    "seven_day_forecast": "Prévisions 7 jours",
+    "now": "Maint.",
+    "today": "Auj.",
+    "wind_directions": {
+      "N": "N",
+      "NNE": "NNE",
+      "NE": "NE",
+      "ENE": "ENE",
+      "E": "E",
+      "ESE": "ESE",
+      "SE": "SE",
+      "SSE": "SSE",
+      "S": "S",
+      "SSO": "SSO",
+      "SO": "SO",
+      "OSO": "OSO",
+      "O": "O",
+      "ONO": "ONO",
+      "NO": "NO",
+      "NNO": "NNO"
     }
   },
   "dashboard": {

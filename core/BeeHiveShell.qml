@@ -15,6 +15,7 @@ ShellRoot {
     property bool osdVisible: false
     property bool welcomeVisible: false
     property bool voiceVisible: false
+    property bool weatherVisible: false
 
     // 🐝 v0.8.27 — Global reminder engine (works even when calendar panel is closed)
     property var _firedReminders: ({})
@@ -512,6 +513,18 @@ ShellRoot {
             // The BeeBar itself — slides in/out via y/opacity when stealth toggles
             BeeBar {
                 id: beeBarInstance
+
+                // Wire BeeWeather detail open request from BeeBar
+                // We use Connections to catch the signal from BeeWeather inside BeeBar
+            }
+
+            // Connections to catch BeeWeather click inside BeeBar
+            Connections {
+                target: BeeBarState
+                function onWeatherDetailToggled() {
+                    root.weatherVisible = !root.weatherVisible
+                    BeeSound.playEvent(root.weatherVisible ? "dash.open" : "dash.close")
+                }
             }
         }
     }
@@ -578,6 +591,7 @@ ShellRoot {
                 onOpenNotes:    { root.notesVisible = !root.notesVisible; BeeSound.playEvent(root.notesVisible ? "dash.open" : "dash.close") }
                 onOpenCalendar: { root.calendarVisible = !root.calendarVisible; BeeSound.playEvent(root.calendarVisible ? "dash.open" : "dash.close") }
                 onOpenSysmon:   { root.sysmonVisible = !root.sysmonVisible; BeeSound.playEvent(root.sysmonVisible ? "dash.open" : "dash.close") }
+                onOpenWeather:  { root.weatherVisible = !root.weatherVisible; BeeSound.playEvent(root.weatherVisible ? "dash.open" : "dash.close") }
             }
 
             Clock {
@@ -814,6 +828,17 @@ ShellRoot {
         }
     }
 
+    // ─── BeeWeather Shared Instance 🐝🌦️ ──────────────────
+    // Created here so BeeWeatherDetail PanelWindow can access weather data.
+    // BeeBar also has its own BeeWeather instance for the bar widget.
+    BeeWeather {
+        id: beeWeatherInstance
+        city: BeeConfig.weatherCity
+        lat: BeeConfig.weatherLat
+        lon: BeeConfig.weatherLon
+        conditionMaxWidth: 70
+    }
+
     // ─── BeeCalendar Panel (focusable, own PanelWindow) ──────────
     property bool calendarVisible: false
 
@@ -951,6 +976,48 @@ ShellRoot {
                         function onVoiceVisibleChanged() {
                             if (root.voiceVisible) voicePanel.forceActiveFocus()
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    // ─── BeeWeather Detail Panel (focusable, own PanelWindow) 🐝🌦️ ─────
+    Loader {
+        active: root.weatherVisible
+        sourceComponent: Variants {
+            model: Quickshell.screens
+            delegate: PanelWindow {
+                required property var modelData
+                screen: modelData
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.namespace: "beehive-weather"
+                WlrLayershell.keyboardFocus: WlrLayershell.OnDemand
+                focusable: true
+                anchors { top: true; bottom: true; left: true; right: true }
+                color: "transparent"
+
+                // Overlay semi-transparent (clic dehors → fermer)
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(0, 0, 0, 0.5)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.weatherVisible = false
+                            BeeSound.playEvent("dash.close")
+                        }
+                    }
+                }
+
+                // BeeWeatherDetail centré dans le panel
+                BeeWeatherDetail {
+                    anchors.centerIn: parent
+                    weatherData: beeWeatherInstance
+                    onCloseRequested: {
+                        root.weatherVisible = false
+                        BeeSound.playEvent("dash.close")
                     }
                 }
             }

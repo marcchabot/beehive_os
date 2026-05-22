@@ -99,7 +99,9 @@ QtObject {
     // BeePower menu visibility
     property bool powerVisible: false
 
-    // ─── Window Tracking ──────────────────────
+    // ─── Weather Detail Panel ──────────────────
+    property bool weatherDetailRequested: false
+    signal weatherDetailToggled()────
     property string activeWindowClass: "none"
 
     // Test: Comment out EVERYTHING Process-related
