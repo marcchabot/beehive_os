@@ -3,7 +3,7 @@ import QtQuick
 
 // ═══════════════════════════════════════════════════════════════
 // BeeTheme.qml — BeePalette Engine 🐝🎨  (Singleton global)
-// v0.8.25: Nectar Auto-Theme (time/weather) + weather accent
+// // v0.8.35: Performance optimization — reduced animations for battery mode + startup benchmark
 //
 // ─── Architecture ─────────────────────────────────────────────
 //   • _progress (0.0 → 1.0) : animation de transition Dark↔Light

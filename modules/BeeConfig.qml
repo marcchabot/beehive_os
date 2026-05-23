@@ -5,7 +5,7 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeConfig.qml — BeeConfig System 🐝📋  (Global Singleton)
-// v0.8.25 — CalDAV sync, Nectar Auto-Theme (time/weather)
+// v0.8.35 — Performance optimization: lazy loading, battery mode, startup benchmark
 // Loads user_config.json and exposes dashboard data
 // Access: BeeConfig.cells, BeeConfig.weatherCity, etc.
 // ═══════════════════════════════════════════════════════════════
@@ -14,8 +14,8 @@ QtObject {
     id: root
 
     // ─── Version 🐝 ──────────────────────────────────────────────
-    // v0.8.33: AccessibilityTab enhancement + Auto-Icons integration
-    property string appVersion: "1.3.8"
+    // v0.8.35: Performance optimization — lazy loading, battery mode, startup benchmark
+    property string appVersion: "0.8.35"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -23,6 +23,11 @@ QtObject {
     property string currentWallpaper: ""        // Path to current wallpaper
     property var extractedColors: []             // Colors extracted from wallpaper
     property string _activePaletteKey: "honey_gold" // Currently active palette key
+
+    // ─── Deferred Startup 🐝⚡ v0.8.35 ─────────────────────────────
+    // When true, calendar sync and weather fetch wait 5s after startup
+    // before executing. Reduces startup load and improves boot time.
+    property bool deferredStartup: true
 
     // ─── Stealth Mode ─────────────────────────────────────────
     property bool stealthMode: false
@@ -1221,6 +1226,7 @@ QtObject {
             loadI18n(uiLang)
         }
         if (cfg.launch_at_startup !== undefined) launchAtStartup = cfg.launch_at_startup === true
+        if (cfg.deferred_startup !== undefined) deferredStartup = cfg.deferred_startup !== false
 
         if (cfg.weather) {
             weatherCity = cfg.weather.city || weatherCity
@@ -1448,6 +1454,7 @@ QtObject {
         // Update only dynamically managed fields
         cfg.lang         = uiLang
         cfg.launch_at_startup = launchAtStartup
+        cfg.deferred_startup = deferredStartup
         cfg.stealth_mode = stealthMode
         cfg.vibe_mode    = vibeMode
         cfg.vibe_backend  = vibeBackend

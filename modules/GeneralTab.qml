@@ -5,7 +5,7 @@ import "."
 
 // ═══════════════════════════════════════════════════════════════
 // GeneralTab.qml — 🏠 General Settings + Profiles + Keyboard Shortcuts
-// v0.8.31: Profile Switching UI added
+// v0.8.35: Performance section + Battery Mode toggle
 // ═══════════════════════════════════════════════════════════════
 
 Item {
@@ -391,6 +391,136 @@ Item {
                         Layout.fillWidth: true
                     }
                 }
+            }
+
+            Item { height: 8 }
+
+            // ─── ⚡ Performance Section v0.8.35 ──────────────────────
+            Text {
+                text: "⚡ " + (s.performance || "Performance")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // Startup time
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.startup_time || "Startup time:"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeePerformance.startupTimeMs > 0
+                        ? (BeePerformance.startupTimeMs + " ms")
+                        : (s.not_yet_measured || "—")
+                    color: BeePerformance.startupTimeMs > 0 ? BeeTheme.accent : BeeTheme.textSecondary
+                    font.pixelSize: 13; font.bold: BeePerformance.startupTimeMs > 0
+                }
+            }
+
+            // RAM usage
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.ram_usage || "RAM usage:"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeePerformance.ramUsageMb > 0
+                        ? (BeePerformance.ramUsageMb.toFixed(1) + " MB")
+                        : (s.calculating || "...")
+                    color: BeePerformance.ramUsageMb > 0 ? BeeTheme.accent : BeeTheme.textSecondary
+                    font.pixelSize: 13; font.bold: BeePerformance.ramUsageMb > 0
+                }
+            }
+
+            // Idle state
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.status || "Status:"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeePerformance.isIdle
+                        ? (s.idle || "Idle")
+                        : (s.active || "Active")
+                    color: BeePerformance.isIdle ? BeeTheme.textSecondary : "#4CAF50"
+                    font.pixelSize: 13; font.bold: true
+                }
+            }
+
+            Item { height: 8 }
+
+            // ─── 🔋 Battery Mode Section v0.8.35 ────────────────────
+            Text {
+                text: "🔋 " + (s.battery_mode || "Battery Mode")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // Battery Mode toggle
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: (s.battery_mode || "Battery Mode") + (BeeConfig.batteryMode ? " ⚡" : "")
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Switch {
+                    checked: BeeConfig.batteryMode
+                    onToggled: {
+                        BeeConfig.batteryMode = checked
+                        // If manual toggle, disable auto-detect
+                        if (checked) BeeConfig.batteryModeAuto = false
+                        else BeeConfig.batteryModeAuto = true
+                        BeeConfig.saveConfig()
+                    }
+                }
+            }
+
+            // Auto-detect toggle
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: s.auto_detect_battery || "Auto-detect battery status"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                Switch {
+                    checked: BeeConfig.batteryModeAuto
+                    onToggled: {
+                        BeeConfig.batteryModeAuto = checked
+                        BeeConfig.saveConfig()
+                    }
+                }
+            }
+
+            // Battery status info
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: (s.battery_status || "Battery") + ": " + BeeConfig.batteryStatus
+                    color: BeeTheme.textSecondary; font.pixelSize: 12; Layout.fillWidth: true
+                }
+                Text {
+                    text: BeeConfig.batteryPercentage + "%"
+                    color: BeeConfig.batteryPercentage <= 20 ? "#FF5252" : BeeTheme.accent
+                    font.pixelSize: 12; font.bold: true
+                }
+            }
+
+            // Effects when battery mode is active
+            Text {
+                text: BeeConfig.reducedAnimations
+                    ? (s.battery_effects_active || "⚡ Reduced animations, Vibe/Motion disabled")
+                    : (s.battery_effects_none || "")
+                color: BeeTheme.textSecondary
+                font.pixelSize: 11
+                font.italic: true
+                visible: BeeConfig.reducedAnimations
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
             }
         }
     }

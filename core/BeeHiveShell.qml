@@ -11,11 +11,16 @@ ShellRoot {
     objectName: "beehiveShell"
 
     property bool dashVisible: false
+    onDashVisibleChanged: { if (dashVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
     property bool searchVisible: false
+    onSearchVisibleChanged: { if (searchVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
     property bool osdVisible: false
     property bool welcomeVisible: false
+    onWelcomeVisibleChanged: { if (welcomeVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
     property bool voiceVisible: false
+    onVoiceVisibleChanged: { if (voiceVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
     property bool weatherVisible: false
+    onWeatherVisibleChanged: { if (weatherVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
 
     // 🐝 v0.8.27 — Global reminder engine (works even when calendar panel is closed)
     property var _firedReminders: ({})
@@ -112,7 +117,7 @@ ShellRoot {
     }
     Timer {
         id: globalEventsReload
-        interval: 300000  // Reload every 5 min
+        interval: BeeConfig.reducedAnimations ? 600000 : 300000  // 10min battery / 5min normal
         running: true
         repeat: true
         onTriggered: root._loadGlobalEvents()
@@ -227,6 +232,12 @@ ShellRoot {
         var totalMs = root._startupTimestamps["shell_completed"] - root._startupTimestamps["shell_created"]
         console.log("🐝 BeeHiveShell: Component completed in", totalMs, "ms")
 
+        // 🐝 v0.8.35 — Record to BeePerformance singleton
+        BeePerformance._shellInitTime = root._startupTimestamps["shell_created"]
+        BeePerformance._timestamps = root._startupTimestamps
+        BeePerformance.startupTimeMs = totalMs
+        console.log("🐝 Bee-Hive OS started in", totalMs, "ms")
+
         // Record to startup profiler
         var profilerPath = Qt.resolvedUrl("../scripts/bee_startup_profiler.py").toString().replace("file://", "")
         var modulesJson = JSON.stringify(root._startupTimestamps)
@@ -236,6 +247,11 @@ ShellRoot {
             "--notes", "BeeHiveShell Component.onCompleted"
         ]
         _startupRecorder.running = true
+
+        // 🐝 v0.8.35 — Deferred startup: trigger heavy modules after 5s delay
+        if (BeeConfig.deferredStartup) {
+            _deferredStartupTimer.start()
+        }
     }
 
     // ─── Lazy Loading Support ⚡ ──────────────────────────────
@@ -253,6 +269,20 @@ ShellRoot {
         running: false
         command: ["echo", ""]
         stdout: SplitParser { onRead: (line) => {} }
+    }
+
+    // 🐝 v0.8.35 — Deferred Startup Timer
+    // Delays heavy operations (calendar sync, weather fetch) for 5s after startup
+    Timer {
+        id: _deferredStartupTimer
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            console.log("🐝 Deferred startup: triggering calendar sync & weather fetch")
+            BeePerformance.markStartup("deferred_start")
+            // Signal to BeeConfig that deferred startup is complete
+            BeeConfig.eventsReloadRequested()
+        }
     }
 
     // ─── First Run Detection ──────────────────────────────────
@@ -514,6 +544,11 @@ ShellRoot {
             BeeBar {
                 id: beeBarInstance
 
+                Component.onCompleted: {
+                    // 🐝 v0.8.35 — Mark BeeBar as rendered for startup profiling
+                    BeePerformance.markStartupComplete()
+                }
+
                 // Wire BeeWeather detail open request from BeeBar
                 // We use Connections to catch the signal from BeeWeather inside BeeBar
             }
@@ -584,8 +619,8 @@ ShellRoot {
                 id: mayaDash
                 z: mayaDash.configVisible ? 200 : 0
                 dashShown: root.dashVisible && !BeeBarState.focusActive
-                beeMotionEnabled: BeeBarState.motionActive
-                beeVibeEnabled:   BeeBarState.vibeActive
+                beeMotionEnabled: BeeBarState.motionActive && !BeeConfig.reducedAnimations
+                beeVibeEnabled:   BeeBarState.vibeActive && !BeeConfig.reducedAnimations
                 onOpenSettings: { root.controlTab = 3; root.controlVisible = true }
                 onOpenStudio:   { root.controlTab = 0; root.controlVisible = true }
                 onOpenNotes:    { root.notesVisible = !root.notesVisible; BeeSound.playEvent(root.notesVisible ? "dash.open" : "dash.close") }
@@ -684,6 +719,7 @@ ShellRoot {
 
     // Panneaux Interactifs
     property bool controlVisible: false
+    onControlVisibleChanged: { if (controlVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
     property int  controlTab: 0
 
     Loader {
@@ -787,6 +823,7 @@ ShellRoot {
 
     // ─── BeeNotes Panel (focusable, own PanelWindow) ─────────────
     property bool notesVisible: false
+    onNotesVisibleChanged: { if (notesVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
 
     Loader {
         active: root.notesVisible
@@ -841,6 +878,7 @@ ShellRoot {
 
     // ─── BeeCalendar Panel (focusable, own PanelWindow) ──────────
     property bool calendarVisible: false
+    onCalendarVisibleChanged: { if (calendarVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
 
     Loader {
         active: root.calendarVisible
@@ -889,6 +927,7 @@ ShellRoot {
 
     // ─── BeeSystemMonitor Panel (focusable, own PanelWindow) 🐝📊 ──────
     property bool sysmonVisible: false
+    onSysmonVisibleChanged: { if (sysmonVisible) BeePerformance.onPanelOpened(); else BeePerformance.onPanelClosed() }
 
     Loader {
         active: root.sysmonVisible

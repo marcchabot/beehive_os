@@ -273,7 +273,7 @@ Item {
     }
 
     Timer {
-        interval: 1800000 // 30 minutes
+        interval: BeeConfig.reducedAnimations ? 600000 : 300000  // 10min battery / 5min normal
         running: true
         repeat: true
         onTriggered: updateWeather()

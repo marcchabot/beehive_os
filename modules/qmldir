@@ -10,6 +10,7 @@ singleton BeePresets      1.0 BeePresets.qml
 singleton BeeProfiles     1.0 BeeProfiles.qml
 singleton BeeFocus        1.0 BeeFocus.qml
 singleton BeeAlarm        1.0 BeeAlarm.qml
+singleton BeePerformance  1.0 BeePerformance.qml
 
 # Composants visuels
 BeeBar       1.0 BeeBar.qml
