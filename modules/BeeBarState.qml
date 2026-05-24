@@ -101,7 +101,7 @@ QtObject {
 
     // ─── Weather Detail Panel ──────────────────
     property bool weatherDetailRequested: false
-    signal weatherDetailToggled()────
+    signal weatherDetailToggled()
     property string activeWindowClass: "none"
 
     // Test: Comment out EVERYTHING Process-related
