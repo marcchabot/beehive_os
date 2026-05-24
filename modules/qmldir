@@ -41,3 +41,4 @@ MayaDashConfig 1.0 MayaDashConfig.qml
 OverlayCloseButton 1.0 OverlayCloseButton.qml
 DashboardTab  1.0 DashboardTab.qml
 BeeReminder   1.0 BeeReminder.qml
+BeeWeatherDetail 1.0 BeeWeatherDetail.qml
