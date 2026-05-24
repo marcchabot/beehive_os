@@ -522,6 +522,245 @@ Item {
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
             }
+
+            Item { height: 8 }
+
+            // ─── 💾 Config Import/Export 🐝 v0.8.36 ──────────────────────
+            Text {
+                text: "💾 " + (s.config_import_export || "Config Import/Export")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // Export buttons row
+            RowLayout {
+                Layout.fillWidth: true; spacing: 10
+
+                // Export Config
+                Rectangle {
+                    width: 160; height: 38; radius: 10
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.5)
+                    border.width: 1.5
+
+                    RowLayout {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "📤"; font.pixelSize: 16 }
+                        Text {
+                            text: s.export_config || "Export Config"
+                            color: BeeTheme.accent; font.pixelSize: 12; font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                        onClicked: BeeConfig.exportConfig(false)
+                    }
+                }
+
+                // Export with Wallpapers
+                Rectangle {
+                    width: 180; height: 38; radius: 10
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
+                    border.width: 1
+
+                    RowLayout {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "🖼️"; font.pixelSize: 16 }
+                        Text {
+                            text: s.export_with_wallpapers || "Export + Wallpapers"
+                            color: BeeTheme.textPrimary; font.pixelSize: 12
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                        onClicked: BeeConfig.exportConfig(true)
+                    }
+                }
+
+                // Import Config
+                Rectangle {
+                    width: 150; height: 38; radius: 10
+                    color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.12)
+                    border.color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.4)
+                    border.width: 1.5
+
+                    RowLayout {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "📥"; font.pixelSize: 16 }
+                        Text {
+                            text: s.import_config || "Import Config"
+                            color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                        onClicked: importFileDialog.visible = true
+                    }
+                }
+            }
+
+            // Import file path dialog
+            Rectangle {
+                id: importFileDialog
+                visible: false
+                Layout.fillWidth: true
+                height: importFileDialog.visible ? importFormLayout.implicitHeight + 24 : 0
+                radius: 10
+                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                border.width: 1
+                clip: true
+
+                ColumnLayout {
+                    id: importFormLayout
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: s.import_config_file || "Import .bhive file"
+                        color: BeeTheme.accent
+                        font.bold: true; font.pixelSize: 13
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 8
+
+                        Text {
+                            text: s.file_path || "Path:"
+                            color: BeeTheme.textPrimary; font.pixelSize: 12
+                            Layout.preferredWidth: 60
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true; height: 30; radius: 6
+                            color: Qt.rgba(BeeTheme.bg.r, BeeTheme.bg.g, BeeTheme.bg.b, 0.8)
+                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                            border.width: 1
+
+                            TextInput {
+                                id: importPathInput
+                                anchors.fill: parent; anchors.margins: 6
+                                color: BeeTheme.textPrimary; font.pixelSize: 12
+                                verticalAlignment: Qt.AlignVCenter
+                                placeholderText: s.import_path_placeholder || "~/Documents/beehive_backup.bhive"
+                                placeholderTextColor: BeeTheme.textSecondary
+                                selectByMouse: true
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 8
+
+                        // Merge import (safe)
+                        Rectangle {
+                            width: 120; height: 32; radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            border.color: BeeTheme.accent; border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.import_merge || "Merge Import"
+                                color: BeeTheme.accent; font.pixelSize: 11; font.bold: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    var path = importPathInput.text.trim()
+                                    if (path.length > 0) {
+                                        BeeConfig.importConfig(path, false)
+                                        importFileDialog.visible = false
+                                    }
+                                }
+                            }
+                        }
+
+                        // Overwrite import (dangerous)
+                        Rectangle {
+                            width: 130; height: 32; radius: 8
+                            color: Qt.rgba(1.0, 0.3, 0.3, 0.1)
+                            border.color: "#FF5252"; border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.import_overwrite || "⚠ Overwrite"
+                                color: "#FF5252"; font.pixelSize: 11; font.bold: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    var path = importPathInput.text.trim()
+                                    if (path.length > 0) {
+                                        BeeConfig.importConfig(path, true)
+                                        importFileDialog.visible = false
+                                    }
+                                }
+                            }
+                        }
+
+                        // Cancel
+                        Rectangle {
+                            width: 80; height: 32; radius: 8
+                            color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.1)
+                            border.color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3); border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.cancel || "Cancel"
+                                color: BeeTheme.textSecondary; font.pixelSize: 12
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: importFileDialog.visible = false
+                            }
+                        }
+                    }
+
+                    // Status message
+                    Text {
+                        visible: BeeConfig.configExportStatus !== "idle" || BeeConfig.configImportStatus !== "idle"
+                        text: {
+                            if (BeeConfig.configExportStatus === "done")
+                                return "✅ " + (s.export_success || "Export successful") + ": " + BeeConfig.configExportMessage
+                            if (BeeConfig.configExportStatus === "error")
+                                return "❌ " + (BeeConfig.configExportMessage || "Export failed")
+                            if (BeeConfig.configExportStatus === "exporting")
+                                return "⏳ " + (s.exporting || "Exporting...")
+                            if (BeeConfig.configImportStatus === "done")
+                                return "✅ " + (s.import_success || "Import successful")
+                            if (BeeConfig.configImportStatus === "error")
+                                return "❌ " + (BeeConfig.configImportMessage || "Import failed")
+                            if (BeeConfig.configImportStatus === "importing")
+                                return "⏳ " + (s.importing || "Importing...")
+                            return ""
+                        }
+                        color: {
+                            if (BeeConfig.configExportStatus === "done" || BeeConfig.configImportStatus === "done") return "#4CAF50"
+                            if (BeeConfig.configExportStatus === "error" || BeeConfig.configImportStatus === "error") return "#FF5252"
+                            return BeeTheme.textSecondary
+                        }
+                        font.pixelSize: 11; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+            }
+
+            // Import description text
+            Text {
+                text: s.config_import_desc || "Export your full configuration or import from a .bhive file. Merge preserves your data, Overwrite replaces everything."
+                color: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.6)
+                font.pixelSize: 10; font.italic: true
+                Layout.fillWidth: true; wrapMode: Text.WordWrap
+            }
         }
     }
 

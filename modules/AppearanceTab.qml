@@ -224,6 +224,213 @@ Item {
                     onToggled: { BeeConfig.colorTherapyEnabled = checked; BeeConfig.saveConfig() }
                 }
             }
+
+            Item { height: 4 }
+
+            // ─── Community Theme Export 🐝🎨 v0.8.36 ────────────────────
+            Text {
+                text: "🎨✨ " + (s.community_theme || "Community Theme")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: s.export_my_theme || "Export my theme"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: s.export_theme_desc || "Create a shareable .bhivetheme file with your visual settings"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+
+                Rectangle {
+                    width: 160; height: 38; radius: 10
+                    color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                    border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.5)
+                    border.width: 1.5
+
+                    RowLayout {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "✨"; font.pixelSize: 16 }
+                        Text {
+                            text: s.export_theme_btn || "Export Theme"
+                            color: BeeTheme.accent; font.pixelSize: 12; font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                        onClicked: BeeConfig.exportTheme()
+                    }
+                }
+            }
+
+            // Import theme button
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                ColumnLayout {
+                    Layout.fillWidth: true; spacing: 2
+                    Text {
+                        text: s.import_theme || "Import theme"
+                        color: BeeTheme.textPrimary; font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        text: s.import_theme_desc || "Apply a .bhivetheme file from the community"
+                        color: Qt.rgba(BeeTheme.textPrimary.r, BeeTheme.textPrimary.g, BeeTheme.textPrimary.b, 0.55)
+                        font.pixelSize: 10; font.italic: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+                }
+
+                Rectangle {
+                    width: 160; height: 38; radius: 10
+                    color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.12)
+                    border.color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.4)
+                    border.width: 1.5
+
+                    RowLayout {
+                        anchors.centerIn: parent; spacing: 6
+                        Text { text: "📥"; font.pixelSize: 16 }
+                        Text {
+                            text: s.import_theme_btn || "Import Theme"
+                            color: BeeTheme.textPrimary; font.pixelSize: 12; font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                        onClicked: themeImportDialog.visible = true
+                    }
+                }
+            }
+
+            // Theme import path dialog
+            Rectangle {
+                id: themeImportDialog
+                visible: false
+                Layout.fillWidth: true
+                height: themeImportDialog.visible ? themeImportFormLayout.implicitHeight + 24 : 0
+                radius: 10
+                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.06)
+                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                border.width: 1
+                clip: true
+
+                ColumnLayout {
+                    id: themeImportFormLayout
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 10
+
+                    Text {
+                        text: s.import_theme_file || "Import .bhivetheme file"
+                        color: BeeTheme.accent
+                        font.bold: true; font.pixelSize: 13
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 8
+
+                        Text {
+                            text: s.file_path || "Path:"
+                            color: BeeTheme.textPrimary; font.pixelSize: 12
+                            Layout.preferredWidth: 60
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true; height: 30; radius: 6
+                            color: Qt.rgba(BeeTheme.bg.r, BeeTheme.bg.g, BeeTheme.bg.b, 0.8)
+                            border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                            border.width: 1
+
+                            TextInput {
+                                id: themeImportPathInput
+                                anchors.fill: parent; anchors.margins: 6
+                                color: BeeTheme.textPrimary; font.pixelSize: 12
+                                verticalAlignment: Qt.AlignVCenter
+                                placeholderText: s.theme_path_placeholder || "~/Documents/beehive_theme.bhivetheme"
+                                placeholderTextColor: BeeTheme.textSecondary
+                                selectByMouse: true
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true; spacing: 8
+
+                        Rectangle {
+                            width: 120; height: 32; radius: 8
+                            color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                            border.color: BeeTheme.accent; border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.apply_theme || "Apply Theme"
+                                color: BeeTheme.accent; font.pixelSize: 11; font.bold: true
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    var path = themeImportPathInput.text.trim()
+                                    if (path.length > 0) {
+                                        BeeConfig.importTheme(path)
+                                        themeImportDialog.visible = false
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: 80; height: 32; radius: 8
+                            color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.1)
+                            border.color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.3); border.width: 1
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: s.cancel || "Cancel"
+                                color: BeeTheme.textSecondary; font.pixelSize: 12
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                onClicked: themeImportDialog.visible = false
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Theme export/import status
+            Text {
+                visible: BeeConfig.configExportStatus !== "idle" && (BeeConfig.configExportStatus === "exporting" || BeeConfig.configExportStatus === "done" || BeeConfig.configExportStatus === "error")
+                text: {
+                    if (BeeConfig.configExportStatus === "done")
+                        return "✅ " + (s.theme_exported || "Theme exported!")
+                    if (BeeConfig.configExportStatus === "error")
+                        return "❌ " + (BeeConfig.configExportMessage || "Export failed")
+                    if (BeeConfig.configExportStatus === "exporting")
+                        return "⏳ " + (s.exporting || "Exporting...")
+                    return ""
+                }
+                color: {
+                    if (BeeConfig.configExportStatus === "done") return "#4CAF50"
+                    if (BeeConfig.configExportStatus === "error") return "#FF5252"
+                    return BeeTheme.textSecondary
+                }
+                font.pixelSize: 11; font.italic: true
+                Layout.fillWidth: true; wrapMode: Text.WordWrap
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeConfig.qml — BeeConfig System 🐝📋  (Global Singleton)
-// v0.8.35 — Performance optimization: lazy loading, battery mode, startup benchmark
+// v0.8.36 — Config Import/Export + Community Theme Sharing
 // Loads user_config.json and exposes dashboard data
 // Access: BeeConfig.cells, BeeConfig.weatherCity, etc.
 // ═══════════════════════════════════════════════════════════════
@@ -15,7 +15,7 @@ QtObject {
 
     // ─── Version 🐝 ──────────────────────────────────────────────
     // v0.8.35: Performance optimization — lazy loading, battery mode, startup benchmark
-    property string appVersion: "0.8.35"
+    property string appVersion: "0.8.36"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -449,6 +449,151 @@ QtObject {
         if (BeeProfiles.activeProfileId !== activeProfileId && activeProfileId) {
             BeeProfiles.activeProfileId = activeProfileId
         }
+    }
+
+    // ─── Config Import/Export 🐝💾 v0.8.36 ──────────────────────
+    property bool   configExportEnabled: true
+    property bool   configImportEnabled: true
+    property string configExportStatus: "idle"  // "idle" | "exporting" | "importing" | "done" | "error"
+    property string configExportMessage: ""
+    property string configImportStatus: "idle"
+    property string configImportMessage: ""
+
+    // Export full config to .bhive archive
+    function exportConfig(includeWallpapers) {
+        configExportStatus = "exporting"
+        configExportMessage = ""
+        var args = ["python3", Qt.resolvedUrl("../scripts/bee_config_export.py").toString().replace("file://", ""), "export"]
+        if (includeWallpapers) args.push("--include-wallpapers")
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(args) + ' }',
+            root, "configExportProc"
+        )
+        var output = ""
+        proc.stdout.connect(function(line) { output += line })
+        proc.exited.connect(function(code, status) {
+            try {
+                var data = JSON.parse(output.trim())
+                if (data.status === "ok") {
+                    configExportStatus = "done"
+                    configExportMessage = data.path || ""
+                    BeeBarState.dispatchNotification(
+                        "🐝 " + (uiLang === "fr" ? "Export réussi" : "Export successful"),
+                        data.size_human || "",
+                        "💾"
+                    )
+                } else {
+                    configExportStatus = "error"
+                    configExportMessage = data.error || "Export failed"
+                }
+            } catch(e) {
+                configExportStatus = "error"
+                configExportMessage = e.toString()
+            }
+        })
+    }
+
+    // Import config from .bhive archive
+    function importConfig(filepath, overwrite) {
+        configImportStatus = "importing"
+        configImportMessage = ""
+        var mode = overwrite ? "--overwrite" : "--merge"
+        var args = ["python3", Qt.resolvedUrl("../scripts/bee_config_import.py").toString().replace("file://", ""), filepath, mode]
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(args) + ' }',
+            root, "configImportProc"
+        )
+        var output = ""
+        proc.stdout.connect(function(line) { output += line })
+        proc.exited.connect(function(code, status) {
+            try {
+                var data = JSON.parse(output.trim())
+                if (data.status === "ok" || data.status === "dry_run") {
+                    configImportStatus = "done"
+                    configImportMessage = JSON.stringify(data.changes || [])
+                    // Reload config after import
+                    loadConfig()
+                    BeeBarState.dispatchNotification(
+                        "🐝 " + (uiLang === "fr" ? "Import réussi" : "Import successful"),
+                        (data.changes ? data.changes.length : 0) + (uiLang === "fr" ? " changements" : " changes"),
+                        "📥"
+                    )
+                } else {
+                    configImportStatus = "error"
+                    configImportMessage = JSON.stringify(data.errors || ["Import failed"])
+                }
+            } catch(e) {
+                configImportStatus = "error"
+                configImportMessage = e.toString()
+            }
+        })
+    }
+
+    // Export theme only to .bhivetheme file
+    function exportTheme() {
+        configExportStatus = "exporting"
+        configExportMessage = ""
+        var args = ["python3", Qt.resolvedUrl("../scripts/bee_config_export.py").toString().replace("file://", ""), "theme"]
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(args) + ' }',
+            root, "themeExportProc"
+        )
+        var output = ""
+        proc.stdout.connect(function(line) { output += line })
+        proc.exited.connect(function(code, status) {
+            try {
+                var data = JSON.parse(output.trim())
+                if (data.status === "ok") {
+                    configExportStatus = "done"
+                    configExportMessage = data.path || ""
+                    BeeBarState.dispatchNotification(
+                        "🎨 " + (uiLang === "fr" ? "Thème exporté" : "Theme exported"),
+                        data.theme || "",
+                        "✨"
+                    )
+                } else {
+                    configExportStatus = "error"
+                    configExportMessage = data.error || "Theme export failed"
+                }
+            } catch(e) {
+                configExportStatus = "error"
+                configExportMessage = e.toString()
+            }
+        })
+    }
+
+    // Import theme from .bhivetheme file
+    function importTheme(filepath) {
+        configImportStatus = "importing"
+        configImportMessage = ""
+        var args = ["python3", Qt.resolvedUrl("../scripts/bee_config_import.py").toString().replace("file://", ""), "theme", filepath]
+        var proc = Qt.createQmlObject(
+            'import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(args) + ' }',
+            root, "themeImportProc"
+        )
+        var output = ""
+        proc.stdout.connect(function(line) { output += line })
+        proc.exited.connect(function(code, status) {
+            try {
+                var data = JSON.parse(output.trim())
+                if (data.status === "ok" || data.status === "dry_run") {
+                    configImportStatus = "done"
+                    configImportMessage = JSON.stringify(data.changes || [])
+                    loadConfig()
+                    BeeBarState.dispatchNotification(
+                        "🎨 " + (uiLang === "fr" ? "Thème importé" : "Theme imported"),
+                        data.theme || "",
+                        "✨"
+                    )
+                } else {
+                    configImportStatus = "error"
+                    configImportMessage = JSON.stringify(data.errors || ["Theme import failed"])
+                }
+            } catch(e) {
+                configImportStatus = "error"
+                configImportMessage = e.toString()
+            }
+        })
     }
 
     // ─── Plugin System v2 🐝🧩 ────────────────────────────────
