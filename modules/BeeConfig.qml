@@ -5,7 +5,7 @@ import Quickshell.Io
 
 // ═══════════════════════════════════════════════════════════════
 // BeeConfig.qml — BeeConfig System 🐝📋  (Global Singleton)
-// v0.8.36 — Config Import/Export + Community Theme Sharing
+// v0.8.37 — Contextual Rules Editor + BeeControl UX Polish
 // Loads user_config.json and exposes dashboard data
 // Access: BeeConfig.cells, BeeConfig.weatherCity, etc.
 // ═══════════════════════════════════════════════════════════════
@@ -15,7 +15,7 @@ QtObject {
 
     // ─── Version 🐝 ──────────────────────────────────────────────
     // v0.8.35: Performance optimization — lazy loading, battery mode, startup benchmark
-    property string appVersion: "0.8.36"
+    property string appVersion: "0.8.37"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
