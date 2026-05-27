@@ -560,6 +560,176 @@ Item {
                     onToggled: { BeeConfig.autoIconsEnabled = checked; BeeConfig.saveConfig() }
                 }
             }
+
+            Item { height: 4 }
+
+            // ─── 🌤️ Weather Settings ───
+            Text {
+                text: "🌤️ " + (sd.weather || "Weather")
+                color: BeeTheme.accent
+                font.bold: true; font.pixelSize: 14; font.letterSpacing: 1.2
+            }
+            Rectangle { height: 1; Layout.fillWidth: true; color: BeeTheme.separator }
+
+            // City
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.weather_city || "City"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                TextField {
+                    id: dashWeatherCityField
+                    text: BeeConfig.weatherCity
+                    color: BeeTheme.textPrimary
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 220
+                    placeholderText: "Blainville"
+                    placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                    background: Rectangle {
+                        radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: dashWeatherCityField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                        border.width: dashWeatherCityField.activeFocus ? 2 : 1
+                    }
+                    onAccepted: { BeeConfig.weatherCity = text; BeeConfig.saveConfig() }
+                    onActiveFocusChanged: {
+                        if (!activeFocus && text !== BeeConfig.weatherCity) { BeeConfig.weatherCity = text; BeeConfig.saveConfig() }
+                    }
+                }
+            }
+
+            // Unit selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.weather_unit || "Unit"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { key: "metric", label: "°C" },
+                            { key: "imperial", label: "°F" }
+                        ]
+                        delegate: Rectangle {
+                            width: 64; height: 30; radius: 8
+                            color: BeeConfig.weatherUnit === modelData.key
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.weatherUnit === modelData.key
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.weatherUnit === modelData.key ? 2 : 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: BeeConfig.weatherUnit === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.weatherUnit === modelData.key
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.weatherUnit = modelData.key; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Language selector
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.weather_lang || "Language"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                RowLayout {
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { key: "fr", label: "FR" },
+                            { key: "en", label: "EN" }
+                        ]
+                        delegate: Rectangle {
+                            width: 64; height: 30; radius: 8
+                            color: BeeConfig.weatherLang === modelData.key
+                                ? Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.2)
+                                : Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.05)
+                            border.color: BeeConfig.weatherLang === modelData.key
+                                ? BeeTheme.accent
+                                : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                            border.width: BeeConfig.weatherLang === modelData.key ? 2 : 1
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: BeeConfig.weatherLang === modelData.key ? BeeTheme.accent : BeeTheme.textSecondary
+                                font.pixelSize: 11; font.bold: BeeConfig.weatherLang === modelData.key
+                            }
+                            MouseArea {
+                                anchors.fill: parent; cursorShape: Qt.PointingHandCursor; hoverEnabled: true
+                                onClicked: { BeeConfig.weatherLang = modelData.key; BeeConfig.saveConfig() }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Latitude
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.weather_lat || "Latitude"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                TextField {
+                    id: dashWeatherLatField
+                    text: BeeConfig.weatherLat.toString()
+                    color: BeeTheme.textPrimary
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 220
+                    placeholderText: "45.67"
+                    placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                    background: Rectangle {
+                        radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: dashWeatherLatField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                        border.width: dashWeatherLatField.activeFocus ? 2 : 1
+                    }
+                    onAccepted: { BeeConfig.weatherLat = parseFloat(text) || 0; BeeConfig.saveConfig() }
+                    onActiveFocusChanged: {
+                        if (!activeFocus) { BeeConfig.weatherLat = parseFloat(text) || 0; BeeConfig.saveConfig() }
+                    }
+                }
+            }
+
+            // Longitude
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                Text {
+                    text: sd.weather_lon || "Longitude"
+                    color: BeeTheme.textPrimary; font.pixelSize: 13; Layout.fillWidth: true
+                }
+                TextField {
+                    id: dashWeatherLonField
+                    text: BeeConfig.weatherLon.toString()
+                    color: BeeTheme.textPrimary
+                    font.pixelSize: 13
+                    Layout.preferredWidth: 220
+                    placeholderText: "-73.88"
+                    placeholderTextColor: Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.5)
+                    background: Rectangle {
+                        radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                        border.color: dashWeatherLonField.activeFocus ? BeeTheme.accent : Qt.rgba(BeeTheme.textSecondary.r, BeeTheme.textSecondary.g, BeeTheme.textSecondary.b, 0.3)
+                        border.width: dashWeatherLonField.activeFocus ? 2 : 1
+                    }
+                    onAccepted: { BeeConfig.weatherLon = parseFloat(text) || 0; BeeConfig.saveConfig() }
+                    onActiveFocusChanged: {
+                        if (!activeFocus) { BeeConfig.weatherLon = parseFloat(text) || 0; BeeConfig.saveConfig() }
+                    }
+                }
+            }
         }
     }
 }

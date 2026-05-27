@@ -15,7 +15,7 @@ QtObject {
 
     // ─── Version 🐝 ──────────────────────────────────────────────
     // v0.8.35: Performance optimization — lazy loading, battery mode, startup benchmark
-    property string appVersion: "0.8.37"
+    property string appVersion: "0.8.38"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"

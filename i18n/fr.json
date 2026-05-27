@@ -331,7 +331,13 @@
       "contextual_bar": "Barre contextuelle",
       "auto_icons": "Icônes automatiques",
       "clock_format": "Format de l'heure",
-      "time_format": "Format d'heure"
+      "time_format": "Format d'heure",
+      "weather": "Météo",
+      "weather_city": "Ville",
+      "weather_unit": "Unité",
+      "weather_lang": "Langue",
+      "weather_lat": "Latitude",
+      "weather_lon": "Longitude"
     },
     "sound_night_start": "Nuit commence à",
     "sound_night_end": "Nuit se termine à",
