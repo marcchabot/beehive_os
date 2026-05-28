@@ -15,6 +15,8 @@ import datetime as dt
 import json
 import re
 import subprocess
+import urllib.request
+import urllib.error
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -254,7 +256,7 @@ def to_rgba_string(rgb: tuple[int, int, int], alpha: float) -> str:
     return f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha:.2f})"
 
 
-def build_palette(colors: list[ColorStat], forced_mode: str | None = None, signature_mode: str | None = None) -> dict:
+def build_palette(colors: list[ColorStat], forced_mode: str | None = None, signature_mode: str | None = None, weather_condition: str | None = None, time_aware_hour: int | None = None) -> dict:
     # If this is a signature wallpaper, use the predefined palette from theme.json
     if signature_mode:
         # Load predefined palette from themes/theme.json
@@ -317,6 +319,27 @@ def build_palette(colors: list[ColorStat], forced_mode: str | None = None, signa
         backdrop = mix_rgb(bg, (255, 255, 255), 0.06)
         bar_bg_alpha = 0.96
         glass_bg_alpha = 0.93
+
+    # ─── Weather-aware palette shift 🐝🌦️ v0.8.39 ────────────────
+    weather_suggestion = ""
+    if weather_condition and weather_condition in WEATHER_TINTS:
+        tint = WEATHER_TINTS[weather_condition]
+        mode_key = "dark" if mode == "HoneyDark" else "light"
+        shifts = tint.get(mode_key, {})
+        intensity = _time_intensity(time_aware_hour)
+
+        accent_shift = shifts.get("accent_shift", (0, 0, 0))
+        bg_shift = shifts.get("bg_shift", (0, 0, 0))
+        secondary_shift = shifts.get("secondary_shift", (0, 0, 0))
+        weather_suggestion = shifts.get("label_en", "")
+
+        if accent_shift != (0, 0, 0):
+            accent = _apply_weather_shift(accent, accent_shift, intensity)
+            bg = _apply_weather_shift(bg, bg_shift, intensity)
+            secondary = _apply_weather_shift(secondary, secondary_shift, intensity)
+            separator = mix_rgb(accent, bg, 0.72 if mode == "HoneyDark" else 0.78)
+            text_secondary = mix_rgb(text_primary, bg, 0.58 if mode == "HoneyDark" else 0.42)
+            print(f"Weather-aware: applied {weather_condition} palette shift (intensity={intensity:.2f})")
 
     return {
         "mode": mode,
@@ -385,6 +408,231 @@ def resolve_default_wallpaper() -> Path:
     raise FileNotFoundError("No default wallpaper found in assets/ or wallpapers/.")
 
 
+# ─── Weather-Aware Palette Logic 🐝🌦️ v0.8.39 ────────────────────
+
+def fetch_weather(city: str = "Blainville") -> dict | None:
+    """Fetch weather data from wttr.in API.
+
+    Returns a dict with keys: temperature, feels_like, weather_code,
+    description, humidity, wind_speed, city or None on failure.
+    """
+    try:
+        url = f"https://wttr.in/{city}?format=j1"
+        req = urllib.request.Request(url, headers={"User-Agent": "bee-hive-os/0.8.39"})
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+
+        current = data.get("current_condition", [{}])[0]
+        weather_code = int(current.get("weatherCode", "0") or "0")
+        # wttr.in uses meteo codes; also check description for thunderstorm
+        desc_list = current.get("weatherDesc", [{}])
+        desc = desc_list[0].get("value", "") if desc_list else ""
+
+        result = {
+            "temperature": float(current.get("temp_C", "0") or "0"),
+            "feels_like": float(current.get("FeelsLikeC", "0") or "0"),
+            "weather_code": weather_code,
+            "description": desc,
+            "humidity": int(current.get("humidity", "0") or "0"),
+            "wind_speed": float(current.get("windspeedKmph", "0") or "0"),
+            "city": city,
+        }
+
+        # Detect thunderstorm from description (wttr.in codes can be unreliable)
+        desc_lower = desc.lower()
+        if any(w in desc_lower for w in ["thunder", "storm", "lightning", "orage", "tonnerre"]):
+            result["_is_storm"] = True
+
+        return result
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, IndexError) as e:
+        print(f"Weather fetch error: {e}")
+        return None
+
+
+def classify_weather(data: dict) -> str:
+    """Classify weather data into a palette condition.
+
+    Returns one of: 'sunny', 'cloudy', 'rainy', 'snowy', 'stormy', 'clear'.
+    """
+    if data is None:
+        return "clear"
+
+    # Check storm first (from description detection)
+    if data.get("_is_storm"):
+        return "stormy"
+
+    code = data.get("weather_code", 0)
+    desc = data.get("description", "").lower()
+
+    # WMO-inspired classification from wttr.in weatherCode
+    # Clear / Sunny
+    if code in (113, 0, 1) or "sunny" in desc or "clear" in desc or "dégagé" in desc:
+        return "sunny"
+
+    # Overcast / Cloudy
+    if code in (116, 119, 122) or "cloud" in desc or "overcast" in desc or "nuageux" in desc:
+        return "cloudy"
+
+    # Fog / Mist
+    if code in (143, 248, 260) or "fog" in desc or "mist" in desc or "brouillard" in desc:
+        return "cloudy"
+
+    # Rain
+    if code in (176, 200, 263, 266, 293, 296, 299, 302, 305, 308, 311, 314, 317, 353, 356, 359, 386, 389, 392, 395) or \
+       "rain" in desc or "shower" in desc or "pluie" in desc or "averse" in desc:
+        return "rainy"
+
+    # Drizzle → rainy
+    if code in (179, 182, 185, 227, 230, 320, 323, 326, 329, 332, 335, 338, 350) or \
+       "drizzle" in desc or "bruine" in desc:
+        return "rainy"
+
+    # Snow
+    if code in (227, 230, 320, 323, 326, 329, 332, 335, 338, 368, 371, 374, 377, 392, 395) or \
+       "snow" in desc or "neige" in desc:
+        return "snowy"
+
+    # Thunderstorm
+    if code in (200, 386, 389, 392, 395) or \
+       "thunder" in desc or "storm" in desc or "orage" in desc:
+        return "stormy"
+
+    # Partly cloudy
+    if code in (116,) or "partly" in desc or "partiel" in desc:
+        return "cloudy"
+
+    # Default fallback
+    return "clear"
+
+
+# ─── Weather Palette Adjustments 🐝🎨 ───────────────────────────
+
+# Named palette tints for weather conditions
+WEATHER_TINTS: dict[str, dict] = {
+    "sunny": {
+        "dark": {
+            "accent_shift": (30, 10, -10),    # warmer, more amber
+            "bg_shift": (5, 3, -2),            # slightly warmer bg
+            "secondary_shift": (8, 5, -3),
+            "label_en": "Sunny → Warm Amber Palette",
+            "label_fr": "Ensoleillé → Palette Amber Chaud",
+        },
+        "light": {
+            "accent_shift": (25, 8, -8),
+            "bg_shift": (8, 5, -3),
+            "secondary_shift": (10, 6, -4),
+            "label_en": "Sunny → Warm Amber Palette",
+            "label_fr": "Ensoleillé → Palette Amber Chaud",
+        },
+    },
+    "cloudy": {
+        "dark": {
+            "accent_shift": (-15, -5, 20),       # cooler, blue-grey
+            "bg_shift": (-2, -1, 5),
+            "secondary_shift": (-5, -2, 10),
+            "label_en": "Cloudy → Cool Blue-Grey Palette",
+            "label_fr": "Nuageux → Palette Bleu-Gris Doux",
+        },
+        "light": {
+            "accent_shift": (-10, -5, 15),
+            "bg_shift": (-3, -1, 5),
+            "secondary_shift": (-5, -2, 8),
+            "label_en": "Cloudy → Cool Blue-Grey Palette",
+            "label_fr": "Nuageux → Palette Bleu-Gris Doux",
+        },
+    },
+    "rainy": {
+        "dark": {
+            "accent_shift": (-20, -10, 30),      # blue-grey, cool
+            "bg_shift": (-3, -2, 8),
+            "secondary_shift": (-8, -5, 15),
+            "label_en": "Rainy → Cool Blue-Grey Palette",
+            "label_fr": "Pluvieux → Palette Bleu-Gris Froide",
+        },
+        "light": {
+            "accent_shift": (-15, -8, 25),
+            "bg_shift": (-5, -3, 8),
+            "secondary_shift": (-6, -3, 12),
+            "label_en": "Rainy → Cool Blue-Grey Palette",
+            "label_fr": "Pluvieux → Palette Bleu-Gris Froide",
+        },
+    },
+    "snowy": {
+        "dark": {
+            "accent_shift": (20, 20, 40),         # icy white-blue
+            "bg_shift": (8, 8, 15),
+            "secondary_shift": (10, 10, 20),
+            "label_en": "Snowy → Cold White-Blue Palette",
+            "label_fr": "Neigeux → Palette Blanc-Bleu Pâle",
+        },
+        "light": {
+            "accent_shift": (15, 15, 35),
+            "bg_shift": (5, 5, 10),
+            "secondary_shift": (8, 8, 18),
+            "label_en": "Snowy → Cold White-Blue Palette",
+            "label_fr": "Neigeux → Palette Blanc-Bleu Pâle",
+        },
+    },
+    "stormy": {
+        "dark": {
+            "accent_shift": (-25, -15, 40),      # deep dramatic blue-purple
+            "bg_shift": (-5, -3, 10),
+            "secondary_shift": (-10, -8, 20),
+            "label_en": "Stormy → Dark Dramatic Palette",
+            "label_fr": "Orageux → Palette Sombre Dramatique",
+        },
+        "light": {
+            "accent_shift": (-20, -12, 35),
+            "bg_shift": (-3, -2, 8),
+            "secondary_shift": (-8, -5, 15),
+            "label_en": "Stormy → Dark Dramatic Palette",
+            "label_fr": "Orageux → Palette Sombre Dramatique",
+        },
+    },
+    "clear": {
+        "dark": {
+            "accent_shift": (0, 0, 0),
+            "bg_shift": (0, 0, 0),
+            "secondary_shift": (0, 0, 0),
+            "label_en": "Clear → Default Palette",
+            "label_fr": "Dégagé → Palette par défaut",
+        },
+        "light": {
+            "accent_shift": (0, 0, 0),
+            "bg_shift": (0, 0, 0),
+            "secondary_shift": (0, 0, 0),
+            "label_en": "Clear → Default Palette",
+            "label_fr": "Dégagé → Palette par défaut",
+        },
+    },
+}
+
+
+def _apply_weather_shift(rgb: tuple[int, int, int], shift: tuple[int, int, int], intensity: float = 0.35) -> tuple[int, int, int]:
+    """Apply an RGB shift to a color at a given intensity (0-1)."""
+    return (
+        clamp(int(rgb[0] + shift[0] * intensity), 0, 255),
+        clamp(int(rgb[1] + shift[1] * intensity), 0, 255),
+        clamp(int(rgb[2] + shift[2] * intensity), 0, 255),
+    )
+
+
+def _time_intensity(hour: int | None) -> float:
+    """Compute weather adjustment intensity based on time of day.
+
+    Night = more dramatic shift (0.5), midday = subtle (0.25).
+    This ensures night + rain = very dark cool palette, not washed out.
+    """
+    if hour is None:
+        return 0.35
+    if hour < 6 or hour >= 21:
+        return 0.50  # Night: more dramatic
+    elif hour < 9 or hour >= 18:
+        return 0.40  # Dawn/dusk: moderate
+    else:
+        return 0.25  # Daytime: subtle
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Bee-Hive auto theme overlay from wallpaper")
     parser.add_argument(
@@ -433,6 +681,7 @@ def main() -> int:
     forced_mode = None if args.mode == "auto" else args.mode
 
     # 🐝 v0.8.21 — Time-aware mode override
+    time_aware_hour = None
     if args.time_aware and not forced_mode:
         import datetime as _dt
         try:
@@ -442,6 +691,7 @@ def main() -> int:
             import zoneinfo
             tz = zoneinfo.ZoneInfo(args.timezone)
         hour = _dt.datetime.now(tz).hour
+        time_aware_hour = hour
         # Morning (6-18) = Light, Evening (18-6) = Dark
         if 6 <= hour < 18:
             forced_mode = "HoneyLight"
@@ -449,11 +699,30 @@ def main() -> int:
             forced_mode = "HoneyDark"
         print(f"Time-aware: hour={hour} in {args.timezone} → mode={forced_mode}")
 
-    palette = build_palette(colors, forced_mode=forced_mode, signature_mode=signature_mode)
+    # 🐝 v0.8.39 — Weather-aware palette adjustment
+    weather_data = None
+    weather_condition = None
+    weather_suggestion = ""
+    if args.weather_aware:
+        weather_data = fetch_weather(args.weather_city)
+        if weather_data:
+            weather_condition = classify_weather(weather_data)
+            print(f"Weather-aware: city={args.weather_city} condition={weather_condition} "
+                  f"temp={weather_data.get('temperature', 'N/A')}°C")
+        else:
+            print(f"Weather-aware: could not fetch weather for {args.weather_city}, skipping")
+
+    palette = build_palette(
+        colors,
+        forced_mode=forced_mode,
+        signature_mode=signature_mode,
+        weather_condition=weather_condition,
+        time_aware_hour=time_aware_hour,
+    )
     effective_mode = forced_mode or args.mode
     overlay = build_overlay(wallpaper, palette, effective_mode)
 
-    # 🐝 v0.8.21 — Inject Nectar Sync flags into overlay metadata
+    # 🐝 v0.8.39 — Inject Nectar Sync flags & weather data into overlay metadata
     if "auto_theme" not in overlay:
         overlay["auto_theme"] = {}
     nectar_meta = overlay["auto_theme"]
@@ -461,6 +730,11 @@ def main() -> int:
     nectar_meta["timezone"] = args.timezone if args.time_aware else None
     nectar_meta["weather_aware"] = args.weather_aware
     nectar_meta["weather_city"] = args.weather_city if args.weather_aware else None
+    if weather_data:
+        nectar_meta["weather_data"] = weather_data
+        nectar_meta["weather_condition"] = weather_condition
+    if weather_suggestion:
+        nectar_meta["weather_suggestion"] = weather_suggestion
 
     output = args.output.resolve() if not args.output.is_absolute() else args.output
     output.parent.mkdir(parents=True, exist_ok=True)

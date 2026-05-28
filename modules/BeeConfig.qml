@@ -15,7 +15,7 @@ QtObject {
 
     // ─── Version 🐝 ──────────────────────────────────────────────
     // v0.8.35: Performance optimization — lazy loading, battery mode, startup benchmark
-    property string appVersion: "0.8.38"
+    property string appVersion: "0.8.39"
 
     // ─── General ────────────────────────────────────────────────
     property string configDir: StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "") + "/.config/bee-hive-os"
@@ -325,6 +325,9 @@ QtObject {
     // "off" = no auto theme, "timeOfDay" = day/night auto-switch,
     // "weather" = weather-based accent, "combined" = both
     property string autoThemeMode: "off"   // "off" | "timeOfDay" | "weather" | "combined"
+    // ─── Nectar Auto-Theme Suggestion 🐝💡 v0.8.39 ─────────────
+    property string autoThemeSuggestion: ""  // e.g. "☀️ Afternoon sunny → Warm Amber Palette"
+    property var autoThemeWeatherData: ({})  // Recent weather data for display
     onNectarAutoScheduleChanged: { if (root._loaded) saveConfig() }
     onColorTherapyEnabledChanged: {
         if (root._loaded) saveConfig()
@@ -731,6 +734,126 @@ QtObject {
                 }
             )
         }
+    }
+
+    // ─── Auto Theme Weather Timer 🐝🌧️ v0.8.39 ──────────────
+    // Periodically runs bee_theme_auto.py with weather-aware flag
+    // to update palette and suggestion based on current conditions.
+    property Timer autoThemeWeatherTimer: Timer {
+        interval: 1800000  // 30 minutes
+        running: autoThemeMode === "weather" || autoThemeMode === "combined"
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: root._runAutoThemeWeather()
+    }
+
+    // ─── Process for weather-aware auto theme 🐝🌧️ v0.8.39 ────
+    property Process autoThemeWeatherProc: Process {
+        id: _autoThemeWeatherProc
+        running: false
+        stdout: SplitParser {
+            onRead: (line) => {
+                var msg = (line || "").trim()
+                if (msg.length > 0) console.log("BeeThemeAuto[weather]:", msg)
+            }
+        }
+        onExited: (code, status) => {
+            if (code !== 0) {
+                autoThemeStatus = "error"
+                console.warn("BeeConfig: weather auto-theme process failed with code", code)
+                return
+            }
+
+            // Reload the auto overlay to pick up weather-adjusted palette
+            _loadAutoOverlay(
+                function(overlayCfg) {
+                    var applied = _applyOverlayTheme(overlayCfg, "BeeConfig[weather]:")
+                    if (applied) {
+                        autoThemeStatus = "ok"
+                    }
+
+                    // Update suggestion text from overlay metadata
+                    if (overlayCfg && overlayCfg.auto_theme) {
+                        var at = overlayCfg.auto_theme
+                        var cond = at.weather_condition || ""
+                        var wd = at.weather_data || null
+                        var isFr = uiLang === "fr"
+
+                        // Build suggestion text
+                        var emoji = "🎨"
+                        var condLabel = ""
+                        var paletteLabel = ""
+
+                        // Time-of-day part
+                        var hour = new Date().getHours()
+                        var timeLabel = ""
+                        if (hour >= 6 && hour < 12) timeLabel = isFr ? "Matin" : "Morning"
+                        else if (hour >= 12 && hour < 18) timeLabel = isFr ? "Après-midi" : "Afternoon"
+                        else if (hour >= 18 && hour < 21) timeLabel = isFr ? "Soir" : "Evening"
+                        else timeLabel = isFr ? "Nuit" : "Night"
+
+                        // Weather condition
+                        if (cond === "sunny") { emoji = "☀️"; condLabel = isFr ? "ensoleillé" : "sunny" }
+                        else if (cond === "cloudy") { emoji = "☁️"; condLabel = isFr ? "nuageux" : "cloudy" }
+                        else if (cond === "rainy") { emoji = "🌧️"; condLabel = isFr ? "pluvieux" : "rainy" }
+                        else if (cond === "snowy") { emoji = "❄️"; condLabel = isFr ? "neigeux" : "snowy" }
+                        else if (cond === "stormy") { emoji = "⛈️"; condLabel = isFr ? "orageux" : "stormy" }
+                        else { emoji = "🌤️"; condLabel = isFr ? "dégagé" : "clear" }
+
+                        // Palette label
+                        if (cond === "sunny") paletteLabel = isFr ? "Palette Amber Chaud" : "Warm Amber Palette"
+                        else if (cond === "cloudy") paletteLabel = isFr ? "Palette Bleu-Gris Doux" : "Cool Blue-Grey Palette"
+                        else if (cond === "rainy") paletteLabel = isFr ? "Palette Bleu-Gris Froide" : "Cool Blue-Grey Palette"
+                        else if (cond === "snowy") paletteLabel = isFr ? "Palette Blanc-Bleu Pâle" : "Cold White-Blue Palette"
+                        else if (cond === "stormy") paletteLabel = isFr ? "Palette Sombre Dramatique" : "Dark Dramatic Palette"
+                        else paletteLabel = isFr ? "Palette par défaut" : "Default Palette"
+
+                        autoThemeSuggestion = emoji + " " + timeLabel + " " + condLabel + " → " + paletteLabel
+                        if (wd) autoThemeWeatherData = wd
+                    }
+                },
+                function(reason) {
+                    autoThemeStatus = "error"
+                    console.warn("BeeConfig: weather auto overlay load failed:", reason)
+                }
+            )
+        }
+    }
+
+    function _runAutoThemeWeather() {
+        if (autoThemeMode !== "weather" && autoThemeMode !== "combined") return
+
+        var wallpaper = autoThemeLastWallpaper || currentWallpaper
+        if (!wallpaper) wallpaper = ""
+
+        var cmd = ["python3", autoThemeScriptPath]
+        if (wallpaper) {
+            cmd.push("--wallpaper", wallpaper)
+        }
+        cmd.push("--mode", (BeeTheme.mode === "HoneyLight") ? "HoneyLight" : "HoneyDark")
+        cmd.push("--output", autoThemeOverlayPath)
+
+        // Add weather-aware flag
+        cmd.push("--weather-aware")
+        cmd.push("--weather-city", weatherCity || "Blainville")
+
+        // Add time-aware if combined mode
+        if (autoThemeMode === "combined") {
+            cmd.push("--time-aware")
+            cmd.push("--timezone", "America/Toronto")
+        }
+
+        _autoThemeWeatherProc.running = false
+        _autoThemeWeatherProc.command = cmd
+        _autoThemeWeatherProc.running = true
+    }
+
+    function regenerateWeatherSuggestion() {
+        // Force immediate regeneration
+        autoThemeWeatherTimer.stop()
+        autoThemeWeatherTimer.interval = 1800000
+        autoThemeWeatherTimer.triggeredOnStart = true
+        autoThemeWeatherTimer.start()
     }
 
     // ─── Color Therapy Timer & Process (persistent, survives TheHive close) ──

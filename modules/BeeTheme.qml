@@ -457,7 +457,7 @@ QtObject {
     // ═══════════════════════════════════════════════════════════
 
     // ─── Weather condition for accent adaptation 🐝🌦️ ────────
-    property string _weatherCondition: "clear"  // clear | cloudy | rainy | snowy
+    property string _weatherCondition: "clear"  // clear | cloudy | rainy | snowy | stormy
     property int _weatherCode: 0
     property real _weatherAccentBlend: 0.0     // 0.0 = base accent, 1.0 = fully weather-adjusted
     property string _timeOfDaySuggestion: ""    // "HoneyLight" or "HoneyDark"
@@ -467,10 +467,12 @@ QtObject {
     readonly property color _cloudyAccent:   "#8B9DAF"   // Cool muted blue-grey
     readonly property color _rainyAccent:    "#5B7E9A"   // Blue-grey undertone
     readonly property color _snowyAccent:   "#B8D4E3"   // Icy white-blue
+    readonly property color _stormyAccent:   "#4A3A8A"   // Deep dramatic purple-blue
     readonly property color _sunnyAccentLight:  "#FFD666"  // Warm amber (light)
     readonly property color _cloudyAccentLight: "#A0B0C0"  // Cool muted (light)
     readonly property color _rainyAccentLight:  "#7BA0BD"  // Blue-grey (light)
     readonly property color _snowyAccentLight:  "#D0E8F5"  // Icy (light)
+    readonly property color _stormyAccentLight: "#6B5AAF"  // Dramatic (light)
 
     // ─── Computed weather accent 🐝 ─────────────────────────
     readonly property color weatherAccent: {
@@ -487,6 +489,8 @@ QtObject {
             target = (_progress >= 0.5) ? _rainyAccentLight : _rainyAccent
         } else if (_weatherCondition === "snowy") {
             target = (_progress >= 0.5) ? _snowyAccentLight : _snowyAccent
+        } else if (_weatherCondition === "stormy") {
+            target = (_progress >= 0.5) ? _stormyAccentLight : _stormyAccent
         }
         return lerpColor(base, target, t)
     }
@@ -508,8 +512,10 @@ QtObject {
             _weatherCondition = "rainy"
         } else if (wmoCode <= 86) {
             _weatherCondition = "snowy"
+        } else if (wmoCode <= 99) {
+            _weatherCondition = "stormy"
         } else {
-            _weatherCondition = "rainy"
+            _weatherCondition = "clear"
         }
         _weatherAccentBlendTarget = 1.0
         _weatherBlendAnim.start()
@@ -616,6 +622,23 @@ QtObject {
         }
         if (BeeConfig.autoThemeMode === "weather" || BeeConfig.autoThemeMode === "combined") {
             _fetchWeatherAccent()
+        }
+    }
+
+    // ─── Auto Suggest Timer 🐝💡 v0.8.39 ────────────────────────
+    // Triggers weather-aware auto-theme refresh every 30 min.
+    // Delegates to BeeConfig.autoThemeWeatherTimer for the actual
+    // Python script execution, but this timer keeps BeeTheme
+    // synced with suggestion changes.
+    property Timer autoSuggestTimer: Timer {
+        interval: 1800000  // 30 minutes
+        running: BeeConfig.autoThemeMode === "weather" || BeeConfig.autoThemeMode === "combined"
+        repeat: true
+        onTriggered: {
+            // Update suggestion from BeeConfig (already refreshed by BeeConfig timer)
+            if (BeeConfig.autoThemeSuggestion !== "") {
+                console.log("BeeTheme: Auto suggestion updated →", BeeConfig.autoThemeSuggestion)
+            }
         }
     }
 

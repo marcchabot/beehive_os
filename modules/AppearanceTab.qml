@@ -193,6 +193,87 @@ Item {
                 Layout.fillWidth: true; wrapMode: Text.WordWrap
             }
 
+            // ─── Weather Suggestion Block 🐝💡 v0.8.39 ─────────────
+            Rectangle {
+                visible: BeeConfig.autoThemeMode === "weather" || BeeConfig.autoThemeMode === "combined"
+                Layout.fillWidth: true
+                height: suggestionContent.height + 24
+                radius: 10
+                color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.08)
+                border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.25)
+                border.width: 1
+
+                ColumnLayout {
+                    id: suggestionContent
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 6
+
+                    Text {
+                        text: (s.theme_suggestion || "Theme Suggestion") + ":"
+                        color: BeeTheme.accent
+                        font.bold: true; font.pixelSize: 12
+                        Layout.fillWidth: true
+                    }
+
+                    Text {
+                        visible: BeeConfig.autoThemeSuggestion !== ""
+                        text: BeeConfig.autoThemeSuggestion
+                        color: BeeTheme.textPrimary
+                        font.pixelSize: 13; font.bold: true
+                        Layout.fillWidth: true; wrapMode: Text.WordWrap
+                    }
+
+                    // Weather data display
+                    RowLayout {
+                        visible: Object.keys(BeeConfig.autoThemeWeatherData).length > 0
+                        Layout.fillWidth: true
+                        spacing: 12
+
+                        Text {
+                            text: (s.weather_city || "City") + ": " + (BeeConfig.autoThemeWeatherData.city || BeeConfig.weatherCity)
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 10
+                        }
+                        Text {
+                            text: (BeeConfig.autoThemeWeatherData.temperature !== undefined)
+                                ? (BeeConfig.autoThemeWeatherData.temperature + "°C")
+                                : ""
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 10
+                        }
+                        Text {
+                            text: BeeConfig.autoThemeWeatherData.description || ""
+                            color: BeeTheme.textSecondary
+                            font.pixelSize: 10
+                            Layout.fillWidth: true
+                        }
+                    }
+
+                    // Regenerate button
+                    Rectangle {
+                        width: 130; height: 30; radius: 8
+                        color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.15)
+                        border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.4)
+                        border.width: 1
+
+                        RowLayout {
+                            anchors.centerIn: parent; spacing: 5
+                            Text { text: "🔄"; font.pixelSize: 13 }
+                            Text {
+                                text: s.suggestion_regenerate || "Regenerate"
+                                color: BeeTheme.accent; font.pixelSize: 11; font.bold: true
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                            onClicked: BeeConfig.regenerateWeatherSuggestion()
+                        }
+                    }
+                }
+            }
+
             Item { height: 4 }
 
             // ─── Color Therapy ───
