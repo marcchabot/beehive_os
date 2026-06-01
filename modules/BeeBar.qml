@@ -175,9 +175,13 @@ Rectangle {
         id: _autoIconSingleScan
         running: false
         property string _pendingApp: ""
-        command: ["python3", "/home/marc/beehive_os/scripts/desktop_icon_scanner.py", "--app", "placeholder"]
-        stdout: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons App] " + line) }
-        stderr: SplitParser { onRead: (line) => console.log("[BeeBar AutoIcons App] " + line) }
+        // Default command uses the real script path; the callsite rebuilds this
+        // array with the actual class name before running.
+        command: ["python3", Qt.resolvedUrl("../scripts/desktop_icon_scanner.py").toString().replace("file://", ""), "--app", "placeholder"]
+        // IconScanner already prefixes its own log() output with [IconScanner],
+        // so we just forward to console.debug/warn to avoid double-prefixing.
+        stdout: SplitParser { onRead: (line) => console.debug("[IconScanner] " + line) }
+        stderr: SplitParser { onRead: (line) => console.warn("[IconScanner] " + line) }
         onExited: (code, status) => {
             if (code === 0) {
                 BeeConfig.loadConfig()
@@ -427,7 +431,11 @@ Rectangle {
                     if (!icon && BeeConfig.autoIconsEnabled) {
                         // Queue a single-app scan (debounced)
                         if (!_autoIconSingleScan.running) {
+                            // Guard against empty/blank cls to avoid spamming the script
+                            if (!cls || cls.trim() === "") return "🐝";
                             _autoIconSingleScan._pendingApp = cls
+                            // Rebuild command dynamically with the real class name + portable script path
+                            _autoIconSingleScan.command = ["python3", Qt.resolvedUrl("../scripts/desktop_icon_scanner.py").toString().replace("file://", ""), "--app", cls]
                             _autoIconSingleScan.running = true
                         }
                     }
