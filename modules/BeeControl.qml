@@ -155,19 +155,28 @@ Rectangle {
             id: contentLoader
             Layout.fillWidth: true; Layout.fillHeight: true
             clip: true
+            // Resolve all tab sources against BeeControl.qml's own directory.
+            // Bare relative names were resolving inconsistently across the
+            // 9 tabs, leaving General / Appearance / Bar&Widgets empty.
             source: {
                 switch (controlRoot.currentTab) {
-                    case 0: return "GeneralTab.qml"
-                    case 1: return "AppearanceTab.qml"
-                    case 2: return "WallpaperTab.qml"
-                    case 3: return "DashboardTab.qml"
-                    case 4: return "BarWidgetsTab.qml"
-                    case 5: return "ProductivityTab.qml"
-                    case 6: return "ExtensionsTab.qml"
-                    case 7: return "AccessibilityTab.qml"
-                    case 8: return "HistoryTab.qml"
-                    default: return "GeneralTab.qml"
+                    case 0: return Qt.resolvedUrl("./GeneralTab.qml")
+                    case 1: return Qt.resolvedUrl("./AppearanceTab.qml")
+                    case 2: return Qt.resolvedUrl("./WallpaperTab.qml")
+                    case 3: return Qt.resolvedUrl("./DashboardTab.qml")
+                    case 4: return Qt.resolvedUrl("./BarWidgetsTab.qml")
+                    case 5: return Qt.resolvedUrl("./ProductivityTab.qml")
+                    case 6: return Qt.resolvedUrl("./ExtensionsTab.qml")
+                    case 7: return Qt.resolvedUrl("./AccessibilityTab.qml")
+                    case 8: return Qt.resolvedUrl("./HistoryTab.qml")
+                    default: return Qt.resolvedUrl("./GeneralTab.qml")
                 }
+            }
+            onStatusChanged: {
+                if (status === Loader.Error)
+                    console.warn("[BeeControl] Loader error for", source, "->", errorString())
+                else if (status === Loader.Ready)
+                    console.debug("[BeeControl] Loaded tab:", source)
             }
         }
     }
