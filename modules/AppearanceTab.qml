@@ -440,7 +440,6 @@ Item {
                                 color: BeeTheme.textPrimary; font.pixelSize: 12
                                 verticalAlignment: Qt.AlignVCenter
                                 placeholderText: s.theme_path_placeholder || "~/Documents/beehive_theme.bhivetheme"
-                                placeholderTextColor: BeeTheme.textSecondary
                                 selectByMouse: true
                             }
                         }

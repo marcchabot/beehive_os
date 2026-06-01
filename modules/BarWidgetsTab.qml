@@ -326,7 +326,7 @@ Item {
                             required property int index
 
                             Layout.fillWidth: true
-                            Layout.leftIndent: 36
+                            Layout.leftMargin: 36
                             spacing: 6
 
                             // Icon

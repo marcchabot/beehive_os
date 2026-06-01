@@ -139,7 +139,6 @@ Item {
                     color: Qt.rgba(BeeTheme.secondary.r, BeeTheme.secondary.g, BeeTheme.secondary.b, 0.06)
                     border.color: Qt.rgba(BeeTheme.accent.r, BeeTheme.accent.g, BeeTheme.accent.b, 0.3)
                     border.width: 1
-                    border.style: Qt.DashLine
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -649,7 +648,6 @@ Item {
                                 color: BeeTheme.textPrimary; font.pixelSize: 12
                                 verticalAlignment: Qt.AlignVCenter
                                 placeholderText: s.import_path_placeholder || "~/Documents/beehive_backup.bhive"
-                                placeholderTextColor: BeeTheme.textSecondary
                                 selectByMouse: true
                             }
                         }
