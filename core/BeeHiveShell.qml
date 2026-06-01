@@ -727,17 +727,62 @@ ShellRoot {
     }
 
     // Timer de lancement
+    // Security: _pendingCmd originates from BeePower.onActionRequested and
+    // BeeSearch.onLaunchRequested (both fed by IPC). Apply the same
+    // allowlist/argv pattern as the BeePower inline handler — never feed
+    // raw IPC strings into a shell. (See fix 7faa62b for the same pattern.)
     property string _pendingCmd: ""
     Timer {
         id: launchTimer
         interval: 200
         onTriggered: {
-            if (!root._pendingCmd) return
+            var cmd = root._pendingCmd
+            root._pendingCmd = ""
+            if (!cmd) return
+
+            var argv = null
+            if (cmd.startsWith("app:")) {
+                // app:NAME → gtk-launch <validated name>
+                var appName = cmd.substring(4)
+                if (!/^[a-zA-Z0-9._-]+$/.test(appName)) {
+                    console.warn("BeeHiveShell: launchTimer invalid app name rejected:", appName)
+                    return
+                }
+                argv = ["/usr/bin/gtk-launch", appName]
+            } else if (cmd.startsWith("shell:")) {
+                // shell:ACTION → strict allowlist of argv vectors
+                var action = cmd.substring(6)
+                var allowedCmds = ({
+                    "suspend":   ["/usr/bin/systemctl", "suspend"],
+                    "reboot":    ["/usr/bin/systemctl", "reboot"],
+                    "shutdown":  ["/usr/bin/systemctl", "poweroff"],
+                    "lock":      ["/usr/bin/loginctl",  "lock-session"],
+                    "hibernate": ["/usr/bin/systemctl", "hibernate"]
+                })
+                argv = allowedCmds[action]
+                if (!argv) {
+                    console.warn("BeeHiveShell: launchTimer unknown shell action rejected:", action)
+                    return
+                }
+            } else if (cmd.startsWith("url:")) {
+                // url:URL → xdg-open with http/https prefix validation
+                var url = cmd.substring(4)
+                if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+                    console.warn("BeeHiveShell: launchTimer url rejected (non-http(s)):", url)
+                    return
+                }
+                argv = ["/usr/bin/xdg-open", url]
+            } else {
+                // Anything else (raw Exec strings, unprefixed IPC) is rejected:
+                // there is no safe way to feed a free-form shell pipeline here.
+                console.warn("BeeHiveShell: launchTimer unrecognised action rejected:", cmd)
+                return
+            }
+
             var proc = Qt.createQmlObject(
-                'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "nohup ' + root._pendingCmd.replace(/"/g, '\\"') + ' >/dev/null 2>&1 & disown"] }',
+                'import Quickshell.Io; Process { running: true; command: ' + JSON.stringify(argv) + ' }',
                 root, "launchProc"
             )
-            root._pendingCmd = ""
         }
     }
 
