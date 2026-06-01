@@ -1,2 +1,74 @@
-boot_scan.log
+# 🐝 Bee-Hive OS — Gitignore
+# Ce fichier protège contre le commit accidentel de données utilisateur,
+# caches, builds, et fichiers temporaires de développement.
+
+# ─── User configuration (sensitive) ─────────────────────────────
+# La vraie config ne doit JAMAIS être commitée.
+# Le template user_config.example.json sert de référence publique.
+user_config.json
+user_config.json.bak
+user_config.auto.json
+user_config.local.json
+
+# ─── Backup / temporary files ──────────────────────────────────
+*.bak
+*.backup
+*.fixed
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ─── Python artifacts ──────────────────────────────────────────
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ─── QML / Quickshell caches ──────────────────────────────────
+.cache/
+.qmlls.ini
+.qmltypes
+
+# ─── Logs ─────────────────────────────────────────────────────
+*.log
+boot_scan.log
+health-check.log
+night-logs.txt
+
+# ─── Virtual environments ─────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ─── IDE / Editor ────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# ─── Bee-Hive specific: legacy Openclaw paths ────────────────
+# (au cas où des artefacts de la migration sont encore là)
+.openclaw/
+openclaw-backup-*/
