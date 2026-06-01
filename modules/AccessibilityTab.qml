@@ -476,11 +476,7 @@ Item {
                         { key: "Super + Tab", desc: s.shortcut_switch || "Switch workspace" },
                         { key: "Super + A",   desc: s.shortcut_accessibility || "Accessibility settings" }
                     ]
-                    delegate: Loader {
-                        Layout.fillWidth: true
-                        sourceComponent: shortcutRow
-                        onLoaded: item.modelData = modelData
-                    }
+                    delegate: shortcutRow
                 }
             }
 
