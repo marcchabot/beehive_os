@@ -111,7 +111,8 @@ Item {
                     beeWeather.humidity = current.relative_humidity_2m + "%"
                     beeWeather.windSpeed = current.wind_speed_10m + " km/h"
                     if (current.wind_direction_10m !== undefined && current.wind_direction_10m !== null) {
-                        beeWeather.windDirection = windDirLabel(current.wind_direction_10m)
+                        var wdLabel = windDirLabel(current.wind_direction_10m)
+                        beeWeather.windDirection = (wdLabel !== undefined && wdLabel !== null) ? wdLabel : "—"
                     } else {
                         beeWeather.windDirection = "—"
                     }
@@ -168,7 +169,8 @@ Item {
                             beeWeather.humidity = c.relative_humidity_2m + "%"
                             beeWeather.windSpeed = c.wind_speed_10m + " km/h"
                             if (c.wind_direction_10m !== undefined && c.wind_direction_10m !== null) {
-                                beeWeather.windDirection = windDirLabel(c.wind_direction_10m)
+                                var wdLabel2 = windDirLabel(c.wind_direction_10m)
+                                beeWeather.windDirection = (wdLabel2 !== undefined && wdLabel2 !== null) ? wdLabel2 : "—"
                             } else {
                                 beeWeather.windDirection = "—"
                             }
