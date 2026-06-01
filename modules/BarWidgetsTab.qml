@@ -539,8 +539,6 @@ Item {
                                 anchors.fill: parent; anchors.margins: 6
                                 color: BeeTheme.textPrimary; font.pixelSize: 13
                                 verticalAlignment: Qt.AlignVCenter
-                                placeholderText: s.ctx_rules_class_placeholder || "e.g. firefox, kitty, code"
-                                placeholderTextColor: BeeTheme.textSecondary
                                 text: barWidgetsTab.newRuleClass
                                 onTextChanged: barWidgetsTab.newRuleClass = text.toLowerCase().trim()
                                 maximumLength: 30
@@ -601,8 +599,6 @@ Item {
                                     anchors.fill: parent; anchors.margins: 6
                                     color: BeeTheme.textPrimary; font.pixelSize: 12
                                     verticalAlignment: Qt.AlignVCenter
-                                    placeholderText: s.ctx_rules_label_placeholder || "e.g. CPU, DLs, NET"
-                                    placeholderTextColor: BeeTheme.textSecondary
                                     text: barWidgetsTab.newRuleLabel
                                     onTextChanged: barWidgetsTab.newRuleLabel = text
                                     maximumLength: 8
@@ -682,8 +678,6 @@ Item {
                                 anchors.fill: parent; anchors.margins: 6
                                 color: BeeTheme.textPrimary; font.pixelSize: 12
                                 verticalAlignment: Qt.AlignVCenter
-                                placeholderText: s.ctx_rules_custom_placeholder || "e.g. alacritty -e htop"
-                                placeholderTextColor: BeeTheme.textSecondary
                                 selectByMouse: true
                                 onTextChanged: {
                                     if (text.length > 0) {

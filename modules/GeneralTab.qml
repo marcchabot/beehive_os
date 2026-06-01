@@ -647,7 +647,6 @@ Item {
                                 anchors.fill: parent; anchors.margins: 6
                                 color: BeeTheme.textPrimary; font.pixelSize: 12
                                 verticalAlignment: Qt.AlignVCenter
-                                placeholderText: s.import_path_placeholder || "~/Documents/beehive_backup.bhive"
                                 selectByMouse: true
                             }
                         }
