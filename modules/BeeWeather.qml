@@ -110,8 +110,12 @@ Item {
                     beeWeather.feelsLike = Math.round(current.apparent_temperature) + "°"
                     beeWeather.humidity = current.relative_humidity_2m + "%"
                     beeWeather.windSpeed = current.wind_speed_10m + " km/h"
-                    beeWeather.windDirection = windDirLabel(current.wind_direction_10m)
-                    beeWeather.uvIndex = current.uv_index !== undefined ? String(current.uv_index) : "—"
+                    if (current.wind_direction_10m !== undefined && current.wind_direction_10m !== null) {
+                        beeWeather.windDirection = windDirLabel(current.wind_direction_10m)
+                    } else {
+                        beeWeather.windDirection = "—"
+                    }
+                    beeWeather.uvIndex = current.uv_index !== undefined && current.uv_index !== null ? String(current.uv_index) : "—"
                     beeWeather.precipitation = current.precipitation + " mm"
                     beeWeather.isDay = current.is_day === 1
                     beeWeather._retryCount = 0  // Reset retry counter on success
@@ -163,8 +167,12 @@ Item {
                             beeWeather.feelsLike = Math.round(c.apparent_temperature) + "°"
                             beeWeather.humidity = c.relative_humidity_2m + "%"
                             beeWeather.windSpeed = c.wind_speed_10m + " km/h"
-                            beeWeather.windDirection = windDirLabel(c.wind_direction_10m)
-                            beeWeather.uvIndex = c.uv_index !== undefined ? String(c.uv_index) : "—"
+                            if (c.wind_direction_10m !== undefined && c.wind_direction_10m !== null) {
+                                beeWeather.windDirection = windDirLabel(c.wind_direction_10m)
+                            } else {
+                                beeWeather.windDirection = "—"
+                            }
+                            beeWeather.uvIndex = c.uv_index !== undefined && c.uv_index !== null ? String(c.uv_index) : "—"
                             beeWeather.precipitation = c.precipitation + " mm"
                             beeWeather.isDay = c.is_day === 1
                         }
