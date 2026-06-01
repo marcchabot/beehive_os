@@ -65,6 +65,14 @@ ShellRoot {
     function _saveSnoozedReminders() {
         var arr = root._snoozedReminders
         var json = JSON.stringify(arr)
+        // Path allowlist: must stay under ~/.cache/beehive_os/ to prevent
+        // shell injection via _remindersCachePath (heredoc uses bash -c).
+        var home = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "")
+        var safePrefix = home + "/.cache/beehive_os/"
+        if (!root._remindersCachePath.startsWith(safePrefix)) {
+            console.warn("BeeHiveShell: _remindersCachePath escapes cache dir, refusing to write:", root._remindersCachePath)
+            return
+        }
         // Use Process to write file
         var proc = Qt.createQmlObject(
             'import Quickshell.Io; Process { running: true; command: ["bash", "-c", "mkdir -p ~/.cache/beehive_os && cat > ' + root._remindersCachePath + ' << \'BEEJSONEOF\'\n' + json.replace(/'/g, "'\\''") + '\nBEEJSONEOF"] }',
@@ -316,6 +324,10 @@ ShellRoot {
             console.log("BeePower: action requested →", cmd)
             if (cmd.startsWith("app:")) {
                 var appName = cmd.substring(4)
+                if (!/^[a-zA-Z0-9._-]+$/.test(appName)) {
+                    console.warn("BeePower: invalid app name rejected:", appName)
+                    return
+                }
                 var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["gtk-launch", "' + appName + '"] }', root, "BeePowerAppLauncher")
                 proc.start()
             } else if (cmd.startsWith("toggle:")) {
@@ -327,8 +339,20 @@ ShellRoot {
                     toggleDash()
                 }
             } else if (cmd.startsWith("shell:")) {
-                var shellCmd = cmd.substring(6)
-                var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ["bash", "-c", "' + shellCmd + '"] }', root, "BeePowerShell")
+                var action = cmd.substring(6)
+                var allowedCmds = ({
+                    "suspend":   ["/usr/bin/systemctl", "suspend"],
+                    "reboot":    ["/usr/bin/systemctl", "reboot"],
+                    "shutdown":  ["/usr/bin/systemctl", "poweroff"],
+                    "lock":      ["/usr/bin/loginctl", "lock-session"],
+                    "hibernate": ["/usr/bin/systemctl", "hibernate"]
+                })
+                var argv = allowedCmds[action]
+                if (!argv) {
+                    console.warn("BeePower: unknown shell action rejected:", action)
+                    return
+                }
+                var proc = Qt.createQmlObject('import QtQuick; import Quickshell.Io; Process { command: ' + JSON.stringify(argv) + ' }', root, "BeePowerShell")
                 proc.start()
             }
         }
