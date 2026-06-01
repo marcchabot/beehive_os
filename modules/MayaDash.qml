@@ -89,34 +89,6 @@ Rectangle {
         }
     }
 
-    // ─── Quick Notes writer ──────────────────────────────────
-    // Quickshell's FileView is read-only (no .write()). This helper
-    // writes the quick notes JSON via a python3 Process that uses
-    // pathlib.Path.write_text(). It validates the target path is
-    // under the bee-hive-os config dir before writing.
-    function _writeQuickNotes(content) {
-        var path = mayaDash._quickNotesPath
-        if (!path) {
-            console.warn("[Bee-Hive] Quick Notes: empty path, refusing to write")
-            return
-        }
-        // Path allowlist: only allow writes under ~/.config/bee-hive-os/
-        var home = StandardPaths.writableLocation(StandardPaths.HomeLocation).toString().replace("file://", "")
-        var safePrefix = home + "/.config/bee-hive-os/"
-        if (path.indexOf(safePrefix) !== 0) {
-            console.warn("[Bee-Hive] Quick Notes: refusing to write outside config dir:", path)
-            return
-        }
-        // python3 with -c: read content from stdin, write to argv[1].
-        // This avoids bash heredoc / quoting issues for arbitrary JSON.
-        var proc = Qt.createQmlObject(
-            'import Quickshell.Io; Process { command: ["python3", "-c", "import sys,pathlib; pathlib.Path(sys.argv[1]).write_text(sys.stdin.read())", ' + JSON.stringify(path) + '] }',
-            mayaDash, "quickNotesWriter"
-        )
-        proc.stdinWrite(content + "\n")
-        proc.running = true
-    }
-
     function _quickNotesActiveIndex() {
         var data = mayaDash._quickNotesData
         if (!data || !data.notes) return 0
@@ -138,7 +110,7 @@ Rectangle {
                 data.notes[idx].updated = Date.now()
             }
         }
-        mayaDash._writeQuickNotes(JSON.stringify(data, null, 2))
+        quickNotesSaver.write(JSON.stringify(data, null, 2))
     }
 
     FileView {
@@ -167,9 +139,15 @@ Rectangle {
                     ],
                     activeNoteId: "note1"
                 }
-                mayaDash._writeQuickNotes(JSON.stringify(mayaDash._quickNotesData, null, 2))
+                quickNotesSaver.write(JSON.stringify(mayaDash._quickNotesData, null, 2))
             }
         }
+    }
+
+    FileView {
+        id: quickNotesSaver
+        path: mayaDash._quickNotesPath
+        watchChanges: false
     }
 
     BeeNetwork {
